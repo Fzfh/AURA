@@ -1,4 +1,4 @@
-const translate = require('@vitalets/google-translate-api');
+const { default: translate } = require('@vitalets/google-translate-api');
 
 module.exports = async function handleTranslate(sock, msg, text, command, args) {
   const sender = msg.key.remoteJid;
