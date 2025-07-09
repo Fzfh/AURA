@@ -26,7 +26,7 @@ module.exports = async function handleTranslate(sock, msg, text, command, args) 
 
   try {
     const res = await translate(originalText, { to: targetLang });
-    const result = `🌐 *TRANSLATE RESULT* 🌐\n\n🗣 Asli: ${originalText}\n📍 Dari: ${res.from.language.iso.toUpperCase()}\n📌 Ke: ${targetLang.toUpperCase()}\n\n📄 Hasil:\n${res.text}`;
+    const result = `🌐 *TRANSLATE RESULT* 🌐\n\n📍 Dari: ${res.from.language.iso.toUpperCase()}\n📌 Ke: ${targetLang.toUpperCase()}\n\n📄 Hasil:\n${res.text}`;
     await sock.sendMessage(sender, { text: result }, { quoted: msg });
   } catch (e) {
     console.error('❌ Error saat translate:', e);
