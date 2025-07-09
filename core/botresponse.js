@@ -69,9 +69,6 @@ async function handleResponder(sock, msg) {
      const handledStatic = await handleStaticCommand(sock, msg, lowerText, userId, from, body)
       if (handledStatic) return
 
-      const handledCommand = await handleCommand(sock, msg, lowerText, from, body, sender)
-       if (handledCommand) return
-
     // Anti-spam
    // Hanya hitung spam jika dia mengirim command (pakai / atau . di awal)
 if (text.startsWith('/') || text.startsWith('.')) {
