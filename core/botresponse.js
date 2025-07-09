@@ -286,7 +286,6 @@ if (text.startsWith('/') || text.startsWith('.')) {
     }
     
     if (!text.startsWith('/')) {
-    const sesi = sessionMap.get(sender);
 
     if (text.startsWith('.kick')) {
       return await kick(sock, msg, text, isGroup)
