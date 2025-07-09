@@ -24,6 +24,7 @@ const linkMap = require('../commands/linkmap');
 const waifuhen = require('../commands/waifuhen')
 const waifu = require('../commands/waifu')
 const stickerToMedia = require('../commands/stickerToMedia');
+const handleTranslate = require('../commands/translate');
 
 const greetedUsers = new Set()
 // const lastCommandMap = new Map()
@@ -104,6 +105,47 @@ if (text.startsWith('/') || text.startsWith('.')) {
 
     const handledMenfess = await menfess(sock, msg, text)
     if (handledMenfess) return
+    
+        const listBahasa = `🌐 *Daftar Kode Bahasa Umum:*
+    
+    🇮🇩 Indonesia — \`id\`  
+    🇬🇧 Inggris — \`en\`  
+    🇯🇵 Jepang — \`ja\`  
+    🇰🇷 Korea — \`ko\`  
+    🇨🇳 Mandarin — \`zh\`  
+    🇫🇷 Prancis — \`fr\`  
+    🇩🇪 Jerman — \`de\`  
+    🇪🇸 Spanyol — \`es\`  
+    🇷🇺 Rusia — \`ru\`  
+    🇮🇳 Hindi — \`hi\`  
+    🇹🇭 Thai — \`th\`  
+    🇵🇹 Portugis — \`pt\`  
+    🇮🇹 Italia — \`it\`  
+    🇳🇱 Belanda — \`nl\`  
+    🇹🇷 Turki — \`tr\`  
+    🇵🇱 Polandia — \`pl\`  
+    🇸🇦 Arab — \`ar\`  
+    🇻🇳 Vietnam — \`vi\`  
+    🇵🇭 Filipino — \`tl\`  
+    🇮🇱 Ibrani — \`he\`  
+    🇺🇦 Ukraina — \`uk\`
+    
+    📌 *Gunakan dengan perintah:*  
+    \`/tl <kode> <teks>\`  
+    Contoh: \`/tl en Saya lapar\` → akan diterjemahkan ke Inggris.
+    
+    ✨ *Ketik sesuai yaa! Hindari typo biar nggak nyasar 😋*
+    `
+
+    if (['/listbahasa', '.listbahasa', 'list bahasa'].includes(lowerText)) {
+      return sock.sendMessage(sender, {
+        text: listBahasa,
+      }, { quoted: msg });
+    }
+
+    if (command === '/tl' || command === '.tl' || command === 'tl') {
+      return await handleTranslate(sock, msg, text, command, args);
+    }
 
     if (command === 'waifuhen') {
       return await waifuhen(sock, msg, args.join(' '));
