@@ -5,7 +5,6 @@ const muteDuration = 2 * 60 * 1000
 const add = require('../commands/add');
 // const { handleAutoKick } = require('../commands/auto_kick')
 const { handleStaticCommand } = require('../core/handler/staticCommand')
-const { handleCommand } = require('../core/handler/commandHandler')
 const tagall = require('../commands/tagall')
 const kick = require('../commands/kick')
 const menfess = require('../commands/menfess')
