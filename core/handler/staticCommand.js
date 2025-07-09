@@ -1,5 +1,4 @@
 const { adminList } = require('../../setting/setting')
-const sessionMap = require('../../core/sessionStore');
 
 function setSession(userId, sessionName) {
   sessionMap.set(userId, sessionName)
