@@ -160,6 +160,5 @@ module.exports = {
   handleStaticCommand,
   setSession,
   getSession,
-  clearSession,
-  sessionMap
+  clearSession
 }
