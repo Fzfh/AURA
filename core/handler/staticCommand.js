@@ -3,7 +3,6 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
   const from = msg.key.remoteJid
   const sender = from
   const actualUserId = msg.key.participant || msg.participant || userId;
-  const currentSession = getSession(userId)
   
   switch (lowerText) {
     case '/menu':
