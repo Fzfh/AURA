@@ -299,20 +299,6 @@ if (text.startsWith('/') || text.startsWith('.')) {
       return await add(sock, msg, command, args, sender, userId)
     }
 
-
-    if (command === 'topup' || command === '/topup' || command === '.topup') {
-      const inputGame = args.join(' ').trim().toLowerCase()
-      if (!inputGame) {
-        return sock.sendMessage(sender, {
-          text: 'Pilih game:\n- topup ff\n- topup ml\n- topup genshin'
-        }, { quoted: msg })
-      }
-    
-      console.log('🎯 Diterima command topup:', inputGame)
-      return await listTopup(sock, msg, inputGame)
-    }
-
-
    if (['s', 'sticker'].includes(lowerText)) {
       try {
         const quoted = msg.message?.extendedTextMessage?.contextInfo?.quotedMessage
