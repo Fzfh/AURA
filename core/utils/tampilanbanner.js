@@ -1,7 +1,7 @@
 const chalk = require("chalk");
 const figlet = require("figlet");
 const gradient = require("gradient-string");
-const boxen = require("boxen");
+const boxen = require("boxen").default;
 const terminalWidth = process.stdout.columns || 80;
 
 function centerText(text) {
