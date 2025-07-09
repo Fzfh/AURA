@@ -237,8 +237,8 @@ Kamu bukan hanya bot fitur — kamu juga teman ngobrol user 😊
   for (let i = 0; i < models.length; i++) {
     const model = models[i]
     try {
-      console.log(`🧠 Coba model: ${model}`)
-       console.log('🔑 GROQ API KEY:', process.env.GROQ_API_KEY);
+      // console.log(`🧠 Coba model: ${model}`)
+      //  console.log('🔑 GROQ API KEY:', process.env.GROQ_API_KEY);
       const res = await axios.post('https://api.groq.com/openai/v1/chat/completions', {
         model,
         messages,
