@@ -49,6 +49,17 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
 ┃   ➤ Contoh: 
 ┃   ➤ \`.dig\` https://instagram.com/linkKamu
 ┃ 
+┃ 🌐 Translete Semua Bahasa
+┃ ➤ /tl <kode bahasa> <teks>
+┃ *CONTOH*
+┃ ➤/tl en halo dunia
+┃ ➤ Bisa juga .tl atau tl
+┃ 
+┃ 🌐 List Kode Bahasa
+┃ ➤ /listbahasa
+┃ ➤ .listbahasa
+┃ ➤ listbahasa
+┃ 
 ┃ 👥 Tag All Group Members
 ┃   ➤ .tagall
 ┃   ➤ Contoh: .tagall Halo semua  
