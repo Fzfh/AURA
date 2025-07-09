@@ -1,17 +1,4 @@
 const { adminList } = require('../../setting/setting')
-
-function setSession(userId, sessionName) {
-  sessionMap.set(userId, sessionName)
-}
-
-function clearSession(userId) {
-  sessionMap.delete(userId)
-}
-
-function getSession(userId) {
-  return sessionMap.get(userId)
-}
-
 async function handleStaticCommand(sock, msg, lowerText, userId, body) {
   const from = msg.key.remoteJid
   const sender = from
@@ -157,8 +144,5 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
 }
 
 module.exports = {
-  handleStaticCommand,
-  setSession,
-  getSession,
-  clearSession
+  handleStaticCommand
 }
