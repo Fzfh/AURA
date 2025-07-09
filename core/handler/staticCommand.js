@@ -154,7 +154,6 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
       }, { quoted: msg })
       return true
   }
-}
   return false
 }
 
