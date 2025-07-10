@@ -5,9 +5,9 @@ const muteDuration = 2 * 60 * 1000
 const { add, tagall, kick, menfess, welcome, tiktokDownloader,
        igDownloader, youtubeDownloader,
        sendAll, show, qris, createQr, mapqr, linkmap,
-       waifuhen, waifu, stickerToMedia, admin, translate } = require('../commands/commandRequire');
+       waifuhen, waifu, stickerToMedia, admin, translate } = require('../commands/commandRequire/commandRequire');
 
-const { staticCommand, openai, stickerHelper } = require('../core/coreRequire');
+const { staticCommand, openai, stickerHelper } = require('../core/coreRequire/coreRequire');
 
 const greetedUsers = new Set()
 const fs = require('fs')
