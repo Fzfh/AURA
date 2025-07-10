@@ -33,7 +33,7 @@ module.exports = async function kick(sock, msg, text, isGroup) {
     if (repliedUser) {
       await sock.groupParticipantsUpdate(groupId, [repliedUser], 'remove')
       return sock.sendMessage(groupId, {
-        text: `👋 @${repliedUser.split('@')[0]} telah dikeluarkan dari grup!`,
+        text: `✅ Berhasil mengeluarkan 1 orang:\n@${repliedUser.split('@')[0]}`,
         mentions: [repliedUser]
       }, { quoted: msg })
     }
@@ -51,19 +51,33 @@ module.exports = async function kick(sock, msg, text, isGroup) {
       return num + '@s.whatsapp.net'
     })
 
-    const results = []
+    const success = []
+    const failed = []
+
     for (const target of targets) {
       try {
         await sock.groupParticipantsUpdate(groupId, [target], 'remove')
-        results.push(`✅ @${target.split('@')[0]}`)
+        success.push(target)
       } catch (err) {
-        results.push(`❌ Gagal kick @${target.split('@')[0]}`)
+        failed.push(target)
       }
     }
 
+    let responseText = ''
+
+    if (success.length > 0) {
+      responseText += `✅ Berhasil mengeluarkan ${success.length} orang:\n`
+      responseText += success.map(jid => `@${jid.split('@')[0]}`).join('\n') + '\n\n'
+    }
+
+    if (failed.length > 0) {
+      responseText += `❌ Gagal mengeluarkan ${failed.length} orang:\n`
+      responseText += failed.map(jid => `@${jid.split('@')[0]}`).join('\n')
+    }
+
     return sock.sendMessage(groupId, {
-      text: `Hasil kick:\n\n${results.join('\n')}`,
-      mentions: targets,
+      text: responseText.trim(),
+      mentions: [...success, ...failed],
     }, { quoted: msg })
 
   } catch (err) {
