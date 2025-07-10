@@ -1,6 +1,6 @@
 module.exports = async function kick(sock, msg, text, isGroup) {
   const groupId = msg.key.remoteJid
-  const userId = msg.key.participant
+  const senderId = msg.key.participant || msg.participant || msg.key.remoteJid
 
   if (!isGroup) {
     return sock.sendMessage(groupId, {
@@ -18,7 +18,7 @@ module.exports = async function kick(sock, msg, text, isGroup) {
     }
 
     const isSenderAdmin = metadata.participants.some(p =>
-      p.id === userId && (p.admin === 'admin' || p.admin === 'superadmin')
+      p.id === senderId && (p.admin === 'admin' || p.admin === 'superadmin')
     )
 
     if (!isSenderAdmin) {
@@ -51,10 +51,19 @@ module.exports = async function kick(sock, msg, text, isGroup) {
       return num + '@s.whatsapp.net'
     })
 
+    const botId = sock.user?.id || ''
+    const filteredTargets = targets.filter(t => t !== botId)
+
+    if (filteredTargets.length === 0) {
+      return sock.sendMessage(groupId, {
+        text: '❌ Tidak ada target valid untuk dikeluarkan. Jangan keluarkan dirimu sendiri yaaa 😢',
+      }, { quoted: msg })
+    }
+
     const success = []
     const failed = []
 
-    for (const target of targets) {
+    for (const target of filteredTargets) {
       try {
         await sock.groupParticipantsUpdate(groupId, [target], 'remove')
         success.push(target)
