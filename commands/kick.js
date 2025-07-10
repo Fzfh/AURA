@@ -1,6 +1,7 @@
 module.exports = async function kick(sock, msg, text, isGroup) {
   const groupId = msg.key.remoteJid
   const senderId = msg.key.participant || msg.participant || msg.key.remoteJid
+  const botId = sock.user?.id || ''
 
   if (!isGroup) {
     return sock.sendMessage(groupId, {
@@ -31,6 +32,12 @@ module.exports = async function kick(sock, msg, text, isGroup) {
     const repliedUser = quotedInfo?.participant
 
     if (repliedUser) {
+      if (repliedUser === botId) {
+        return sock.sendMessage(groupId, {
+          text: '❌ Eitss... Ketik Kick sambil reply keaku ya?? itu namanya nyuruh aku keluar wkwkwk\n No☝🏻️ No☝🏻️ No☝🏻️ Jangan ketik Kick reply keaku lagi ya',
+        }, { quoted: msg })
+      }
+
       await sock.groupParticipantsUpdate(groupId, [repliedUser], 'remove')
       return sock.sendMessage(groupId, {
         text: `✅ Berhasil mengeluarkan 1 orang:\n@${repliedUser.split('@')[0]}`,
@@ -51,12 +58,11 @@ module.exports = async function kick(sock, msg, text, isGroup) {
       return num + '@s.whatsapp.net'
     })
 
-    const botId = sock.user?.id || ''
     const filteredTargets = targets.filter(t => t !== botId)
 
     if (filteredTargets.length === 0) {
       return sock.sendMessage(groupId, {
-        text: '❌ Tidak ada target valid untuk dikeluarkan. Jangan keluarkan dirimu sendiri yaaa 😢',
+        text: '❌ Tidak ada target valid untuk dikeluarkan. Jangan keluarkan dirimu sendiri yaaa wkwk',
       }, { quoted: msg })
     }
 
