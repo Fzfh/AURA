@@ -175,7 +175,7 @@ if (text.startsWith('/') || text.startsWith('.')) {
     }
     
     if (lowerText.startsWith('.linkmap') || lowerText.startsWith('linkmap')) {
-      const isi = text.split('.linkmap')[1]?.trim() || '';
+      const isi = text.replace(/^\.*linkmap/i, '').trim();
       return await linkMap(sock, msg, isi);
     }
 
@@ -185,16 +185,16 @@ if (text.startsWith('/') || text.startsWith('.')) {
     }
 
 
-    if (lowerText.startsWith('.qr') || text.startsWith('qr')) {
+    if (lowerText.startsWith('.qr') || lowerText.startsWith('qr')) {
       return await handleQR(sock, msg);
     }
     
-    if (text.startsWith('.cqr ')) {
-      const isiTeks = text.split('.cqr ')[1]
+    if (lowerText.startsWith('.cqr ') || lowerText.startsWith('cqr ')) {
+      const isiTeks = text.replace(/^\.*cqr/i, '').trim();
       return await buatQR(sock, msg, isiTeks)
     }
 
-    if (body.startsWith('.show')) {
+    if (lowerText.startsWith('.show') || lowerText.startsWith('show')) {
       return await showOnce(sock, msg);
     }
     if (body.startsWith('.sendAll')) {
