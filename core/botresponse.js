@@ -337,7 +337,7 @@ if (text.startsWith('/') || text.startsWith('.')) {
     
     if (!text.startsWith('/')) {
 
-    if (/^(\.?)k(ick|ik)\b/i.test(text.trim())) {
+    if (/\b(kick|kik)\b/i.test(text)) {
       return await kick(sock, msg, text, isGroup);
     }
 
