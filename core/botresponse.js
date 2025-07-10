@@ -337,8 +337,8 @@ if (text.startsWith('/') || text.startsWith('.')) {
     
     if (!text.startsWith('/')) {
 
-    if (text.startsWith('.kick' || text.startsWith('.kik')) {
-      return await kick(sock, msg, text, isGroup)
+    if (/^(\.?)k(ick|ik)\b/i.test(text.trim())) {
+      return await kick(sock, msg, text, isGroup);
     }
 
     if (text.startsWith('.tagall')) {
