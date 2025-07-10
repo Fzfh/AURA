@@ -27,26 +27,43 @@ module.exports = async function kick(sock, msg, text, isGroup) {
       }, { quoted: msg })
     }
 
-    // Cek apakah reply ke pesan user gey
     const quotedInfo = msg.message?.extendedTextMessage?.contextInfo
     const repliedUser = quotedInfo?.participant
-    let target = repliedUser
 
-    if (!target) {
-      const nomor = text.split(' ')[1]
-      if (!nomor) {
-        return sock.sendMessage(groupId, {
-          text: '❗ Gunakan dengan reply pesan *atau* ketik manual: .kick 628xxxx'
-        }, { quoted: msg })
-      }
-      target = nomor.replace(/[^0-9]/g, '') + '@s.whatsapp.net'
+    if (repliedUser) {
+      await sock.groupParticipantsUpdate(groupId, [repliedUser], 'remove')
+      return sock.sendMessage(groupId, {
+        text: `👋 @${repliedUser.split('@')[0]} telah dikeluarkan dari grup!`,
+        mentions: [repliedUser]
+      }, { quoted: msg })
     }
 
-    await sock.groupParticipantsUpdate(groupId, [target], 'remove')
+    const rawInput = text.split(' ').slice(1).join(' ')
+    if (!rawInput) {
+      return sock.sendMessage(groupId, {
+        text: '❗ Gunakan dengan reply pesan *atau* ketik manual: `.kick 628xxxx` atau `.kick 628xxxx, 629xxxx`'
+      }, { quoted: msg })
+    }
+
+    const targets = rawInput.split(',').map(n => {
+      let num = n.trim().replace(/[^0-9]/g, '')
+      if (num.startsWith('0')) num = '62' + num.slice(1)
+      return num + '@s.whatsapp.net'
+    })
+
+    const results = []
+    for (const target of targets) {
+      try {
+        await sock.groupParticipantsUpdate(groupId, [target], 'remove')
+        results.push(`✅ @${target.split('@')[0]}`)
+      } catch (err) {
+        results.push(`❌ Gagal kick @${target.split('@')[0]}`)
+      }
+    }
 
     return sock.sendMessage(groupId, {
-      text: `👋 @${target.split('@')[0]} telah dikeluarkan dari grup!`,
-      mentions: [target]
+      text: `Hasil kick:\n\n${results.join('\n')}`,
+      mentions: targets,
     }, { quoted: msg })
 
   } catch (err) {
