@@ -82,7 +82,10 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
 ╰━━━━━━━━━━━━━━━━━━━━━━━╯  
 
 ╭━[ 🔒 KHUSUS ADMIN GRUP ]━╮  
-┃  
+┃  📸 Ambil Foto/video Sekali lihat
+┃   ➤ \`.show\` atau show
+┃   ➤ Contoh: \`.show\` lalu reply ke foto/video sekali lihat  
+┃
 ┃  👥 Tag Semua Member Grup  
 ┃   ➤ \`.tagall\`  
 ┃   ➤ Contoh: .tagall Halo semua  
