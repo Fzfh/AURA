@@ -1,82 +1,76 @@
-const fs = require('fs');
-const path = require('path');
-const adminFile = path.join(__dirname, '../setting/admin.json');
-
-function getAdminList() {
-  if (!fs.existsSync(adminFile)) fs.writeFileSync(adminFile, JSON.stringify([]));
-  return JSON.parse(fs.readFileSync(adminFile));
-}
-
-function saveAdminList(list) {
-  fs.writeFileSync(adminFile, JSON.stringify(list, null, 2));
-}
+const { adminList } = require('../setting/setting');
 
 function extractTargetJid(msg, text) {
-  const context = msg.message?.extendedTextMessage?.contextInfo || {};
-  const mention = context?.mentionedJid?.[0];
-  const replyJid = context?.participant;
-  const plainNumber = text.split(' ')[1];
+  const contextInfo = msg.message?.extendedTextMessage?.contextInfo;
+  const mentioned = contextInfo?.mentionedJid;
+  if (mentioned && mentioned.length > 0) return mentioned[0];
 
-  if (mention) return mention;
-  if (replyJid) return replyJid;
-  if (plainNumber && plainNumber.length >= 9) return plainNumber.replace(/\D/g, '') + '@s.whatsapp.net';
+  const parts = text.split(' ');
+  if (parts.length >= 2) {
+    const number = parts[1].replace(/\D/g, '');
+    if (number.length >= 8) return number + '@s.whatsapp.net';
+  }
+
   return null;
 }
 
 async function addAdmin(sock, msg, sender, userId, text) {
-  const adminList = getAdminList();
-  const target = extractTargetJid(msg, text);
+  if (!adminList.includes(userId)) {
+    return sock.sendMessage(sender, {
+      text: '❌ Kamu bukan admin bot. Tidak bisa naikkin jabatan orang.',
+    }, { quoted: msg });
+  }
 
+  const target = extractTargetJid(msg, text);
   if (!target) {
     return sock.sendMessage(sender, {
-      text: '⚠️ Format salah!\n\nContoh:\n.reply lalu .admin\n.admin @628xxx\n.admin 628xxx',
+      text: '❌ Gagal mengenali user yang ingin dijadikan admin.',
     }, { quoted: msg });
   }
 
-  if (adminList.includes(target)) {
-    return sock.sendMessage(sender, {
-      text: `ℹ️ User <@${target.split('@')[0]}> sudah jadi admin.`,
-      mentions: [target]
+  try {
+    await sock.groupParticipantsUpdate(sender, [target], 'promote');
+    await sock.sendMessage(sender, {
+      text: `✅ Berhasil menjadikan @${target.split('@')[0]} sebagai *admin grup*!`,
+      mentions: [target],
+    }, { quoted: msg });
+  } catch (e) {
+    console.error('❌ Gagal promote:', e);
+    await sock.sendMessage(sender, {
+      text: '❌ Gagal menaikkan jabatan user. Pastikan bot punya akses admin.',
     }, { quoted: msg });
   }
-
-  adminList.push(target);
-  saveAdminList(adminList);
-
-  await sock.sendMessage(sender, {
-    text: `✅ User <@${target.split('@')[0]}> telah dijadikan admin bot!`,
-    mentions: [target]
-  }, { quoted: msg });
 }
 
 async function removeAdmin(sock, msg, sender, userId, text) {
-  const adminList = getAdminList();
-  const target = extractTargetJid(msg, text);
+  if (!adminList.includes(userId)) {
+    return sock.sendMessage(sender, {
+      text: '❌ Kamu bukan admin bot. Tidak bisa nurunin jabatan orang.',
+    }, { quoted: msg });
+  }
 
+  const target = extractTargetJid(msg, text);
   if (!target) {
     return sock.sendMessage(sender, {
-      text: '⚠️ Format salah!\n\nContoh:\n.reply lalu .unadmin\n.unadmin @628xxx\n.unadmin 628xxx',
+      text: '❌ Gagal mengenali user yang ingin dihapus adminnya.',
     }, { quoted: msg });
   }
 
-  if (!adminList.includes(target)) {
-    return sock.sendMessage(sender, {
-      text: `❌ User <@${target.split('@')[0]}> bukan admin bot.`,
-      mentions: [target]
+  try {
+    await sock.groupParticipantsUpdate(sender, [target], 'demote');
+    await sock.sendMessage(sender, {
+      text: `✅ Berhasil menghapus jabatan admin dari @${target.split('@')[0]}.`,
+      mentions: [target],
+    }, { quoted: msg });
+  } catch (e) {
+    console.error('❌ Gagal demote:', e);
+    await sock.sendMessage(sender, {
+      text: '❌ Gagal menurunkan jabatan user. Pastikan bot adalah admin grup.',
     }, { quoted: msg });
   }
-
-  const updated = adminList.filter(u => u !== target);
-  saveAdminList(updated);
-
-  await sock.sendMessage(sender, {
-    text: `✅ User <@${target.split('@')[0]}> telah dihapus dari admin bot!`,
-    mentions: [target]
-  }, { quoted: msg });
 }
 
 module.exports = {
   addAdmin,
-  removeAdmin,
-  getAdminList
-}
+  removeAdmin
+};
