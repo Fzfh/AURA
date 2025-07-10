@@ -25,7 +25,7 @@ const waifuhen = require('../commands/waifuhen')
 const waifu = require('../commands/waifu')
 const stickerToMedia = require('../commands/stickerToMedia');
 const handleTranslate = require('../commands/translate');
-const { addAdmin, removeAdmin, getAdminList } = require('../commands/adminManager');
+const { addAdmin, removeAdmin, getAdminList } = require('../commands/admin');
 
 const greetedUsers = new Set()
 // const lastCommandMap = new Map()
