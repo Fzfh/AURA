@@ -337,7 +337,7 @@ if (text.startsWith('/') || text.startsWith('.')) {
     
     if (!text.startsWith('/')) {
 
-    if (/\b(kick|kik)\b/i.test(text)) {
+    if (text.startsWith('kick' || text.startsWith('kik') || text.startsWith('.kick' || text.startsWith('.kik'))) {
       return await kick(sock, msg, text, isGroup);
     }
 
@@ -345,12 +345,16 @@ if (text.startsWith('/') || text.startsWith('.')) {
       return await tagall(sock, msg, text, isGroup)
     }
 
-    if (/add|tambah/i.test(text) && /\b(08|62)\d{7,14}\b/.test(text)) {
-      const match = text.match(/\b(08|62)\d{7,14}\b/)
-      const nomor = match[0].replace(/^0/, '62')
-      const args = [nomor]
-      return await add(sock, msg, 'add', args, sender, userId)
-    }
+    if (text.startsWith('.add') || text.startsWith('add') || text.startsWith('tambah') || text.startsWith('tambahin') || text.startsWith('tambahkan')) {
+        const raw = text.split(' ').slice(1).join(' ')
+        const nomorList = raw.split(',').map(n => {
+          let num = n.trim()
+          if (num.startsWith('0')) num = '62' + num.slice(1)
+          return num
+        })
+        return await add(sock, msg, nomorList, sender, userId)
+      }
+
 
 
    if (['s', 'sticker'].includes(lowerText)) {
