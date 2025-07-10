@@ -129,10 +129,13 @@ Asumsikan mereka mau download, bantu kasih petunjuk dengan format rapi:
 Coba pakai command ini ya~  
 
 .d <link>  
-➡️ Buat video TikTok/Instagram  
+➡️ Buat video/foto TikTok 
 
 .ds <link>  
 ➡️ Kalau cuma mau ambil suara TikTok-nya aja 🎧"
+
+.dig <link>  
+➡️ Buat video Instagram
 
 ---
 
