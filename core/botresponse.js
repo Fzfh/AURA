@@ -445,7 +445,12 @@ if (isMentionedToBot || isMentioned || isReplyToBot || isPrivate) {
       const history = memoryMap.get(userId) || []
       history.push({ role: 'user', content: query })
 
-      const aiReply = await askOpenAI(history)
+      const quotedText = quoted?.conversation ||
+                   quoted?.extendedTextMessage?.text ||
+                   quoted?.imageMessage?.caption ||
+                   quoted?.videoMessage?.caption || ''
+
+      const aiReply = await askOpenAI(history, quotedText)
       history.push({ role: 'assistant', content: aiReply })
       memoryMap.set(userId, history.slice(-15))
 
