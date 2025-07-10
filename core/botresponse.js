@@ -335,23 +335,30 @@ if (text.startsWith('/') || text.startsWith('.')) {
       return;
     }
     
-    if (text.startsWith('kick') || text.startsWith('kik') || text.startsWith('.kick') || text.startsWith('.kik')) {
+    if (lowerText.startsWith('kick') || lowerText.startsWith('kik') || lowerText.startsWith('.kick') || lowerText.startsWith('.kik')) {
       return await kick(sock, msg, text, isGroup);
     }
 
-    if (text.startsWith('.tagall')) {
-      return await tagall(sock, msg, text, isGroup)
+    if (lowerText.startsWith('.tagall') || lowerText.startsWith('tagall') || lowerText.startsWith('tag semua') || lowerText.startsWith('tag')) {
+      return await tagall(sock, msg, text, isGroup);
     }
 
-    if (text.startsWith('.add') || text.startsWith('add') || text.startsWith('tambah') || text.startsWith('tambahin') || text.startsWith('tambahkan')) {
-        const raw = text.split(' ').slice(1).join(' ')
-        const nomorList = raw.split(',').map(n => {
-          let num = n.trim()
-          if (num.startsWith('0')) num = '62' + num.slice(1)
-          return num
-        })
-        return await add(sock, msg, nomorList, sender, userId)
-      }
+    if (
+      lowerText.startsWith('.add') ||
+      lowerText.startsWith('add') ||
+      lowerText.startsWith('tambah') ||
+      lowerText.startsWith('tambahin') ||
+      lowerText.startsWith('tambahkan')
+    ) {
+      const raw = text.split(' ').slice(1).join(' ');
+      const nomorList = raw.split(',').map(n => {
+        let num = n.trim();
+        if (num.startsWith('0')) num = '62' + num.slice(1);
+        return num;
+      });
+      return await add(sock, msg, nomorList, sender, userId);
+    }
+    
 
 
 
