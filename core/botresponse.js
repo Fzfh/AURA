@@ -142,11 +142,27 @@ if (text.startsWith('/') || text.startsWith('.')) {
     
     ✨ *Ketik sesuai yaa! Hindari typo biar nggak nyasar 😋*
     `
-    if (text.startsWith('.na')) {
+    if (text.startsWith('.math')) {
+      const res = await askOpenAI([
+        { role: 'user', content: 'Yuk mulai game matematika. Kirimin aku soal pertama.' }
+      ]);
+      return sock.sendMessage(from, { text: res }, { quoted: msg });
+    }
+
+    if (msg.message?.extendedTextMessage?.contextInfo?.quotedMessage?.conversation?.includes('Soal')) {
+      const soal = msg.message?.extendedTextMessage?.contextInfo?.quotedMessage?.conversation;
+      const res = await askOpenAI([
+        { role: 'user', content: `Soal sebelumnya: ${soal}` },
+        { role: 'user', content: `Jawabanku: ${text}` }
+      ]);
+      return sock.sendMessage(from, { text: res }, { quoted: msg });
+    }
+
+    if (lowerText.startsWith('.na') || lowerText.startsWith('na')) {
       return await addAdmin(sock, msg, sender, actualUserId, text);
     }
 
-    if (text.startsWith('.una')) {
+    if (lowerText.startsWith('.una') || lowerText.startsWith('una')) {
       return await removeAdmin(sock, msg, sender, actualUserId, text);
     }
 
