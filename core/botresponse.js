@@ -3,8 +3,11 @@ const mutedUsers = new Map();
 const memoryMap = new Map();
 const muteDuration = 2 * 60 * 1000;
 
-const { commands } = require('../commands/commandRequire/commandRequire');
-const { core } = require('../core/coreRequire/coreRequire');
+const { add, tagall, kick, menfess, welcome, tiktokDownloader,
+       igDownloader, youtubeDownloader,
+       sendAll, show, qris, createQr, mapqr, linkmap,
+       waifuhen, waifu, stickerToMedia, admin, translate } = require('../commands/commandRequire/commandRequire');
+const { staticCommand, openai, stickerHelper } = require('../core/coreRequire/coreRequire');
 const greetedUsers = new Set();
 const fs = require('fs');
 const path = require('path');
