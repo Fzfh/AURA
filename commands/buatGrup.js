@@ -72,8 +72,6 @@ module.exports = async function buatGrup(sock, msg, text) {
     text: hasilText,
 }, { quoted: msg });
 
-    }, { quoted: msg });
-
     return true;
   } catch (err) {
     console.error('❌ Gagal buat grup:', err);
