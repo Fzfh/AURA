@@ -43,6 +43,7 @@ async function askOpenAI(userHistory = [], quotedText = '') {
 - Kalau user menyebut fitur (seperti stiker, tiktok, pulsa), jawab sesuai panduan yang rapi di bawah
 - Kalau user tidak menyebut fitur, kamu bebas membalas sesuai konteks obrolan
 - Jika user membalas/reply pesan dari kamu, tanggapi seolah kamu mengingat konteks percakapan sebelumnya
+- Dan jangan memakai tanda kutip (") untuk balasan ke user, cukup kamu memikir apa balasannya jangan memakai kutip 
 
 ---
 
