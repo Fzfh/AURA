@@ -3,7 +3,10 @@ module.exports = async function(sock, msg, nomorList, sender, userId) {
   const metadata = await sock.groupMetadata(groupId)
   const botNumber = sock.user.id.split(':')[0] + '@s.whatsapp.net'
 
-  for (const nomor of nomorList) {
+  for (let nomor of nomorList) {
+    nomor = nomor.replace(/[^0-9]/g, '')
+    if (nomor.startsWith('0')) nomor = '62' + nomor.slice(1)
+
     const jid = `${nomor}@s.whatsapp.net`
 
     try {
