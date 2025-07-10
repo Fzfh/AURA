@@ -234,7 +234,8 @@ jika user ngomong kasar atau tidak senonoh tolong jawab dengan tegas dan juga la
           Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
           'Content-Type': 'application/json'
         },
-        timeout: 10000
+        timeout: 10000,
+        responseEncoding: 'utf8'
       })
 
       // return `🤖 *${model}*:\n${res.data.choices[0].message.content}`
