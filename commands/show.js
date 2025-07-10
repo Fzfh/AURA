@@ -1,16 +1,22 @@
 const { downloadMediaMessage } = require('@whiskeysockets/baileys');
-const { adminList } = require('../setting/setting');
 
 module.exports = async function show(sock, msg) {
   const sender = msg.key.participant || msg.key.remoteJid;
   const chatId = msg.key.remoteJid;
   const isGroup = chatId.endsWith('@g.us');
 
-  if (!adminList.includes(sender)) {
-    return sock.sendMessage(chatId, {
-      text: '❌ Hanya Admin Bot yang boleh menggunakan fitur ini',
-    }, { quoted: msg });
-  }
+    if (isGroup) {
+      const metadata = await sock.groupMetadata(chatId);
+      const admins = metadata.participants
+        .filter(p => p.admin === 'admin' || p.admin === 'superadmin')
+        .map(p => p.id);
+
+      if (!admins.includes(sender)) {
+        return sock.sendMessage(chatId, {
+          text: '🚫 Hanya admin grup yang boleh menggunakan perintah *show*!',
+        }, { quoted: msg });
+      }
+    }
 
   try {
     const messageContent = msg.message || {};
