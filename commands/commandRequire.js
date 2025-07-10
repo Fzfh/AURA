@@ -16,5 +16,6 @@ module.exports = {
   waifuhen: require('./waifuhen'),
   waifu: require('./waifu'),
   stickerToMedia: require('./stickerToMedia'),
-  admin: require('./admin')
+  admin: require('./admin'),
+  translate: require('./translate')
 }
