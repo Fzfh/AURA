@@ -2,34 +2,14 @@ const spamTracker = new Map()
 const mutedUsers = new Map()
 const memoryMap = new Map()
 const muteDuration = 2 * 60 * 1000
-const add = require('../commands/add');
-// const { handleAutoKick } = require('../commands/auto_kick')
-const { handleStaticCommand } = require('../core/handler/staticCommand')
-const tagall = require('../commands/tagall')
-const kick = require('../commands/kick')
-const menfess = require('../commands/menfess')
-const handleWelcome = require('../commands/welcome');
-const { adminList, toxicWords } = require('../setting/setting')
-const askOpenAI = require('../core/utils/openai')
-const { createStickerFromMessage, createStickerFromText } = require('../core/stickerHelper')
-const downloadTiktok = require('../commands/tiktokDownloader');
-const downloadInstagram = require('../commands/igDownloader');
-const downloadYouTubeMP3 = require('../commands/youtubeDownloader');;
-const sendAll = require('../commands/sendAll');
-const showOnce = require('../commands/show');
-const handleQR = require('../commands/qris')
-const buatQR = require('../commands/createQr')
-const mapsQR = require('../commands/mapqr');
-const linkMap = require('../commands/linkmap');
-const waifuhen = require('../commands/waifuhen')
-const waifu = require('../commands/waifu')
-const stickerToMedia = require('../commands/stickerToMedia');
-const handleTranslate = require('../commands/translate');
-const { addAdmin, removeAdmin } = require('../commands/admin');
+const { add, tagall, kick, menfess, welcome, tiktokDownloader,
+       igDownloader, youtubeDownloader,
+       sendAll, show, qris, createQr, mapqr, linkmap,
+       waifuhen, waifu, stickerToMedia, admin, translate } = require('../commands/commandRequire');
+
+const { staticCommand, openai, stickerHelper } = require('../core/coreRequire');
 
 const greetedUsers = new Set()
-// const lastCommandMap = new Map()
-// const selectedNominalMap = new Map()
 const fs = require('fs')
 const path = require('path')
 const mime = require('mime-types')
