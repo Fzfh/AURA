@@ -169,20 +169,21 @@ if (text.startsWith('/') || text.startsWith('.')) {
       return await waifu(sock, msg, args.join(' '));
     }
 
-    if (text.startsWith('.sm')) {
+    if (lowerText.startsWith('.sm') || lowerText.startsWith('sm')) {
       await stickerToMedia(sock, msg);
       return;
     }
     
-    if (text.startsWith('.linkmap')) {
+    if (lowerText.startsWith('.linkmap') || lowerText.startsWith('linkmap')) {
       const isi = text.split('.linkmap')[1]?.trim() || '';
       return await linkMap(sock, msg, isi);
     }
 
-    if (lowerText.startsWith('.mapqr') || lowerText.startsWith('mapqr')) {
-      const isi = text.split('.mapqr')[1]?.trim() || '';
+   if (lowerText.startsWith('.mapqr') || lowerText.startsWith('mapqr')) {
+      const isi = text.replace(/^\.*mapqr/i, '').trim();
       return await mapsQR(sock, msg, isi);
     }
+
 
     if (lowerText.startsWith('.qr') || text.startsWith('qr')) {
       return await handleQR(sock, msg);
