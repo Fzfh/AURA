@@ -20,11 +20,6 @@ module.exports = async function (sock, msg, command, args, sender, userId) {
 
     const metadata = await sock.groupMetadata(groupId)
 
-    const code = await sock.groupInviteCode(groupId)
-      await sock.sendMessage(jid, {
-        text: `Halo! Kamu diundang gabung ke grup, nih~ Klik link ini: https://chat.whatsapp.com/${code}`
-      })
-
     const alreadyInGroup = metadata.participants.some(p => p.id === jid)
     if (alreadyInGroup) {
       return sock.sendMessage(groupId, {
@@ -34,7 +29,6 @@ module.exports = async function (sock, msg, command, args, sender, userId) {
     }
 
     const isBotAdmin = metadata.participants.some(p => p.id === botNumber && p.admin)
-
     if (!isBotAdmin) {
       return sock.sendMessage(groupId, {
         text: '❌ Bot bukan admin grup, jadi gak bisa nambahin member.',
@@ -50,8 +44,22 @@ module.exports = async function (sock, msg, command, args, sender, userId) {
 
   } catch (err) {
     console.error('❌ Gagal menambahkan member:', err)
-    return sock.sendMessage(groupId, {
-      text: '⚠️ Gagal menambahkan. Mungkin privasi pengguna tidak mengizinkan ditambahkan ke grup atau terjadi error. Coba pakai link grup aja yaa~',
-    }, { quoted: msg })
+
+    try {
+      const code = await sock.groupInviteCode(groupId)
+      await sock.sendMessage(jid, {
+        text: `Halo! 🫣\nAku nggak bisa menambahkan kamu langsung ke grup.\nTapi kamu bisa gabung lewat link ini ya:\n\n🌐 https://chat.whatsapp.com/${code}`
+      })
+
+      return sock.sendMessage(groupId, {
+        text: `⚠️ Gagal menambahkan @${nomor}, tapi link undangan sudah dikirim ke dia ✉️`,
+        mentions: [jid]
+      }, { quoted: msg })
+    } catch (inviteErr) {
+      console.error('❌ Gagal kirim link undangan:', inviteErr)
+      return sock.sendMessage(groupId, {
+        text: '⚠️ Gagal menambahkan dan kirim link. Mungkin pengguna memblokir bot atau ada kendala lain.',
+      }, { quoted: msg })
+    }
   }
 }
