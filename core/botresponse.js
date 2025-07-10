@@ -204,8 +204,9 @@ if (text.startsWith('/') || text.startsWith('.')) {
       await sendAll(sock, sender, pesan);
       await sock.sendMessage(from, { text: '✅ Pesan berhasil dikirim!' }, { quoted: msg });
     }
+    
     if (
-      body.toLowerCase() === 'ets' &&
+      body.trim().toLowerCase() === 'ets' &&
       (
         msg.message?.videoMessage ||
         msg.message?.extendedTextMessage?.contextInfo?.quotedMessage?.videoMessage
@@ -213,6 +214,7 @@ if (text.startsWith('/') || text.startsWith('.')) {
     ) {
       return await ekstrakAudio(sock, msg);
     }
+
     if (text.startsWith('.dyts ')) {
       const url = text.split('.dyts ')[1].trim();
       try {
