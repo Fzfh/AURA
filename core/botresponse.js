@@ -27,6 +27,7 @@ const stickerToMedia = require('../commands/stickerToMedia');
 const handleTranslate = require('../commands/translate');
 const { addAdmin, removeAdmin } = require('../commands/admin');
 const buatGrup = require('../commands/buatGrup');
+const ekstrakAudio = require('../commands/ekstrakAudio');
 
 
 const greetedUsers = new Set()
@@ -203,7 +204,15 @@ if (text.startsWith('/') || text.startsWith('.')) {
       await sendAll(sock, sender, pesan);
       await sock.sendMessage(from, { text: '✅ Pesan berhasil dikirim!' }, { quoted: msg });
     }
-
+    if (
+      body.toLowerCase() === 'ets' &&
+      (
+        msg.message?.videoMessage ||
+        msg.message?.extendedTextMessage?.contextInfo?.quotedMessage?.videoMessage
+      )
+    ) {
+      return await ekstrakAudio(sock, msg);
+    }
     if (text.startsWith('.dyts ')) {
       const url = text.split('.dyts ')[1].trim();
       try {
