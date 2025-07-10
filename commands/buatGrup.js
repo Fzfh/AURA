@@ -1,4 +1,5 @@
-const { adminList } = require('../setting/setting');
+const cooldownMap = new Map(); 
+const COOLDOWN_DURATION = 90 * 1000; 
 
 module.exports = async function buatGrup(sock, msg, text) {
   const sender = msg.key.participant || msg.key.remoteJid;
@@ -6,19 +7,43 @@ module.exports = async function buatGrup(sock, msg, text) {
 
   if (!text.toLowerCase().startsWith('bg ')) return false;
 
-  if (!adminList.includes(senderId)) {
-    await sock.sendMessage(sender, {
-      text: '🚫 Maaf, hanya admin yang boleh buat grup lewat bot ini.',
+  const metadata = await sock.groupMetadata(msg.key.remoteJid);
+  const groupAdmins = metadata.participants
+    .filter(p => p.admin === 'admin' || p.admin === 'superadmin')
+    .map(p => p.id);
+
+  const isGroupAdmin = groupAdmins.includes(senderId);
+
+  if (!isGroupAdmin) {
+    await sock.sendMessage(msg.key.remoteJid, {
+      text: '🚫 Maaf, hanya *admin grup* yang boleh buat grup lewat bot ini.',
     }, { quoted: msg });
     return true;
   }
+
+  const now = Date.now();
+  const lastUsed = cooldownMap.get(senderId) || 0;
+  const remaining = COOLDOWN_DURATION - (now - lastUsed);
+
+  if (remaining > 0) {
+    const seconds = Math.floor((remaining / 1000) % 60);
+    const minutes = Math.floor(remaining / 1000 / 60);
+    const waktu = `${minutes} menit ${seconds} detik`;
+
+    await sock.sendMessage(msg.key.remoteJid, {
+      text: `⏳ Tunggu ya! Masih cooldown\nSisa waktu: *${waktu}*`,
+    }, { quoted: msg });
+    return true;
+  }
+
+  cooldownMap.set(senderId, now);
 
   const isi = text.slice(3).trim();
   const [beforeAdd, afterAdd] = isi.split(/add/i);
   const namaGrup = beforeAdd.trim();
 
   if (!namaGrup) {
-    await sock.sendMessage(sender, {
+    await sock.sendMessage(msg.key.remoteJid, {
       text: '❗ Format salah.\nContoh: `bg NamaGrup` atau `bg NamaGrup add 628xxxx, 628xxxx`',
     }, { quoted: msg });
     return true;
@@ -69,8 +94,8 @@ module.exports = async function buatGrup(sock, msg, text) {
       `🔗 *Link Grup:*\n${groupLink}`;
 
     await sock.sendMessage(msg.key.remoteJid, {
-    text: hasilText,
-}, { quoted: msg });
+      text: hasilText,
+    }, { quoted: msg });
 
     return true;
   } catch (err) {
