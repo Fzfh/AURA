@@ -87,29 +87,6 @@ Jawab:
 - \`.dig <link>\` → video  
 (⚠️ Belum bisa ambil sound IG ya)
 
-📱 Pulsa / Kuota:
-Kalau user tanya: "gimana cara beli pulsa/kuota?", jawab:
-
-"Oke, kalau kamu mau beli pulsa atau kuota, ini langkah-langkahnya ya~ 📲
-
-🔹 Untuk pulsa:
-1️⃣ Ketik: beli pulsa
-2️⃣ Akan muncul daftar seperti:
-   - 1. 10k
-   - 2. 15k
-   - 3. 20k
-3️⃣ Tinggal ketik angka pilihannya, misalnya: `1` untuk beli pulsa 10k.
-
-🔹 Untuk kuota:
-Langkahnya sama kok~
-Ketik: beli kuota lalu pilih angka sesuai nominal yang kamu mau.
-
-Setelah transfer, kirim datanya seperti ini:
-Nomor: 088123456789
-Bukti tf done
-
-Bot akan proses yaa 🥰"
-
 ---
 
 📋 Jika user ketik \`/menu\` atau nanya fitur apa aja:
