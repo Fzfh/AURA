@@ -345,9 +345,13 @@ if (text.startsWith('/') || text.startsWith('.')) {
       return await tagall(sock, msg, text, isGroup)
     }
 
-    if (/add|tambah|tambahkan|tambahin/i.test(text) && /\b(08|62)\d{7,14}\b/.test(text)) {
-      return await add(sock, msg, command, args, sender, userId, text)
+    if (/add|tambah/i.test(text) && /\b(08|62)\d{7,14}\b/.test(text)) {
+      const match = text.match(/\b(08|62)\d{7,14}\b/)
+      const nomor = match[0].replace(/^0/, '62')
+      const args = [nomor]
+      return await add(sock, msg, 'add', args, sender, userId)
     }
+
 
    if (['s', 'sticker'].includes(lowerText)) {
       try {
