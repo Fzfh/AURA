@@ -44,7 +44,7 @@ module.exports = async function kick(sock, msg, text, isGroup) {
     if (repliedUser) {
       if (repliedUser === botId) {
         return sock.sendMessage(groupId, {
-          text: '⚠️ Kamu mencoba meng-kick botnya sendiri lho!\nGak Bisa ya!',
+          text: '❌ Eitss... Ketik Kick sambil reply keaku ya?? itu namanya nyuruh aku keluar wkwkwk\n No☝🏻️ No☝🏻️ No☝🏻️ Jangan ketik Kick reply keaku lagi ya!',
         }, { quoted: msg });
       }
 
