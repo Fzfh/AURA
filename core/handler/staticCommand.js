@@ -52,6 +52,11 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
 ┃   ➤ \`.dig\` link instagram 
 ┃   ➤ Contoh: \`.dig\` https://instagram.com/linkKamu
 ┃ 
+┃ 🎛️ Baca isi Qris
+┃   ➤ \`.qr\` 
+┃   ➤ Contoh: \`.qr\` reply ke qr code
+┃   ➤ bisa juga hanya \`qr\`
+┃ 
 ┃ 🌐 Translate Semua Bahasa
 ┃ ➤ /tl <kode bahasa> <teks>
 ┃ *CONTOH*
