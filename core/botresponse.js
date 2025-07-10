@@ -337,7 +337,7 @@ if (text.startsWith('/') || text.startsWith('.')) {
     
     if (!text.startsWith('/')) {
 
-    if (text.startsWith('kick') || text.startsWith('kik') || text.startsWith('.kick' || text.startsWith('.kik')) {
+    if (text.startsWith('kick') || text.startsWith('kik') || text.startsWith('.kick') || text.startsWith('.kik')) {
       return await kick(sock, msg, text, isGroup);
     }
 
