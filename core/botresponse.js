@@ -137,7 +137,7 @@ if (text.startsWith('/') || text.startsWith('.')) {
     
     ✨ *Ketik sesuai yaa! Hindari typo biar nggak nyasar 😋*
     `
-    if (text.startsWith('.a')) {
+    if (text.startsWith('.na')) {
       return await addAdmin(sock, msg, sender, actualUserId, text);
     }
 
@@ -145,7 +145,7 @@ if (text.startsWith('/') || text.startsWith('.')) {
       return await removeAdmin(sock, msg, sender, actualUserId, text);
     }
 
-    if (['/listbahasa', '.listbahasa', 'list bahasa'].includes(lowerText)) {
+    if (['/listbahasa', '.listbahasa', 'listbahasa', 'list bahasa'].includes(lowerText)) {
       return sock.sendMessage(sender, {
         text: listBahasa,
       }, { quoted: msg });
@@ -337,7 +337,7 @@ if (text.startsWith('/') || text.startsWith('.')) {
     
     if (!text.startsWith('/')) {
 
-    if (text.startsWith('.kick')) {
+    if (text.startsWith('.kick' || text.startsWith('.kik')) {
       return await kick(sock, msg, text, isGroup)
     }
 
