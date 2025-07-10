@@ -141,14 +141,14 @@ if (text.startsWith('/') || text.startsWith('.')) {
       if (!adminList.includes(actualUserId)) {
         return sock.sendMessage(sender, { text: '❌ Hanya admin bot yang bisa menambahkan admin.' }, { quoted: msg });
       }
-      return await addAdmin(sock, msg, sender, userId);
+      return await addAdmin(sock, msg, sender, userId, text);
     }
 
     if (text.startsWith('.una')) {
       if (!adminList.includes(actualUserId)) {
         return sock.sendMessage(sender, { text: '❌ Hanya admin bot yang bisa menghapus admin.' }, { quoted: msg });
       }
-      return await removeAdmin(sock, msg, sender, userId);
+      return await removeAdmin(sock, msg, sender, userId, text);
     }
 
     if (['/listbahasa', '.listbahasa', 'list bahasa'].includes(lowerText)) {
