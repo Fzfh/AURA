@@ -35,6 +35,11 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
 ┃   ➤ Contoh: \`.linkmap\` monas Jakarta
 ┃   ➤ Reply Ke shareloc untuk jadi link
 ┃
+┃  🗺️🎛️ Cari Lokasi Google Maps ke qr code (qris)
+┃   ➤ \`.mapqr\` atau \`mapqr\` <nama daerah> 
+┃   ➤ Contoh: \`.mapqr\` atau \`mapqr\` monas Jakarta
+┃   ➤ Reply Ke shareloc untuk jadi link
+┃
 ┃  👰🏻 Cari Waifu Kamu!
 ┃   ➤ \`.waifu\` <jenis waifu>
 ┃   ➤ Contoh: \`.waifu\` neko
