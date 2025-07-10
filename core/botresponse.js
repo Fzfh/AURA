@@ -184,7 +184,7 @@ if (text.startsWith('/') || text.startsWith('.')) {
       return await mapsQR(sock, msg, isi);
     }
 
-    if (text.startsWith('.qr')) {
+    if (text.startsWith('.qr') || text.startsWith('qr')) {
       return await handleQR(sock, msg);
     }
     
