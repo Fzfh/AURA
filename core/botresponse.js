@@ -8,6 +8,7 @@ const { add, tagall, kick, menfess, welcome, tiktokDownloader,
        sendAll, show, qris, createQr, mapqr, linkmap,
        waifuhen, waifu, stickerToMedia, admin, translate } = require('../commands/commandRequire/commandRequire');
 const { staticCommand, openai, stickerHelper } = require('../core/coreRequire/coreRequire');
+const { adminList } = require('../setting/setting');
 const greetedUsers = new Set();
 const fs = require('fs');
 const path = require('path');
