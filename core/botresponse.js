@@ -109,7 +109,36 @@ async function handleResponder(sock, msg) {
     if (text.startsWith('.una')) return await removeAdmin(sock, msg, sender, actualUserId, text);
 
     if (['/listbahasa', '.listbahasa', 'listbahasa', 'list bahasa'].includes(lowerText)) {
-      const listBahasa = `🌐 *Daftar Kode Bahasa Umum:*\n\n🇮🇩 id\n🇬🇧 en\n🇯🇵 ja\n... (dan seterusnya)`;
+      const listBahasa = `🌐 Daftar Kode Bahasa Umum:
+    
+    🇮🇩 Indonesia — id  
+    🇬🇧 Inggris — en  
+    🇯🇵 Jepang — ja  
+    🇰🇷 Korea — ko  
+    🇨🇳 Mandarin — zh  
+    🇫🇷 Prancis — fr  
+    🇩🇪 Jerman — de  
+    🇪🇸 Spanyol — es  
+    🇷🇺 Rusia — ru  
+    🇮🇳 Hindi — hi  
+    🇹🇭 Thai — th  
+    🇵🇹 Portugis — pt  
+    🇮🇹 Italia — it  
+    🇳🇱 Belanda — nl  
+    🇹🇷 Turki — tr  
+    🇵🇱 Polandia — pl  
+    🇸🇦 Arab — ar  
+    🇻🇳 Vietnam — vi  
+    🇵🇭 Filipino — tl  
+    🇮🇱 Ibrani — he  
+    🇺🇦 Ukraina — uk
+    
+    📌 Gunakan dengan perintah:  
+    /tl <kode> <teks>  
+    Contoh: /tl en Saya lapar → akan diterjemahkan ke Inggris.
+    
+    ✨ Ketik sesuai yaa! Hindari typo biar nggak nyasar 😋
+    `;
       return sock.sendMessage(sender, { text: listBahasa }, { quoted: msg });
     }
 
