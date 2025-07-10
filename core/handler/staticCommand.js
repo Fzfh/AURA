@@ -86,6 +86,14 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
 ┃   ➤ \`.show\` atau show
 ┃   ➤ Contoh: \`.show\` lalu reply ke foto/video sekali lihat  
 ┃
+┃  ⤴️ Promote Member jadi Admin
+┃   ➤ \`.na\` reply ke user atau tag
+┃   ➤ Contoh: \`.na\` @aurabot atau reply
+┃
+┃  ⤵️ Demote Admin jadi Member
+┃   ➤ \`.una\` reply ke user atau tag
+┃   ➤ Contoh: \`.una\` @aurabot atau reply
+┃
 ┃  👥 Tag Semua Member Grup  
 ┃   ➤ \`.tagall\`  
 ┃   ➤ Contoh: .tagall Halo semua  
@@ -98,9 +106,10 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
 ┃   ➤ bg <nama grup>  
 ┃   ➤ Contoh: \`bg auragrup\`  
 ┃   ➤ Tambah member langsung:  
-┃     ➤ \`bg auragrup add 62812345, 62854321\`  
+┃   ➤ \`bg auragrup add 62812345, 62854321\`  
 ╰━━━━━━━━━━━━━━━━━━━━━━╯  
 
+💡Kalau Kamu admin di grup maka kamu bisa menikmati semua fitur ya!
 🧠 Ketik sesuai menu ya adick-adickk!  
 📌 Hindari typo biar AURABOT gak Misskom 🤖🔥
 `
