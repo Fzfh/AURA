@@ -26,6 +26,8 @@ const waifu = require('../commands/waifu')
 const stickerToMedia = require('../commands/stickerToMedia');
 const handleTranslate = require('../commands/translate');
 const { addAdmin, removeAdmin } = require('../commands/admin');
+const buatGrup = require('../commands/buatGrup');
+
 
 const greetedUsers = new Set()
 // const lastCommandMap = new Map()
@@ -103,6 +105,8 @@ if (text.startsWith('/') || text.startsWith('.')) {
         botBehavior: { botName: 'AuraBot', botMenu: '/menu' }
       })
     }
+    const grupCreated = await buatGrup(sock, msg, text);
+    if (grupCreated) return;
 
     const handledMenfess = await menfess(sock, msg, text)
     if (handledMenfess) return
