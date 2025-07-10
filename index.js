@@ -18,18 +18,6 @@ const tampilkanBanner = require('./core/utils/tampilanbanner');
 const app = express();
 const PORT = 3000;
 
-function extractMessageContent(msg) {
-  const isViewOnce = !!msg.message?.viewOnceMessageV2;
-  const realMsg = isViewOnce ? msg.message.viewOnceMessageV2.message : msg.message;
-  const text =
-    realMsg?.conversation ||
-    realMsg?.extendedTextMessage?.text ||
-    realMsg?.imageMessage?.caption ||
-    realMsg?.videoMessage?.caption ||
-    '';
-  return { text, realMsg };
-}
-
 async function startBot() {
   try {
     const { state, saveCreds } = await useMultiFileAuthState('./auth_info');
@@ -75,17 +63,18 @@ async function startBot() {
       if (!messages || type !== 'notify') return;
       const msg = messages[0];
       if (!msg.message) return;
-    
+
       try {
         await handleResponder(sock, msg);
       } catch (e) {
         console.error(chalk.red('❌ Error di handleResponder:'), e);
       }
     });
-    } catch (err) {
-      console.error(chalk.bgRed('🔥 Gagal memulai bot:'), err);
-    }
+
+  } catch (err) {
+    console.error(chalk.bgRed('🔥 Gagal memulai bot:'), err);
   }
+}
 
 app.get('/qr', (req, res) => {
   res.send('🛑 Sekarang QR ditampilkan langsung di terminal.');
