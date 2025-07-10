@@ -26,6 +26,7 @@ module.exports = async function buatGrup(sock, msg, text) {
 
   const participants = [senderId];
   const addedNumbers = [];
+  const gagalNumbers = [];
 
   if (afterAdd) {
     const nomorList = afterAdd.split(',').map(n => {
@@ -36,9 +37,17 @@ module.exports = async function buatGrup(sock, msg, text) {
 
     for (const nomor of nomorList) {
       const jid = `${nomor}@s.whatsapp.net`;
-      if (!participants.includes(jid)) {
-        participants.push(jid);
-        addedNumbers.push(`+${nomor}`);
+
+      try {
+        const [check] = await sock.onWhatsApp(jid);
+        if (check?.exists) {
+          participants.push(jid);
+          addedNumbers.push(`+${nomor}`);
+        } else {
+          gagalNumbers.push(`+${nomor}`);
+        }
+      } catch {
+        gagalNumbers.push(`+${nomor}`);
       }
     }
   }
@@ -54,16 +63,19 @@ module.exports = async function buatGrup(sock, msg, text) {
       (addedNumbers.length > 0
         ? `👥 *Berhasil menambahkan:*\n${addedNumbers.join(', ')}\n`
         : '') +
+      (gagalNumbers.length > 0
+        ? `⚠️ *Gagal ditambahkan (tidak terdaftar atau tidak bisa diinvite):*\n${gagalNumbers.join(', ')}\n`
+        : '') +
       `🔗 *Link Grup:*\n${groupLink}`;
 
-    await sock.sendMessage(groupId, {
+    await sock.sendMessage(senderId, {
       text: hasilText,
-    });
+    }, { quoted: msg });
 
     return true;
   } catch (err) {
     console.error('❌ Gagal buat grup:', err);
-    await sock.sendMessage(sender, {
+    await sock.sendMessage(senderId, {
       text: '❌ Gagal membuat grup. Mungkin nomor tidak valid atau bot dibatasi.',
     }, { quoted: msg });
     return true;
