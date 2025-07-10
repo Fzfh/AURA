@@ -14,7 +14,6 @@ module.exports = async function ekstrakAudio(sock, msg) {
 
     let mediaMsg;
     if (isReply) {
-
       mediaMsg = {
         key: {
           remoteJid: msg.key.remoteJid,
@@ -35,8 +34,12 @@ module.exports = async function ekstrakAudio(sock, msg) {
       text: '🔄 Sedang mengekstrak audio...',
     }, { quoted: msg });
 
-    const videoPath = path.join(tmpdir(), `vid-${uuidv4()}.mp4`);
-    const audioPath = path.join(tmpdir(), `aud-${uuidv4()}.mp3`);
+    const timestamp = Date.now();
+    const videoFileName = `ekstrak-audio-aurabot #${timestamp}.mp4`;
+    const audioFileName = `ekstrak-audio-aurabot #${timestamp}.mp3`;
+
+    const videoPath = path.join(tmpdir(), videoFileName);
+    const audioPath = path.join(tmpdir(), audioFileName);
 
     const buffer = await downloadMediaMessage(
       mediaMsg,
@@ -59,6 +62,7 @@ module.exports = async function ekstrakAudio(sock, msg) {
     await sock.sendMessage(sender, {
       audio: audioBuffer,
       mimetype: 'audio/mpeg',
+      fileName: audioFileName,
       ptt: false,
     }, { quoted: msg });
 
