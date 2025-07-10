@@ -75,21 +75,17 @@ async function startBot() {
       if (!messages || type !== 'notify') return;
       const msg = messages[0];
       if (!msg.message) return;
-
-      const sender = msg.key.remoteJid;
-      const { text, realMsg } = extractMessageContent(msg);
-
+    
       try {
-        msg.message = realMsg;
         await handleResponder(sock, msg);
       } catch (e) {
         console.error(chalk.red('❌ Error di handleResponder:'), e);
       }
     });
-  } catch (err) {
-    console.error(chalk.bgRed('🔥 Gagal memulai bot:'), err);
+    } catch (err) {
+      console.error(chalk.bgRed('🔥 Gagal memulai bot:'), err);
+    }
   }
-}
 
 app.get('/qr', (req, res) => {
   res.send('🛑 Sekarang QR ditampilkan langsung di terminal.');
