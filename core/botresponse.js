@@ -345,8 +345,8 @@ if (text.startsWith('/') || text.startsWith('.')) {
       return await tagall(sock, msg, text, isGroup)
     }
 
-    if (text.startsWith('.add')) {
-      return await add(sock, msg, command, args, sender, userId)
+    if (/add|tambah|tambahkan|tambahin/i.test(text) && /\b(08|62)\d{7,14}\b/.test(text)) {
+      return await add(sock, msg, command, args, sender, userId, text)
     }
 
    if (['s', 'sticker'].includes(lowerText)) {
