@@ -9,7 +9,7 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
     case 'menu':
     case '.menu':
       await sock.sendMessage(sender, {
-        text: `╭━━━[ ✨ AURA BOT MENU ✨ ]━━━╮  
+       text: `╭━━━[ ✨ AURA BOT MENU ✨ ]━━━╮  
 ┃  
 ┃  🖼 Sticker dari Gambar/Video  
 ┃   ➤ Kirim media (foto/video)  
@@ -22,6 +22,10 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
 ┃  ✍ Sticker dari Teks  
 ┃   ➤ Ketik: \`stickertext\` teks  
 ┃   ➤ Contoh: \`stickertext\` AuraBot  
+┃  
+┃  🎵 Ekstrak Audio dari Video
+┃   ➤ Kirim video dengan caption: \`ets\`
+┃   ➤ Atau reply ke video lalu ketik: \`ets\`
 ┃  
 ┃  💌 Menfess Anonim  
 ┃   ➤ \`/menfess\` 
@@ -44,34 +48,45 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
 ┃   ➤ Contoh: \`.ds\` https://tiktok.com/linkKamu  
 ┃   
 ┃ ⬇ Download Reels Instagram  
-┃  \`IG DOWNLOAD 1 MENIT, JANGAN SPAM!\`
+┃  *IG DOWNLOAD 1 MENIT, JANGAN SPAM!*
 ┃   ➤ \`.dig\` link instagram 
-┃   ➤ Contoh: 
-┃   ➤ \`.dig\` https://instagram.com/linkKamu
+┃   ➤ Contoh: \`.dig\` https://instagram.com/linkKamu
 ┃ 
-┃ 🌐 Translete Semua Bahasa
+┃ 🌐 Translate Semua Bahasa
 ┃ ➤ /tl <kode bahasa> <teks>
 ┃ *CONTOH*
-┃ ➤/tl en halo dunia
+┃ ➤ /tl en halo dunia
 ┃ ➤ Bisa juga .tl atau tl
 ┃ 
 ┃ 🌐 List Kode Bahasa
 ┃ ➤ /listbahasa
 ┃ ➤ .listbahasa
 ┃ ➤ listbahasa
-┃ 
-┃ 👥 Tag All Group Members
-┃   ➤ .tagall
-┃   ➤ Contoh: .tagall Halo semua  
-┃   ➤ (Admin Only) 
 ┃  
 ┃ 🤖 Beli Bot WA  
 ┃   ➤ beli bot — Lihat harga & fitur bot  
 ┃  
 ┃ ❓ BINGUNG?? KETIK COMMAND INI AJA!!  
-┃   ➤ tutorial/tutor
+┃   ➤ tutorial / tutor  
 ┃   ➤ admin Bot — Hubungi langsung via WA  
 ╰━━━━━━━━━━━━━━━━━━━━━━━╯  
+
+╭━[ 🔒 KHUSUS ADMIN GRUP ]━╮  
+┃  
+┃  👥 Tag Semua Member Grup  
+┃   ➤ \`.tagall\`  
+┃   ➤ Contoh: .tagall Halo semua  
+┃  
+┃  🧾 Buat QR Code dengan Logo  
+┃   ➤ \`.cqr\` isi teks  
+┃   ➤ Contoh: \`.cqr\` halo dunia  
+┃  
+┃  🏗️ Buat Grup Baru via Bot  
+┃   ➤ bg <nama grup>  
+┃   ➤ Contoh: \`bg auragrup\`  
+┃   ➤ Tambah member langsung:  
+┃     ➤ \`bg auragrup add 62812345, 62854321\`  
+╰━━━━━━━━━━━━━━━━━━━━━━╯  
 
 🧠 Ketik sesuai menu ya adick-adickk!  
 📌 Hindari typo biar AURABOT gak Misskom 🤖🔥
