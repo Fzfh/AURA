@@ -350,9 +350,7 @@ if (text.startsWith('/') || text.startsWith('.')) {
     if (
       lowerText.startsWith('.add') ||
       lowerText.startsWith('add') ||
-      lowerText.startsWith('tambah') ||
-      lowerText.startsWith('tambahin') ||
-      lowerText.startsWith('tambahkan')
+      lowerText.startsWith('tambah')
     ) {
       const raw = text.split(' ').slice(1).join(' ');
       const nomorList = raw.split(',').map(n => {
