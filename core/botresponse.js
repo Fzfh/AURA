@@ -179,12 +179,12 @@ if (text.startsWith('/') || text.startsWith('.')) {
       return await linkMap(sock, msg, isi);
     }
 
-    if (text.startsWith('.mapqr')) {
+    if (lowerText.startsWith('.mapqr') || lowerText.startsWith('mapqr')) {
       const isi = text.split('.mapqr')[1]?.trim() || '';
       return await mapsQR(sock, msg, isi);
     }
 
-    if (text.startsWith('.qr') || text.startsWith('qr')) {
+    if (lowerText.startsWith('.qr') || text.startsWith('qr')) {
       return await handleQR(sock, msg);
     }
     
