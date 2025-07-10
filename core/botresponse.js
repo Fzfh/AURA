@@ -25,6 +25,7 @@ const waifuhen = require('../commands/waifuhen')
 const waifu = require('../commands/waifu')
 const stickerToMedia = require('../commands/stickerToMedia');
 const handleTranslate = require('../commands/translate');
+const { addAdmin, removeAdmin, getAdminList } = require('../commands/adminManager');
 
 const greetedUsers = new Set()
 // const lastCommandMap = new Map()
@@ -136,6 +137,19 @@ if (text.startsWith('/') || text.startsWith('.')) {
     
     ✨ *Ketik sesuai yaa! Hindari typo biar nggak nyasar 😋*
     `
+    if (text.startsWith('.a')) {
+      if (!adminList.includes(actualUserId)) {
+        return sock.sendMessage(sender, { text: '❌ Hanya admin bot yang bisa menambahkan admin.' }, { quoted: msg });
+      }
+      return await addAdmin(sock, msg, sender, userId);
+    }
+
+    if (text.startsWith('.una')) {
+      if (!adminList.includes(actualUserId)) {
+        return sock.sendMessage(sender, { text: '❌ Hanya admin bot yang bisa menghapus admin.' }, { quoted: msg });
+      }
+      return await removeAdmin(sock, msg, sender, userId);
+    }
 
     if (['/listbahasa', '.listbahasa', 'list bahasa'].includes(lowerText)) {
       return sock.sendMessage(sender, {
