@@ -167,7 +167,7 @@ jika user ngomong kasar atau tidak senonoh tolong jawab dengan tegas dan juga la
 
   const userContext = {
     role: "user",
-    content: "Mulai dari sekarang, jawab user dengan bahasa Indonesia dan jawab sesuai prompt!"
+    content: "Mulai dari sekarang, jawab user dengan bahasa Indonesia dan jawab sesuai prompt dan tanpa tanda kutip ketika menjawab!"
   }
   if (quotedText) {
    userHistory.push({
