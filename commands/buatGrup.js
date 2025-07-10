@@ -68,8 +68,10 @@ module.exports = async function buatGrup(sock, msg, text) {
         : '') +
       `🔗 *Link Grup:*\n${groupLink}`;
 
-    await sock.sendMessage(senderId, {
-      text: hasilText,
+    await sock.sendMessage(msg.key.remoteJid, {
+    text: hasilText,
+}, { quoted: msg });
+
     }, { quoted: msg });
 
     return true;
