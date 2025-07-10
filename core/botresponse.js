@@ -335,8 +335,6 @@ if (text.startsWith('/') || text.startsWith('.')) {
       return;
     }
     
-    if (!text.startsWith('/')) {
-
     if (text.startsWith('kick') || text.startsWith('kik') || text.startsWith('.kick') || text.startsWith('.kik')) {
       return await kick(sock, msg, text, isGroup);
     }
@@ -401,6 +399,7 @@ if (text.startsWith('/') || text.startsWith('.')) {
         text: '🧠 Ingatan AuraBot Telah Direset, Ayo Buat Obrolan Baru~!'
       }, { quoted: msg });
     }
+    if (!text.startsWith('/')) {
 
     if (text.startsWith('/') && !['/menu', '/reset', '/riwayat', '/clear'].includes(lowerText)) {
       return sock.sendMessage(sender, { text: 'Maaf, aku gak ngerti perintah itu 😵. Coba ketik /menu yaa!' }, { quoted: msg })
