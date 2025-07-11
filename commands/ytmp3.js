@@ -1,25 +1,33 @@
-const ytdlp = require('yt-dlp-exec');
 const fs = require('fs');
+const ytdl = require('ytdl-core');
+const { exec } = require('child_process');
+const path = require('path');
 
 async function downloadYtToMp3(url, outputPath) {
   try {
-    await ytdlp([
-      url,
-      '--extract-audio',
-      '--audio-format', 'mp3',
-      '--audio-quality', '0',
-      '--output', outputPath,
-      '--no-check-certificate',
-      '--no-playlist',
-      '--limit-rate', '500K',
-      '--user-agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
-    ]);
+    const tempStream = path.join('/tmp', `audio_${Date.now()}.mp4`);
 
-    if (!fs.existsSync(outputPath)) {
-      throw new Error('❌ File MP3 tidak ditemukan.');
-    }
+    await new Promise((resolve, reject) => {
+      const stream = ytdl(url, { quality: 'highestaudio' });
+      const file = fs.createWriteStream(tempStream);
+      stream.pipe(file);
+      stream.on('end', resolve);
+      stream.on('error', reject);
+    });
+
+    await new Promise((resolve, reject) => {
+      exec(`ffmpeg -i ${tempStream} -vn -ab 128k -ar 44100 -y ${outputPath}`, (error, stdout, stderr) => {
+        if (error) {
+          console.error(stderr);
+          return reject('Gagal convert MP3.');
+        }
+        resolve();
+      });
+    });
+
+    fs.unlinkSync(tempStream);
   } catch (err) {
-    console.error('❌ YTDLP ERROR:', err);
+    console.error('❌ MP3 Error:', err);
     throw new Error('Gagal convert MP3. Coba link lain ya~');
   }
 }
