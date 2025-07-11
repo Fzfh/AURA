@@ -143,52 +143,6 @@ if (text.startsWith('/') || text.startsWith('.')) {
     
     ✨ *Ketik sesuai yaa! Hindari typo biar nggak nyasar 😋*
     `
-   const stopWords = ['gamau', 'nggak mau', 'tidak mau', 'skip', 'cukup', 'gak lanjut', 'udah', 'berhenti']
-
-// Cek jika user ingin berhenti main math
-   const isStopping = stopWords.some(word => lowerText.includes(word)) &&
-    msg.message?.extendedTextMessage?.contextInfo?.quotedMessage?.conversation?.includes('Soal')
-
-    if (isStopping) {
-      const history = memoryMap.get(userId) || []
-      userStateMap.delete(userId)
-    
-      return sock.sendMessage(from, {
-        text: 'Oke sip! Kita istirahat dulu ya~ Kalau mau main lagi tinggal ketik /mathai aja 😉'
-      }, { quoted: msg })
-    }
-
-// Mulai game matematika
-    if (text.startsWith('.math') || text.startsWith('/mathai')) {
-      const res = await askOpenAI([
-        { role: 'user', content: 'Yuk mulai game matematika. Kirimin aku soal pertama.' }
-      ])
-    
-      const history = memoryMap.get(userId) || []
-      userStateMap.set(userId, 'playingMath')
-
-    
-      return sock.sendMessage(from, { text: res }, { quoted: msg })
-    }
-
-// User menjawab soal
-    if (msg.message?.extendedTextMessage?.contextInfo?.quotedMessage?.conversation?.includes('Soal')) {
-      const soal = msg.message?.extendedTextMessage?.contextInfo?.quotedMessage?.conversation
-      const isPlaying = userStateMap.get(userId) === 'playingMath'
-
-      if (!isPlaying) {
-        return sock.sendMessage(from, {
-          text: 'Eh, kayaknya kita udah selesai main math deh 😅 Mau mulai lagi? ketik /mathai ya~'
-        }, { quoted: msg })
-      }
-    
-      const res = await askOpenAI([
-        { role: 'user', content: `Soal sebelumnya: ${soal}` },
-        { role: 'user', content: `Jawabanku: ${text}` }
-      ])
-      return sock.sendMessage(from, { text: res }, { quoted: msg })
-    }
-
     if (lowerText.startsWith('.na') || lowerText.startsWith('na')) {
       return await addAdmin(sock, msg, sender, actualUserId, text);
     }
