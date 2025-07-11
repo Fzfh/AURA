@@ -12,7 +12,15 @@ async function downloadYtToMp3(url, outputPath) {
         return reject(new Error('❌ Format audio tidak ditemukan.'));
       }
 
-      ffmpeg(ytdl.downloadFromInfo(info, { quality: 'highestaudio' }))
+      ffmpeg(ytdl.downloadFromInfo(info, {
+        quality: 'highestaudio',
+        requestOptions: {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+            'Accept-Language': 'en-US,en;q=0.9',
+          }
+        }
+      }))
         .audioBitrate(128)
         .format('mp3')
         .on('error', err => {
