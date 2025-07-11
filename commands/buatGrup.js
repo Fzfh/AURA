@@ -1,29 +1,34 @@
-const cooldownMap = new Map(); 
-const COOLDOWN_DURATION = 90 * 1000; 
+const cooldownMap = new Map();
+const COOLDOWN_GROUP = 90 * 1000;
+const COOLDOWN_PRIVATE = 180 * 1000;
 
 module.exports = async function buatGrup(sock, msg, text) {
   const sender = msg.key.participant || msg.key.remoteJid;
   const senderId = sender.includes('@s.whatsapp.net') ? sender : sender.split(':')[0] + '@s.whatsapp.net';
+  const isGroup = msg.key.remoteJid.endsWith('@g.us');
 
   if (!text.toLowerCase().startsWith('.bg ')) return false;
 
-  const metadata = await sock.groupMetadata(msg.key.remoteJid);
-  const groupAdmins = metadata.participants
-    .filter(p => p.admin === 'admin' || p.admin === 'superadmin')
-    .map(p => p.id);
+  let isAllowed = true;
+  let cooldownTime = isGroup ? COOLDOWN_GROUP : COOLDOWN_PRIVATE;
 
-  const isGroupAdmin = groupAdmins.includes(senderId);
+  if (isGroup) {
+    const metadata = await sock.groupMetadata(msg.key.remoteJid);
+    const groupAdmins = metadata.participants
+      .filter(p => p.admin === 'admin' || p.admin === 'superadmin')
+      .map(p => p.id);
 
-  if (!isGroupAdmin) {
-    await sock.sendMessage(msg.key.remoteJid, {
-      text: '🚫 Maaf, hanya *admin grup* yang boleh buat grup lewat bot ini.',
-    }, { quoted: msg });
-    return true;
+    if (!groupAdmins.includes(senderId)) {
+      await sock.sendMessage(msg.key.remoteJid, {
+        text: '🚫 Maaf, hanya *admin grup* yang boleh buat grup lewat bot ini.',
+      }, { quoted: msg });
+      return true;
+    }
   }
 
   const now = Date.now();
   const lastUsed = cooldownMap.get(senderId) || 0;
-  const remaining = COOLDOWN_DURATION - (now - lastUsed);
+  const remaining = cooldownTime - (now - lastUsed);
 
   if (remaining > 0) {
     const seconds = Math.floor((remaining / 1000) % 60);
@@ -79,14 +84,14 @@ module.exports = async function buatGrup(sock, msg, text) {
     }
   }
 
-    try {
+  try {
     const response = await sock.groupCreate(namaGrup, participants);
     const groupId = response.id;
     const promoteList = [senderId, ...addedJids];
     await sock.groupParticipantsUpdate(groupId, promoteList, 'promote');
     const groupCode = await sock.groupInviteCode(groupId);
     const groupLink = `https://chat.whatsapp.com/${groupCode}`;
-  
+
     const hasilText = `✅ *Grup berhasil dibuat!*\n\n` +
       `📛 *Nama:* ${namaGrup}\n` +
       (addedNumbers.length > 0
@@ -96,11 +101,11 @@ module.exports = async function buatGrup(sock, msg, text) {
         ? `⚠️ *Gagal ditambahkan (tidak terdaftar atau tidak bisa diinvite):*\n${gagalNumbers.join(', ')}\n`
         : '') +
       `🔗 *Link Grup:*\n${groupLink}`;
-  
+
     await sock.sendMessage(msg.key.remoteJid, {
       text: hasilText,
     }, { quoted: msg });
-  
+
     return true;
   } catch (err) {
     console.error('❌ Gagal buat grup:', err);
