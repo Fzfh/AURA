@@ -1,41 +1,23 @@
 const fs = require('fs');
-const ytdl = require('ytdl-core');
-const ffmpeg = require('fluent-ffmpeg');
+const { exec } = require('child_process');
 
 async function downloadYtToMp3(url, outputPath) {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const info = await ytdl.getInfo(url);
-      const audioFormat = ytdl.chooseFormat(info.formats, { quality: 'highestaudio' });
+  return new Promise((resolve, reject) => {
+    const command = `yt-dlp -x --audio-format mp3 --audio-quality 0 --no-playlist --no-check-certificate --limit-rate 500K -o "${outputPath}" "${url}"`;
 
-      if (!audioFormat || !audioFormat.url) {
-        return reject(new Error('❌ Format audio tidak ditemukan.'));
+    exec(command, (error, stdout, stderr) => {
+      if (error) {
+        console.error('❌ YTDLP ERROR:', stderr || error.message);
+        reject(new Error('❌ Gagal convert MP3. Coba link lain ya~'));
+        return;
       }
 
-      ffmpeg(ytdl.downloadFromInfo(info, {
-        quality: 'highestaudio',
-        requestOptions: {
-          headers: {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
-            'Accept-Language': 'en-US,en;q=0.9',
-          }
-        }
-      }))
-        .audioBitrate(128)
-        .format('mp3')
-        .on('error', err => {
-          console.error('FFMPEG Error:', err);
-          reject(new Error('❌ Gagal convert MP3.'));
-        })
-        .on('end', () => {
-          resolve();
-        })
-        .save(outputPath);
+      if (!fs.existsSync(outputPath)) {
+        return reject(new Error('❌ File MP3 tidak ditemukan setelah convert.'));
+      }
 
-    } catch (err) {
-      console.error('❌ MP3 Error:', err);
-      reject(new Error('❌ Gagal convert MP3. Link mungkin dibatasi YouTube.'));
-    }
+      resolve();
+    });
   });
 }
 
