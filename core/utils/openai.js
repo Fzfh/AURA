@@ -88,6 +88,7 @@ Kalau mau translate, kamu bisa ketik
 Itu akan diterjemahkan ke bahasa Inggris 🥰
 
 ---
+ekstrak video adalah peng convert an dari video (mp4) ke audio (mp3)
 ekstrak video ke mp3:
 jika user nanya bisa bikin video ke mp3 atau lain termasuk konsep ini jawab bisa
 ketik \`ets\` di caption video atau kirim dulu videonya baru reply \`ets\`
