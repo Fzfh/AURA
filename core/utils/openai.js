@@ -222,11 +222,11 @@ jangan terima command yang hanya (d)!
  }
 
   if (quotedText) {
-   userHistory.push({
-     role: 'user',
-     content: `User membalas pesan sebelumnya: ${quotedText}`
-   })
- }
+    userHistory.push({
+      role: 'system',
+      content: `User sedang membalas pesan bot sebelumnya: "${quotedText}". Tanggapi dengan relevan, lucu, dan alami seolah kamu ingat isi obrolannya.`
+    })
+  }
 
   const messages = [systemPrompt, userContext, ...userHistory]
 
