@@ -5,7 +5,7 @@ module.exports = async function buatGrup(sock, msg, text) {
   const sender = msg.key.participant || msg.key.remoteJid;
   const senderId = sender.includes('@s.whatsapp.net') ? sender : sender.split(':')[0] + '@s.whatsapp.net';
 
-  if (!text.toLowerCase().startsWith('bg ')) return false;
+  if (!text.toLowerCase().startsWith('.bg ')) return false;
 
   const metadata = await sock.groupMetadata(msg.key.remoteJid);
   const groupAdmins = metadata.participants
@@ -44,7 +44,7 @@ module.exports = async function buatGrup(sock, msg, text) {
 
   if (!namaGrup) {
     await sock.sendMessage(msg.key.remoteJid, {
-      text: '❗ Format salah.\nContoh: `bg NamaGrup` atau `bg NamaGrup add 628xxxx, 628xxxx`',
+      text: '❗ Format salah.\nContoh: `.bg NamaGrup` atau `.bg NamaGrup add 628xxxx, 628xxxx`',
     }, { quoted: msg });
     return true;
   }
