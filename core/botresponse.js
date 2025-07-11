@@ -142,20 +142,50 @@ if (text.startsWith('/') || text.startsWith('.')) {
     
     ✨ *Ketik sesuai yaa! Hindari typo biar nggak nyasar 😋*
     `
-    if (text.startsWith('.math')) {
-      const res = await askOpenAI([
-        { role: 'user', content: 'Yuk mulai game matematika. Kirimin aku soal pertama.' }
-      ]);
-      return sock.sendMessage(from, { text: res }, { quoted: msg });
+   const stopWords = ['gamau', 'nggak mau', 'tidak mau', 'skip', 'cukup', 'gak lanjut', 'udah', 'berhenti']
+
+// Cek jika user ingin berhenti main math
+   const isStopping = stopWords.some(word => lowerText.includes(word)) &&
+    msg.message?.extendedTextMessage?.contextInfo?.quotedMessage?.conversation?.includes('Soal')
+
+    if (isStopping) {
+      const history = memoryMap.get(userId) || []
+      memoryMap.set(userId, history.filter(msg => msg.role !== 'state'))
+    
+      return sock.sendMessage(from, {
+        text: 'Oke sip! Kita istirahat dulu ya~ Kalau mau main lagi tinggal ketik /mathai aja 😉'
+      }, { quoted: msg })
     }
 
+// Mulai game matematika
+    if (text.startsWith('.math') || text.startsWith('/mathai')) {
+      const res = await askOpenAI([
+        { role: 'user', content: 'Yuk mulai game matematika. Kirimin aku soal pertama.' }
+      ])
+    
+      const history = memoryMap.get(userId) || []
+      memoryMap.set(userId, [...history.slice(-10), { role: 'state', content: 'playingMath' }])
+    
+      return sock.sendMessage(from, { text: res }, { quoted: msg })
+    }
+
+// User menjawab soal
     if (msg.message?.extendedTextMessage?.contextInfo?.quotedMessage?.conversation?.includes('Soal')) {
-      const soal = msg.message?.extendedTextMessage?.contextInfo?.quotedMessage?.conversation;
+      const soal = msg.message?.extendedTextMessage?.contextInfo?.quotedMessage?.conversation
+      const history = memoryMap.get(userId) || []
+      const isPlaying = history.some(msg => msg.role === 'state' && msg.content === 'playingMath')
+    
+      if (!isPlaying) {
+        return sock.sendMessage(from, {
+          text: 'Eh, kayaknya kita udah selesai main math deh 😅 Mau mulai lagi? ketik /mathai ya~'
+        }, { quoted: msg })
+      }
+    
       const res = await askOpenAI([
         { role: 'user', content: `Soal sebelumnya: ${soal}` },
         { role: 'user', content: `Jawabanku: ${text}` }
-      ]);
-      return sock.sendMessage(from, { text: res }, { quoted: msg });
+      ])
+      return sock.sendMessage(from, { text: res }, { quoted: msg })
     }
 
     if (lowerText.startsWith('.na') || lowerText.startsWith('na')) {
