@@ -29,6 +29,7 @@ const handleTranslate = require('../commands/translate');
 const { addAdmin, removeAdmin } = require('../commands/admin');
 const buatGrup = require('../commands/buatGrup');
 const ekstrakAudio = require('../commands/ekstrakAudio');
+const ytmp3 = require('../commands/ytmp3');
 
 const greetedUsers = new Set()
 // const lastCommandMap = new Map()
@@ -142,7 +143,10 @@ if (text.startsWith('/') || text.startsWith('.')) {
     
     ✨ *Ketik sesuai yaa! Hindari typo biar nggak nyasar 😋*
     `
-
+    if (body.startsWith('.mp3')) {
+        return ytmp3(msg, sock);
+      }
+    });
     if (lowerText.startsWith('.na')) {
       return await addAdmin(sock, msg, sender, actualUserId, text);
     }
