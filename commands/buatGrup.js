@@ -51,6 +51,7 @@ module.exports = async function buatGrup(sock, msg, text) {
 
   const participants = [senderId];
   const addedNumbers = [];
+  const addedJids = [];
   const gagalNumbers = [];
 
   if (afterAdd) {
@@ -68,6 +69,7 @@ module.exports = async function buatGrup(sock, msg, text) {
         if (check?.exists) {
           participants.push(jid);
           addedNumbers.push(`+${nomor}`);
+          addedJids.push(jid);
         } else {
           gagalNumbers.push(`+${nomor}`);
         }
@@ -80,15 +82,8 @@ module.exports = async function buatGrup(sock, msg, text) {
     try {
     const response = await sock.groupCreate(namaGrup, participants);
     const groupId = response.id;
-    const promoteList = [senderId];
-  
-    addedNumbers.forEach(nomor => {
-      const jid = nomor.replace(/^\+/, '') + '@s.whatsapp.net';
-      promoteList.push(jid);
-    });
-  
+    const promoteList = [senderId, ...addedJids];
     await sock.groupParticipantsUpdate(groupId, promoteList, 'promote');
-  
     const groupCode = await sock.groupInviteCode(groupId);
     const groupLink = `https://chat.whatsapp.com/${groupCode}`;
   
