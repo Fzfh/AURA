@@ -1,28 +1,27 @@
-const axios = require('axios');
+const ytdlp = require('yt-dlp-exec');
+const { escape } = require('shell-escape');
 const fs = require('fs');
 
 async function downloadYtToMp3(url, outputPath) {
   try {
-    const encodedUrl = encodeURIComponent(url);
-    const res = await axios.get(`https://vidfetch.my.id/api/ytmp3?url=${encodedUrl}`);
+    await ytdlp([
+      url,
+      '--extract-audio',
+      '--audio-format', 'mp3',
+      '--audio-quality', '0',
+      '--output', outputPath,
+      '--no-check-certificate',
+      '--no-playlist',
+      '--limit-rate', '500K',
+      '--user-agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+    ], { shell: true });
 
-    if (!res.data.status || !res.data.result?.url) {
-      throw new Error('Audio tidak ditemukan!');
+    if (!fs.existsSync(outputPath)) {
+      throw new Error('Gagal menghasilkan file');
     }
-
-    const audioUrl = res.data.result.url;
-    const writer = fs.createWriteStream(outputPath);
-    const audioRes = await axios.get(audioUrl, { responseType: 'stream' });
-
-    audioRes.data.pipe(writer);
-
-    await new Promise((resolve, reject) => {
-      writer.on('finish', resolve);
-      writer.on('error', reject);
-    });
   } catch (err) {
-    console.error('❌ Gagal download via API:', err);
-    throw new Error('❌ Gagal ambil MP3. Coba link lain yaa!');
+    console.error('❌ YTDLP ERROR:', err);
+    throw new Error('Gagal convert MP3. Coba link lain ya~');
   }
 }
 
