@@ -17,27 +17,25 @@ function centerText(text) {
 function tampilkanBanner(botName = "AURABOT") {
   console.clear();
 
-  // Teks besar (figlet)
+  // Banner figlet gradient
   const banner = figlet.textSync(botName, {
     font: "Standard",
     horizontalLayout: "default",
     verticalLayout: "default",
   });
 
-  // Center + gradient
   console.log(gradient.pastel.multiline(centerText(banner)));
 
-  // Kotak info login
-  const info =
-    chalk.whiteBright.bold(
-      `🟢 Status: Menunggu login ke WhatsApp\n\n` +
-      `📲 Pilih salah satu metode:\n` +
-      `   ▶ Jalankan: ${chalk.cyan("node start --qrcode")} untuk QR Code\n` +
-      `   ▶ Jalankan: ${chalk.cyan("node start --prcode=628xxxx")} untuk Pairing Code\n\n` +
-      `💡 Catatan:\n` +
-      ` - Jangan pakai +62, spasi, atau 08xxx\n` +
-      ` - Format WA harus: 628xxxxxx`
-    );
+  // INFO LOGIN (chalk diperbaiki)
+  const info = chalk.bold.whiteBright(
+    `🟢 Status: Menunggu login ke WhatsApp\n\n` +
+    `📲 Pilih salah satu metode:\n` +
+    `   ▶ Jalankan: ${chalk.cyan("node start --qrcode")} untuk QR Code\n` +
+    `   ▶ Jalankan: ${chalk.cyan("node start --prcode=628xxxx")} untuk Pairing Code\n\n` +
+    `💡 Catatan:\n` +
+    ` - Jangan pakai +62, spasi, atau 08xxx\n` +
+    ` - Format WA harus: 628xxxxxx`
+  );
 
   const box = boxen(info, {
     padding: 1,
@@ -48,14 +46,14 @@ function tampilkanBanner(botName = "AURABOT") {
     titleAlignment: "center",
   });
 
-  // Center box juga
+  // Center box
   const boxLines = box.split("\n");
   boxLines.forEach(line => {
     const pad = Math.max(0, Math.floor((terminalWidth - line.length) / 2));
     console.log(" ".repeat(pad) + line);
   });
 
-  // Branding
+  // Branding bawah
   console.log(centerText(gradient.fruit("📛 BOT BY FAZRI")));
 }
 
