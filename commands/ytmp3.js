@@ -1,37 +1,28 @@
-const axios = require('axios');
 const fs = require('fs');
-const path = require('path');
-require('dotenv').config();
+const ytdl = require('ytdl-core');
+const ffmpeg = require('fluent-ffmpeg');
+const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
+ffmpeg.setFfmpegPath(ffmpegPath);
 
 async function downloadYtToMp3(url, outputPath) {
-  try {
-    const apiUrl = process.env.YTMP3_API;
-    if (!apiUrl) throw new Error('API URL tidak ditemukan di .env');
+  return new Promise((resolve, reject) => {
+    if (!ytdl.validateURL(url))
+      return reject(new Error('❌ URL YouTube tidak valid'));
 
-    const { data } = await axios.get(`${apiUrl}&url=${encodeURIComponent(url)}`);
-    if (!data || !data.result || !data.result.audioUrl) {
-      throw new Error('Gagal ambil MP3 dari API');
-    }
-
-    const mp3Url = data.result.audioUrl;
-
-    const writer = fs.createWriteStream(outputPath);
-    const response = await axios.get(mp3Url, { responseType: 'stream' });
-    response.data.pipe(writer);
-
-    await new Promise((resolve, reject) => {
-      writer.on('finish', resolve);
-      writer.on('error', reject);
-    });
-
-    if (!fs.existsSync(outputPath)) {
-      throw new Error('Gagal menghasilkan file');
-    }
-
-  } catch (err) {
-    console.error('❌ MP3 Error:', err);
-    throw new Error('❌ Gagal convert MP3. Link mungkin dibatasi YouTube.');
-  }
+    const audioStream = ytdl(url, { filter: 'audioonly', quality: 'highestaudio' });
+    const proc = ffmpeg(audioStream)
+      .audioBitrate(128)
+      .format('mp3')
+      .save(outputPath)
+      .on('end', () => {
+        if (fs.existsSync(outputPath)) resolve();
+        else reject(new Error('❌ Gagal membuat file MP3'));
+      })
+      .on('error', err => {
+        console.error('❌ FFMPEG ERROR:', err);
+        reject(new Error('❌ Gagal convert MP3. Coba lagi'));
+      });
+  });
 }
 
 module.exports = downloadYtToMp3;
