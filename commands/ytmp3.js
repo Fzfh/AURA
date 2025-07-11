@@ -13,10 +13,10 @@ async function downloadYtToMp3(url, outputPath) {
       '--no-playlist',
       '--limit-rate', '500K',
       '--user-agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
-    ], { shell: true });
+    ]);
 
     if (!fs.existsSync(outputPath)) {
-      throw new Error('Gagal menghasilkan file');
+      throw new Error('❌ File MP3 tidak ditemukan.');
     }
   } catch (err) {
     console.error('❌ YTDLP ERROR:', err);
