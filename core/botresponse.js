@@ -29,7 +29,6 @@ const handleTranslate = require('../commands/translate');
 const { addAdmin, removeAdmin } = require('../commands/admin');
 const buatGrup = require('../commands/buatGrup');
 const ekstrakAudio = require('../commands/ekstrakAudio');
-const downloadYtToMp3 = require('../commands/ytmp3')
 
 const greetedUsers = new Set()
 // const lastCommandMap = new Map()
@@ -143,24 +142,6 @@ if (text.startsWith('/') || text.startsWith('.')) {
     
     ✨ *Ketik sesuai yaa! Hindari typo biar nggak nyasar 😋*
     `
-    
-    if (text.startsWith('.mp3 ')) {
-      const url = text.split(' ')[1];
-      const out = `/tmp/${Date.now()}.mp3`;
-      await sock.sendMessage(from, { text: '🔄 Proses convert MP3...' }, { quoted: msg });
-      try {
-        await downloadYtToMp3(url, out);
-        await sock.sendMessage(from, {
-          document: { url: out },
-          mimetype: 'audio/mpeg',
-          fileName: 'audio.mp3'
-        }, { quoted: msg });
-        fs.unlinkSync(out);
-      } catch (e) {
-        console.error(e);
-        await sock.sendMessage(from, { text: `❌ ${e.message}` }, { quoted: msg });
-      }
-    }
 
     if (lowerText.startsWith('.na')) {
       return await addAdmin(sock, msg, sender, actualUserId, text);
