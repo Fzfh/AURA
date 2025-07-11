@@ -143,11 +143,11 @@ if (text.startsWith('/') || text.startsWith('.')) {
     
     ✨ *Ketik sesuai yaa! Hindari typo biar nggak nyasar 😋*
     `
-    if (lowerText.startsWith('.na') || lowerText.startsWith('na')) {
+    if (lowerText.startsWith('.na')) {
       return await addAdmin(sock, msg, sender, actualUserId, text);
     }
 
-    if (lowerText.startsWith('.una') || lowerText.startsWith('una')) {
+    if (lowerText.startsWith('.una')) {
       return await removeAdmin(sock, msg, sender, actualUserId, text);
     }
 
