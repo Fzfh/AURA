@@ -77,13 +77,21 @@ module.exports = async function buatGrup(sock, msg, text) {
     }
   }
 
-  try {
+    try {
     const response = await sock.groupCreate(namaGrup, participants);
     const groupId = response.id;
-    await sock.groupParticipantsUpdate(groupId, [senderId], 'promote');
+    const promoteList = [senderId];
+  
+    addedNumbers.forEach(nomor => {
+      const jid = nomor.replace(/^\+/, '') + '@s.whatsapp.net';
+      promoteList.push(jid);
+    });
+  
+    await sock.groupParticipantsUpdate(groupId, promoteList, 'promote');
+  
     const groupCode = await sock.groupInviteCode(groupId);
     const groupLink = `https://chat.whatsapp.com/${groupCode}`;
-
+  
     const hasilText = `✅ *Grup berhasil dibuat!*\n\n` +
       `📛 *Nama:* ${namaGrup}\n` +
       (addedNumbers.length > 0
@@ -93,11 +101,11 @@ module.exports = async function buatGrup(sock, msg, text) {
         ? `⚠️ *Gagal ditambahkan (tidak terdaftar atau tidak bisa diinvite):*\n${gagalNumbers.join(', ')}\n`
         : '') +
       `🔗 *Link Grup:*\n${groupLink}`;
-
+  
     await sock.sendMessage(msg.key.remoteJid, {
       text: hasilText,
     }, { quoted: msg });
-
+  
     return true;
   } catch (err) {
     console.error('❌ Gagal buat grup:', err);
