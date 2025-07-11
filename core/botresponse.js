@@ -143,10 +143,10 @@ if (text.startsWith('/') || text.startsWith('.')) {
     
     ✨ *Ketik sesuai yaa! Hindari typo biar nggak nyasar 😋*
     `
-    if (body.startsWith('.mp3')) {
-        return ytmp3(msg, sock);
-      }
-    });
+     if (body.startsWith('.mp3')) {
+      return ytmp3(msg, sock);
+    }
+
     if (lowerText.startsWith('.na')) {
       return await addAdmin(sock, msg, sender, actualUserId, text);
     }
