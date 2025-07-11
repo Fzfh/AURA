@@ -2,14 +2,14 @@ const ytdl = require('ytdl-core');
 const fs = require('fs');
 const path = require('path');
 
-module.exports = async (msg, conn) => {
+module.exports = async (msg, sock) => {
   const from = msg.key.remoteJid;
   const body = msg.message.conversation || msg.message.extendedTextMessage?.text || '';
   const args = body.split(' ');
   const url = args[1];
 
   if (!url || !url.includes('music.youtube.com')) {
-    return conn.sendMessage(from, {
+    return sock.sendMessage(from, {
       text: '⚠️ Kirim link dari *YouTube Music* ya. Contoh:\n.mp3 https://music.youtube.com/watch?v=xxxxx'
     }, { quoted: msg });
   }
@@ -28,7 +28,7 @@ module.exports = async (msg, conn) => {
 
     const filePath = path.join(tempDir, fileName);
 
-    await conn.sendMessage(from, {
+    await sock.sendMessage(from, {
       text: `🎶 Mengunduh lagu: *${title}*\nTunggu sebentar ya...`
     }, { quoted: msg });
 
@@ -45,14 +45,14 @@ module.exports = async (msg, conn) => {
       const sizeMB = stats.size / (1024 * 1024);
 
       if (sizeMB > 50) {
-        await conn.sendMessage(from, {
+        await sock.sendMessage(from, {
           text: '⚠️ Ukuran audio terlalu besar (>50MB). Gagal dikirim ke WhatsApp.'
         }, { quoted: msg });
         fs.unlinkSync(filePath);
         return;
       }
 
-      await conn.sendMessage(from, {
+      await sock.sendMessage(from, {
         audio: fs.readFileSync(filePath),
         mimetype: 'audio/mp4',
         ptt: false
@@ -63,7 +63,7 @@ module.exports = async (msg, conn) => {
 
   } catch (err) {
     console.error(err);
-    conn.sendMessage(from, {
+    sock.sendMessage(from, {
       text: '❌ Gagal download audio. Link error atau tidak valid.'
     }, { quoted: msg });
   }
