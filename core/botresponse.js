@@ -1,4 +1,5 @@
 const spamTracker = new Map()
+const userStateMap = new Map()
 const mutedUsers = new Map()
 const memoryMap = new Map()
 const muteDuration = 2 * 60 * 1000
@@ -150,7 +151,7 @@ if (text.startsWith('/') || text.startsWith('.')) {
 
     if (isStopping) {
       const history = memoryMap.get(userId) || []
-      memoryMap.set(userId, history.filter(msg => msg.role !== 'state'))
+      userStateMap.delete(userId)
     
       return sock.sendMessage(from, {
         text: 'Oke sip! Kita istirahat dulu ya~ Kalau mau main lagi tinggal ketik /mathai aja 😉'
@@ -164,7 +165,8 @@ if (text.startsWith('/') || text.startsWith('.')) {
       ])
     
       const history = memoryMap.get(userId) || []
-      memoryMap.set(userId, [...history.slice(-10), { role: 'state', content: 'playingMath' }])
+      userStateMap.set(userId, 'playingMath')
+
     
       return sock.sendMessage(from, { text: res }, { quoted: msg })
     }
@@ -172,9 +174,8 @@ if (text.startsWith('/') || text.startsWith('.')) {
 // User menjawab soal
     if (msg.message?.extendedTextMessage?.contextInfo?.quotedMessage?.conversation?.includes('Soal')) {
       const soal = msg.message?.extendedTextMessage?.contextInfo?.quotedMessage?.conversation
-      const history = memoryMap.get(userId) || []
-      const isPlaying = history.some(msg => msg.role === 'state' && msg.content === 'playingMath')
-    
+      const isPlaying = userStateMap.get(userId) === 'playingMath'
+
       if (!isPlaying) {
         return sock.sendMessage(from, {
           text: 'Eh, kayaknya kita udah selesai main math deh 😅 Mau mulai lagi? ketik /mathai ya~'
