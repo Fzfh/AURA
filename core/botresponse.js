@@ -29,7 +29,7 @@ const handleTranslate = require('../commands/translate');
 const { addAdmin, removeAdmin } = require('../commands/admin');
 const buatGrup = require('../commands/buatGrup');
 const ekstrakAudio = require('../commands/ekstrakAudio');
-const downloadYtToMp3 = require('../commands/ytmp3')
+const { downloadYtToMp3 } = require('../commands/ytmp3')
 
 const greetedUsers = new Set()
 // const lastCommandMap = new Map()
