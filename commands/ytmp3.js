@@ -9,3 +9,4 @@ async function downloadYtToMp3(url, outputPath) {
     output: outputPath
   });
 }
+module.exports = downloadYtToMp3;
