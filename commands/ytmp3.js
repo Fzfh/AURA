@@ -1,24 +1,28 @@
+const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
-const ytdlp = require('yt-dlp-exec');
 
-async function downloadYtToMp3(url, outputPath) {
+async function downloadYtToMp3(url, savePath) {
   try {
-    await ytdlp(url, {
-      extractAudio: true,
-      audioFormat: 'mp3',
-      audioQuality: '0',
-      output: outputPath,
-      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0 Safari/537.36',
-      noCheckCertificate: true,
-      preferFreeFormats: true,
-      geoBypass: true,
-      embedThumbnail: true,
-      quiet: true,
+    const { data } = await axios.get(`https://yt.tio.my.id/api/ytmp3?url=${encodeURIComponent(url)}`);
+
+    if (!data.status || !data.result?.url) {
+      throw new Error('⚠️ Gagal ambil audio. Coba link lain ya~');
+    }
+
+    const audioUrl = data.result.url;
+
+    const writer = fs.createWriteStream(savePath);
+    const response = await axios.get(audioUrl, { responseType: 'stream' });
+    response.data.pipe(writer);
+
+    await new Promise((resolve, reject) => {
+      writer.on('finish', resolve);
+      writer.on('error', reject);
     });
   } catch (err) {
-    console.error('❌ Gagal download MP3:', err.stderr || err.message);
-    throw new Error('Gagal download MP3! Coba video lain ya~');
+    console.error('❌ Gagal download via API:', err);
+    throw new Error('❌ Gagal ambil MP3. Link-nya mungkin error.');
   }
 }
 
