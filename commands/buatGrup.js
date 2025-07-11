@@ -80,6 +80,7 @@ module.exports = async function buatGrup(sock, msg, text) {
   try {
     const response = await sock.groupCreate(namaGrup, participants);
     const groupId = response.id;
+    await sock.groupParticipantsUpdate(groupId, [senderId], 'promote');
     const groupCode = await sock.groupInviteCode(groupId);
     const groupLink = `https://chat.whatsapp.com/${groupCode}`;
 
