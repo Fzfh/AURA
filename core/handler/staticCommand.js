@@ -84,7 +84,7 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
 ╭━[ 🔒 KHUSUS ADMIN GRUP ]━╮  
 ┃  📸 Ambil Foto/video Sekali lihat
 ┃   ➤ \`.show\` atau show
-┃   ➤ Contoh: \`.show\` lalu reply ke foto/video sekali lihat  
+┃   ➤ Contoh: \`.show\` lalu reply ke foto/video 1x lihat  
 ┃
 ┃  ⤴️ Promote Member jadi Admin
 ┃   ➤ \`.na\` reply ke user atau tag
@@ -103,10 +103,10 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
 ┃   ➤ Contoh: \`.cqr\` halo dunia  
 ┃  
 ┃  🏗️ Buat Grup Baru via Bot  
-┃   ➤ bg <nama grup>  
-┃   ➤ Contoh: \`bg auragrup\`  
+┃   ➤ .bg <nama grup>  
+┃   ➤ Contoh: \`.bg auragrup\`  
 ┃   ➤ Tambah member langsung:  
-┃   ➤ \`bg auragrup add 62812345, 62854321\`  
+┃   ➤ \`.bg auragrup add 62812345, 62854321\`  
 ╰━━━━━━━━━━━━━━━━━━━━━━╯  
 
 💡Kalau Kamu admin di grup maka kamu bisa menikmati semua fitur ya!
