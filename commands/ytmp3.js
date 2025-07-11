@@ -1,5 +1,4 @@
 const ytdlp = require('yt-dlp-exec');
-const { escape } = require('shell-escape');
 const fs = require('fs');
 
 async function downloadYtToMp3(url, outputPath) {
