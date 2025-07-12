@@ -6,30 +6,7 @@ const muteDuration = 2 * 60 * 1000
 const add = require('../commands/add');
 // const { handleAutoKick } = require('../commands/auto_kick')
 const { handleStaticCommand } = require('../core/handler/staticCommand')
-const tagall = require('../commands/tagall')
-const kick = require('../commands/kick')
-const menfess = require('../commands/menfess')
-const handleWelcome = require('../commands/welcome');
-const { adminList, toxicWords } = require('../setting/setting')
-const askOpenAI = require('../core/utils/openai')
-const { createStickerFromMessage, createStickerFromText } = require('../core/stickerHelper')
-const downloadTiktok = require('../commands/tiktokDownloader');
-const downloadInstagram = require('../commands/igDownloader');
-const downloadYouTubeMP3 = require('../commands/youtubeDownloader');;
-const sendAll = require('../commands/sendAll');
-const showOnce = require('../commands/show');
-const handleQR = require('../commands/qris')
-const buatQR = require('../commands/createQr')
-const mapsQR = require('../commands/mapqr');
-const linkMap = require('../commands/linkmap');
-const waifuhen = require('../commands/waifuhen')
-const waifu = require('../commands/waifu')
-const stickerToMedia = require('../commands/stickerToMedia');
-const handleTranslate = require('../commands/translate');
-const { addAdmin, removeAdmin } = require('../commands/admin');
-const buatGrup = require('../commands/buatGrup');
-const ekstrakAudio = require('../commands/ekstrakAudio');
-const openCloseGroup = require('../commands/openCloseGroup');
+
 
 const greetedUsers = new Set()
 // const lastCommandMap = new Map()
@@ -220,29 +197,12 @@ if (text.startsWith('/') || text.startsWith('.')) {
     ) {
       return await ekstrakAudio(sock, msg);
     }
-
-    if (text.startsWith('.dyts ')) {
-      const url = text.split('.dyts ')[1].trim();
-      try {
-        await sock.sendMessage(from, { text: '🎧 Mengunduh audio dari YouTube...' }, { quoted: msg });
-        const { filePath, title } = await downloadYouTubeMP3(url);
-        await sock.sendMessage(from, {
-          audio: { url: filePath },
-          mimetype: 'audio/mp4',
-          ptt: false
-        }, { quoted: msg });
-        fs.unlinkSync(filePath);
-      } catch (e) {
-        console.error('❌ Gagal download audio:', e);
-        await sock.sendMessage(from, { text: `❌ Gagal download audio:\n${e.message}` }, { quoted: msg });
-      }
-    }
     
-          if (text.startsWith('.d ')) {
-          const link = text.split(' ')[1];
+    if (text.startsWith('.d ')) {
+      const link = text.split(' ')[1];
           
-          if (!link || !link.includes('tiktok.com')) {
-            await sock.sendMessage(from, {
+    if (!link || !link.includes('tiktok.com')) {
+      await sock.sendMessage(from, {
               text: '❌ Link TikTok tidak valid!',
             }, { quoted: msg });
             return;
