@@ -239,7 +239,7 @@ jangan terima command yang hanya (d)!
       const res = await axios.post('https://api.groq.com/openai/v1/chat/completions', {
         model,
         messages,
-        max_tokens: 700
+        max_tokens: 500
       }, {
         headers: {
           Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
