@@ -20,7 +20,7 @@ const commandMap = new Map([
   ['.ds', require('../../commands/tiktokDownloader')],
   ['.dig', require('../../commands/igDownloader')],
   ['.tl', require('../../commands/translate')],
-  ['.st', require('../stickerHelper').createStickerFromText],
+  ['st', require('../stickerHelper').createStickerFromText],
   ['stickertext', require('../stickerHelper').createStickerFromText],
   ['.show', require('../../commands/show')],
   ['s', require('../stickerHelper').createStickerFromMessage],
