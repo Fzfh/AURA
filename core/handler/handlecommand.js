@@ -19,11 +19,11 @@ const commandMap = new Map([
   ['.ds', require('../../commands/tiktokDownloader')],
   ['.dig', require('../../commands/igDownloader')],
   ['.tl', require('../../commands/translate')],
-  ['.st', require('..//stickerHelper')],
-  ['stickertext', require('..//stickerHelper')],
+  ['.st', require('../stickerHelper')],
+  ['stickertext', require('../stickerHelper')],
   ['.show', require('../../commands/show')],
-  ['s', require('../../commands/stickerReply')],
-  ['sticker', require('../../commands/stickerReply')],
+  ['s', require('../stickerHelper')],
+  ['sticker', require('../stickerHelper')],
 ]);
 
 async function handleDynamicCommand(sock, msg, text, command, args, from, sender, userId, actualUserId, isGroup) {
