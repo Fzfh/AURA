@@ -60,7 +60,7 @@ async function createStickerFromMessage(sock, msg) {
       ? await convertVideoToSticker(buffer)
       : await new Sticker(buffer, {
           pack: 'AuraBot',
-          author: 'AURA',
+          author: 'Mau Sewa Bot Auto Sticker? Hub: 083194900080',
           type: StickerTypes.DEFAULT,
           quality: 70,
         }).toBuffer();
@@ -179,7 +179,7 @@ async function createStickerFromText(text) {
   const imgBuf = canvas.toBuffer('image/jpeg', { quality: 0.1 }); 
   const sticker = new Sticker(imgBuf, {
     pack: 'AuraBot',
-    author: 'AURA',
+    author: 'Mau Sewa Bot Auto Sticker Anomali? Hub: 083194900080',
     type: StickerTypes.DEFAULT,
     quality: 5
   });
