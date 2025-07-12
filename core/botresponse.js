@@ -3,7 +3,6 @@ const userStateMap = new Map()
 const mutedUsers = new Map()
 const memoryMap = new Map()
 const muteDuration = 2 * 60 * 1000
-const add = require('../commands/add');
 // const { handleAutoKick } = require('../commands/auto_kick')
 const { handleStaticCommand } = require('../core/handler/staticCommand')
 const handleWelcome = require('../commands/welcome');
