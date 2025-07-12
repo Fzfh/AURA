@@ -7,6 +7,7 @@ const { handleStaticCommand } = require('../core/handler/staticCommand')
 const buatGrup = require('../commands/buatGrup');
 const { handleDynamicCommand } = require('../core/handler/handlecommand');
 const menfess = require('../commands/menfess')
+const askOpenAI = require('../core/utils/openai')
 
 const greetedUsers = new Set()
 // const lastCommandMap = new Map()
