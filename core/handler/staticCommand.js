@@ -22,7 +22,6 @@ const buatGrup = require('../../commands/buatGrup');
 const ekstrakAudio = require('../../commands/ekstrakAudio');
 const openCloseGroup = require('../../commands/openCloseGroup');
 async function handleStaticCommand(sock, msg, lowerText, userId, from, body, text, command, args) {
-  const from = msg.key.remoteJid
   const sender = from
   const actualUserId = msg.key.participant || msg.participant || userId;
   
