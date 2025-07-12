@@ -1,5 +1,6 @@
 module.exports = async function(sock, msg, nomorList, sender, userId) {
   const groupId = msg.key.remoteJid;
+  const sender = msg.key.participant || msg.key.remoteJid;
   const metadata = await sock.groupMetadata(groupId);
   const botNumber = sock.user.id.split(':')[0] + '@s.whatsapp.net';
 
