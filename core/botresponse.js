@@ -6,7 +6,7 @@ const muteDuration = 2 * 60 * 1000
 const { handleStaticCommand } = require('../core/handler/staticCommand')
 const buatGrup = require('../commands/buatGrup');
 const { handleDynamicCommand } = require('../core/handler/handlecommand');
-const { menfess } = require('../commands/menfess')
+const menfess = require('../commands/menfess')
 
 const greetedUsers = new Set()
 // const lastCommandMap = new Map()
