@@ -20,8 +20,24 @@ const commandMap = new Map([
   ['.ds', require('../../commands/tiktokDownloader')],
   ['.dig', require('../../commands/igDownloader')],
   ['.tl', require('../../commands/translate')],
-  ['st', require('../stickerHelper').createStickerFromText],
-  ['stickertext', require('../stickerHelper').createStickerFromText],
+  ['st', async (sock, msg, text) => {
+  if (!text) return sock.sendMessage(msg.key.remoteJid, {
+    text: '📝 Ketik teks setelah perintah *st*, misalnya:\n.st Halo aku ganteng 😎',
+  }, { quoted: msg });
+
+  const sticker = await createStickerFromText(text);
+  await sock.sendMessage(msg.key.remoteJid, { sticker }, { quoted: msg });
+}],
+  ['stickertext', async (sock, msg, text) => {
+  if (!text) {
+    return sock.sendMessage(msg.key.remoteJid, {
+      text: '📝 Ketik: stickertext Halo Dunia!',
+    }, { quoted: msg });
+  }
+
+  const sticker = await createStickerFromText(text);
+  await sock.sendMessage(msg.key.remoteJid, { sticker }, { quoted: msg });
+}],
   ['.show', require('../../commands/show')],
   ['s', require('../stickerHelper').createStickerFromMessage],
   ['sticker', require('../stickerHelper').createStickerFromMessage],
