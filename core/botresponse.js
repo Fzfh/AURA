@@ -4,6 +4,7 @@ const mutedUsers = new Map()
 const memoryMap = new Map()
 const muteDuration = 2 * 60 * 1000
 const { handleStaticCommand } = require('../core/handler/staticCommand')
+const buatGrup = require('../commands/buatGrup');
 const { handleDynamicCommand } = require('../core/handler/handlecommand');
 
 const greetedUsers = new Set()
