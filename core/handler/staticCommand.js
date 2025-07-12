@@ -1,4 +1,5 @@
 const { adminList } = require('../../setting/setting')
+const add = require('../commands/add');
 const tagall = require('../../commands/tagall')
 const kick = require('../../commands/kick')
 const menfess = require('../../commands/menfess')
