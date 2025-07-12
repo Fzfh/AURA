@@ -86,6 +86,10 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
 ┃   ➤ \`.show\` atau show
 ┃   ➤ Contoh: \`.show\` lalu reply ke foto/video 1x lihat  
 ┃
+┃  🔒 Open & Close Group
+┃   ➤ Open: \`.open\`
+┃   ➤ Close: \`.close\`
+┃
 ┃  ⤴️ Promote Member jadi Admin
 ┃   ➤ \`.na\` reply ke user atau tag
 ┃   ➤ Contoh: \`.na\` @aurabot atau reply
