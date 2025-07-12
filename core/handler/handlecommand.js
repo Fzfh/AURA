@@ -22,21 +22,25 @@ const commandMap = new Map([
   ['.dig', require('../../commands/igDownloader')],
   ['.tl', require('../../commands/translate')],
   ['st', async (sock, msg, text) => {
-  if (!text) return sock.sendMessage(msg.key.remoteJid, {
-    text: '📝 Ketik teks setelah perintah *st*, misalnya:\n.st Halo aku ganteng 😎',
-  }, { quoted: msg });
-
-  const sticker = await createStickerFromText(text);
-  await sock.sendMessage(msg.key.remoteJid, { sticker }, { quoted: msg });
-}],
+    const isiTeks = text.replace(/^st\s*/i, '').trim();
+    if (!isiTeks) {
+      return sock.sendMessage(msg.key.remoteJid, {
+        text: '📝 Ketik teks setelah perintah *st*, misalnya:\n.st Halo aku ganteng 😎',
+      }, { quoted: msg });
+    }
+  
+    const sticker = await createStickerFromText(isiTeks);
+    await sock.sendMessage(msg.key.remoteJid, { sticker }, { quoted: msg });
+  }],
   ['stickertext', async (sock, msg, text) => {
-  if (!text) {
+  const isiTeks = text.replace(/^stickertext\s*/i, '').trim();
+  if (!isiTeks) {
     return sock.sendMessage(msg.key.remoteJid, {
       text: '📝 Ketik: stickertext Halo Dunia!',
     }, { quoted: msg });
   }
 
-  const sticker = await createStickerFromText(text);
+  const sticker = await createStickerFromText(isiTeks);
   await sock.sendMessage(msg.key.remoteJid, { sticker }, { quoted: msg });
 }],
   ['.show', require('../../commands/show')],
