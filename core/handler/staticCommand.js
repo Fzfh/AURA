@@ -138,20 +138,20 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
    ➤ Ketik: *stickertext* (teks kamu)
    ➤ Atau pakai singkatan: *st* hello world!
    ➤ Contoh: *stickertext Halo Auraa!*
-
+================================================
 🖼️ *2. Bikin Stiker dari Foto/Video*
    ➤ Kirim foto/video dengan caption: *s* atau *sticker*
    ➤ Atau reply media dengan "s" untuk mengubah jadi stiker otomatis!
-
+================================================
 👩‍🎨 *3. Cari Waifu Lucu~*
    ➤ Ketik: *.waifu* (kategori/nama waifu)
    ➤ Contoh: *.waifu kamisato-ayaka*
-
+================================================
 💌 *4. Kirim Menfess Anonim*
    ➤ Ketik: */menfess*
    ➤ Isi nomor tujuan & isi pesan
    ➤ Ketik: */batal* untuk membatalkan
-
+================================================
 🎞️ *5. Download Video & Musik*
    🎵 *TikTok*
       ➤ *.d* — otomatis deteksi foto/video
@@ -160,7 +160,7 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
       ➤ *.dig* + link
 
 🔗 *Contoh:* .d https://vt.tiktok.com/abc123
-
+================================================
 🗺️ *6. Cari Atau Generate Lokasi*
     *Cari Lokasi*
     ➤ .linkmap (nama daerah)
@@ -168,13 +168,22 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
 
     *Reply Ke shareloc*
     ➤ Reply shareloc dan ketik .linkmap untuk generate link ke google maps
-
+================================================
 ⬆️ *7. Ambil Sticker Jadi Media*
     *Untuk Mengambil Sticker*
     ➤ Ketik .sm lalu reply ke sticker kamu
-
-🚪 *10. Keluar Sesi*
-   ➤ Ketik: */keluar* untuk akhiri sesi
+================================================
+🎛️ *8. Buat qris*
+    *Untuk membuat qris cukup ketik \`.cqr\` <teks>
+    ➤ Ketik: \`.cqr\` <teks>
+    ➤ contoh: \`.cqr\` hello world
+================================================
+🎵 *9. Ekstrak Audio dari Video*
+    *Untuk meng convert dari video ke mp3 bisa dengan command \`ets\`*
+    ➤ Ketik: \`ets\` reply ke video atau kirim video dengan caption \`ets\`
+================================================
+🚪 *8. Keluar Sesi*
+   ➤ Ketik: */keluar* untuk akhiri sesi fitur
 
 ╰━━━━━━━━━━━━━━━━━━━━━━━╯
 ✨ *Selamat Menikmati Fitur AuraBot yaaa* ✨`
