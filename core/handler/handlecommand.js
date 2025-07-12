@@ -22,7 +22,6 @@ const commandMap = new Map([
   ['.st', require('..//stickerHelper')],
   ['stickertext', require('..//stickerHelper')],
   ['.show', require('../../commands/show')],
-  ['.reset', require('../../commands/resetMemory')],
   ['s', require('../../commands/stickerReply')],
   ['sticker', require('../../commands/stickerReply')],
 ]);
