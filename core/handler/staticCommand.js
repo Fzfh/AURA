@@ -21,7 +21,7 @@ const { addAdmin, removeAdmin } = require('../../commands/admin');
 const buatGrup = require('../../commands/buatGrup');
 const ekstrakAudio = require('../../commands/ekstrakAudio');
 const openCloseGroup = require('../../commands/openCloseGroup');
-async function handleStaticCommand(sock, msg, lowerText, userId, body) {
+async function handleStaticCommand(sock, msg, lowerText, userId, body, text) {
   const from = msg.key.remoteJid
   const sender = from
   const actualUserId = msg.key.participant || msg.participant || userId;
