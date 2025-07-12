@@ -19,11 +19,14 @@ const { handleResponder, registerGroupUpdateListener } = require('./core/botresp
 const app = express();
 const PORT = 3000;
 
-// === ARGUMENT PARSING ===
 const args = process.argv.slice(2);
 const prcodeArg = args.find(arg => arg.startsWith('--prcode='));
 const phoneNumber = prcodeArg ? prcodeArg.split('=')[1] : null;
 const qrMode = args.includes('--qrcode');
+
+let latestQR = null;
+let qrRetryInterval = null;
+let pairingRetryTimeout = null;
 let pairingRequested = false;
 
 function extractMessageContent(msg) {
@@ -59,26 +62,45 @@ async function startBot() {
       const { connection, lastDisconnect, qr } = update;
 
       if (qr && qrMode) {
+        latestQR = qr;
         console.log(chalk.yellowBright('\n📸 Scan QR berikut ini:\n'));
         qrcode.generate(qr, { small: true });
+
+        if (qrRetryInterval) clearInterval(qrRetryInterval);
+        qrRetryInterval = setInterval(() => {
+          if (latestQR) {
+            console.log(chalk.yellow('\n🔁 QR ulang karena belum discan:\n'));
+            qrcode.generate(latestQR, { small: true });
+          }
+        }, 60_000);
       }
+
       if (qr && phoneNumber && !pairingRequested) {
-        try {
-          pairingRequested = true;
-          console.log(chalk.cyan(`🔐 Mode pairing aktif dengan nomor: ${phoneNumber}`));
-          const pairingCode = await sock.requestPairingCode(phoneNumber);
-          const formattedCode = pairingCode.slice(0, 4) + '-' + pairingCode.slice(4);
-          console.log(chalk.yellowBright(`\n🔑 Masukkan kode ini di WhatsApp:\n\n${chalk.bold(formattedCode)}\n`));
-        } catch (err) {
-          console.error(chalk.redBright('\n❌ Gagal request pairing code:'), err);
-          process.exit(1);
-        }
+        pairingRequested = true;
+
+        const requestPairing = async () => {
+          try {
+            console.log(chalk.cyan(`🔐 Mode pairing aktif dengan nomor: ${phoneNumber}`));
+            const code = await sock.requestPairingCode(phoneNumber);
+            const formatted = code.slice(0, 4) + '-' + code.slice(4);
+            console.log(chalk.yellowBright(`\n🔑 Masukkan kode ini di WhatsApp:\n\n${chalk.bold(formatted)}\n`));
+          } catch (err) {
+            console.error(chalk.red('❌ Gagal generate pairing code. Ulang dalam 10 detik...'));
+            pairingRetryTimeout = setTimeout(requestPairing, 10_000);
+          }
+        };
+
+        requestPairing();
       }
+
       if (connection === 'open') {
         console.log(chalk.greenBright('\n✅ Bot berhasil terhubung ke WhatsApp!'));
-        console.log(chalk.cyanBright('AURABOT SUDAH AKTIF! SELAMAT MENIKMATI FITUR KAMI\n'));
+        console.log(chalk.cyanBright('✨ AURABOT SIAP MELAYANI TUAN AURAA 😎\n'));
+        if (qrRetryInterval) clearInterval(qrRetryInterval);
+        if (pairingRetryTimeout) clearTimeout(pairingRetryTimeout);
         registerGroupUpdateListener(sock);
       }
+
       if (connection === 'close') {
         const reason = lastDisconnect?.error?.output?.statusCode;
         if (reason === DisconnectReason.loggedOut) {
@@ -92,7 +114,6 @@ async function startBot() {
       }
     });
 
-    // === HANDLE MESSAGE MASUK ===
     sock.ev.on('messages.upsert', async ({ messages, type }) => {
       if (!messages || type !== 'notify') return;
       const msg = messages[0];
@@ -112,9 +133,8 @@ async function startBot() {
   }
 }
 
-// === QR VIA WEB ===
 app.get('/qr', (req, res) => {
-  res.send('🛑 Sekarang QR ditampilkan langsung di terminal.');
+  res.send('🛑 QR ditampilkan langsung di terminal.');
 });
 
 app.listen(PORT, '0.0.0.0', () =>
