@@ -426,7 +426,6 @@ if (text.startsWith('/') || text.startsWith('.')) {
     if (text.startsWith('/') && !['/menu', '/reset', '/riwayat', '/clear'].includes(lowerText)) {
       return sock.sendMessage(sender, { text: 'Maaf, aku gak ngerti perintah itu 😵. Coba ketik /menu yaa!' }, { quoted: msg })
     }
-  }
     
 if (isMentionedToBot || isMentioned || isReplyToBot || isPrivate) {
   let query = ''
