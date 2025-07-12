@@ -1,4 +1,25 @@
 const { adminList } = require('../../setting/setting')
+const tagall = require('../../commands/tagall')
+const kick = require('../../commands/kick')
+const menfess = require('../../commands/menfess')
+const { createStickerFromMessage, createStickerFromText } = require('../stickerHelper')
+const downloadTiktok = require('../../commands/tiktokDownloader');
+const downloadInstagram = require('../../commands/igDownloader');
+const downloadYouTubeMP3 = require('../../commands/youtubeDownloader');;
+const sendAll = require('../../commands/sendAll');
+const showOnce = require('../../commands/show');
+const handleQR = require('../../commands/qris')
+const buatQR = require('../../commands/createQr')
+const mapsQR = require('../../commands/mapqr');
+const linkMap = require('../../commands/linkmap');
+const waifuhen = require('../../commands/waifuhen')
+const waifu = require('../../commands/waifu')
+const stickerToMedia = require('../../commands/stickerToMedia');
+const handleTranslate = require('../../commands/translate');
+const { addAdmin, removeAdmin } = require('../commands/admin');
+const buatGrup = require('../../commands/buatGrup');
+const ekstrakAudio = require('../../commands/ekstrakAudio');
+const openCloseGroup = require('../../commands/openCloseGroup');
 async function handleStaticCommand(sock, msg, lowerText, userId, body) {
   const from = msg.key.remoteJid
   const sender = from
