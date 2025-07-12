@@ -143,72 +143,71 @@ if (text.startsWith('/') || text.startsWith('.')) {
       }, { quoted: msg });
     }
 
-    if (text.startsWith('/') && !['/menu', '/reset', '/riwayat', '/clear'].includes(lowerText)) {
-      return sock.sendMessage(sender, { text: 'Maaf, aku gak ngerti perintah itu 😵. Coba ketik /menu yaa!' }, { quoted: msg })
-    }
-  }
-    
-if (isMentionedToBot || isMentioned || isReplyToBot || isPrivate) {
-  let query = ''
-  const msgContent = msg.message
-  const contextInfo = msgContent?.extendedTextMessage?.contextInfo || {}
-  const quoted = contextInfo.quotedMessage
-  const quotedSender = contextInfo.participant || null
-  const botNumber = sock.user.id.split(':')[0]
-  const botJid = botNumber.includes('@s.whatsapp.net') ? botNumber : `${botNumber}@s.whatsapp.net`
-
-  //  Jika reply tapi bukan reply ke bot
-  if (quoted && quotedSender !== botJid) {
-    if (quoted.conversation) {
-      query = quoted.conversation
-    } else if (quoted.imageMessage) {
-      query = '[Gambar dikirim]'
-    } else if (quoted.videoMessage) {
-      query = '[Video dikirim]'
-    } else if (quoted.locationMessage) {
-      const loc = quoted.locationMessage
-      query = `📍 Lokasi dikirim:\nLatitude: ${loc.degreesLatitude}, Longitude: ${loc.degreesLongitude}`
-      if (loc.name) query += `\n🗺️ Nama Lokasi: ${loc.name}`
-      if (loc.address) query += `\n🏠 Alamat: ${loc.address}`
-    } else {
-      query = '[Pesan tidak dikenali]'
-    }
-  } else {
-    // Kalau bukan reply, ambil dari isi biasa
-    query =
-      msgContent?.conversation ||
-      msgContent?.extendedTextMessage?.text ||
-      msgContent?.imageMessage?.caption ||
-      msgContent?.videoMessage?.caption ||
-      ''
-  }
-
-  if (query?.trim()) {
-    try {
-      await sock.sendPresenceUpdate('composing', sender)
-
-      const history = memoryMap.get(userId) || []
-      history.push({ role: 'user', content: query })
-
-      const quotedText = quoted?.conversation ||
-                   quoted?.extendedTextMessage?.text ||
-                   quoted?.imageMessage?.caption ||
-                   quoted?.videoMessage?.caption || ''
-
-      const aiReply = await askOpenAI(history, quotedText)
-      history.push({ role: 'assistant', content: aiReply })
-      memoryMap.set(userId, history.slice(-15))
-
-      return sock.sendMessage(sender, { text: aiReply }, { quoted: msg })
-    } catch (err) {
-      console.error('❌ Gagal respon AI:', err)
+      if (text.startsWith('/') && !['/menu', '/reset', '/riwayat', '/clear'].includes(lowerText)) {
       return sock.sendMessage(sender, {
-        text: '⚠️ Maaf, AI-nya lagi error nih~ coba beberapa saat lagi ya!',
-      }, { quoted: msg })
+        text: 'Maaf, aku gak ngerti perintah itu 😵. Coba ketik /menu yaa!'
+      }, { quoted: msg });
     }
-  }
-}
 
+    // 🧠 INI BLOK AI ChatGPT HARUS DI DALAM SINI:
+    if (isMentionedToBot || isMentioned || isReplyToBot || isPrivate) {
+      let query = ''
+      const msgContent = msg.message
+      const contextInfo = msgContent?.extendedTextMessage?.contextInfo || {}
+      const quoted = contextInfo.quotedMessage
+      const quotedSender = contextInfo.participant || null
+      const botNumber = sock.user.id.split(':')[0]
+      const botJid = botNumber.includes('@s.whatsapp.net') ? botNumber : `${botNumber}@s.whatsapp.net`
+
+      if (quoted && quotedSender !== botJid) {
+        if (quoted.conversation) {
+          query = quoted.conversation
+        } else if (quoted.imageMessage) {
+          query = '[Gambar dikirim]'
+        } else if (quoted.videoMessage) {
+          query = '[Video dikirim]'
+        } else if (quoted.locationMessage) {
+          const loc = quoted.locationMessage
+          query = `📍 Lokasi dikirim:\nLatitude: ${loc.degreesLatitude}, Longitude: ${loc.degreesLongitude}`
+          if (loc.name) query += `\n🗺️ Nama Lokasi: ${loc.name}`
+          if (loc.address) query += `\n🏠 Alamat: ${loc.address}`
+        } else {
+          query = '[Pesan tidak dikenali]'
+        }
+      } else {
+        query =
+          msgContent?.conversation ||
+          msgContent?.extendedTextMessage?.text ||
+          msgContent?.imageMessage?.caption ||
+          msgContent?.videoMessage?.caption ||
+          ''
+      }
+
+      if (query?.trim()) {
+        try {
+          await sock.sendPresenceUpdate('composing', sender)
+
+          const history = memoryMap.get(userId) || []
+          history.push({ role: 'user', content: query })
+
+          const quotedText = quoted?.conversation ||
+                    quoted?.extendedTextMessage?.text ||
+                    quoted?.imageMessage?.caption ||
+                    quoted?.videoMessage?.caption || ''
+
+          const aiReply = await askOpenAI(history, quotedText)
+          history.push({ role: 'assistant', content: aiReply })
+          memoryMap.set(userId, history.slice(-15))
+
+          return sock.sendMessage(sender, { text: aiReply }, { quoted: msg })
+        } catch (err) {
+          console.error('❌ Gagal respon AI:', err)
+          return sock.sendMessage(sender, {
+            text: '⚠️ Maaf, AI-nya lagi error nih~ coba beberapa saat lagi ya!',
+          }, { quoted: msg })
+        }
+      }
+    }
 
   } catch (error) {
     console.error('❌ Error di handleResponder:', error)
