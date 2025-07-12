@@ -94,6 +94,12 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
 ┃   ➤ \`.una\` reply ke user atau tag
 ┃   ➤ Contoh: \`.una\` @aurabot atau reply
 ┃
+┃  👤 Tambah Member
+┃   ➤ tambah, add,
+┃   ➤ tambah <nomor>
+┃   ➤ contoh: tambah 628787
+┃   ➤ contoh: add 628787
+┃
 ┃  👥 Tag Semua Member Grup  
 ┃   ➤ \`.tagall\`  
 ┃   ➤ Contoh: .tagall Halo semua  
