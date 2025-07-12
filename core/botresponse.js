@@ -49,7 +49,7 @@ async function handleResponder(sock, msg) {
 
     if (!text) return;
 
-     const handledStatic = await handleStaticCommand(sock, msg, lowerText, userId, from, body, text)
+    const handledStatic = await handleStaticCommand(sock, msg, lowerText, userId, from, body, text, command, args)
       if (handledStatic) return
 
     // Anti-spam
