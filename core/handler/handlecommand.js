@@ -16,9 +16,45 @@ const commandMap = new Map([
   ['.linkmap', require('../../commands/linkmap')],
   ['ets', require('../../commands/ekstrakAudio')],
   ['.sendall', require('../../commands/sendAll')],
-  ['.dyts', require('../../commands/youtubeDownloader')],
-  ['.d', require('../../commands/tiktokDownloader')],
-  ['.ds', require('../../commands/tiktokDownloader')],
+  ['.d', async (sock, msg, text) => {
+    const url = text.trim();
+    if (!url.startsWith('http')) {
+      return sock.sendMessage(msg.key.remoteJid, {
+        text: '📎 Kirim link TikTok-nya setelah perintah, contoh:\n.d https://www.tiktok.com/@user/video/...',
+      }, { quoted: msg });
+    }
+
+    const data = await downloadTiktok(url);
+    if (!data) {
+      return sock.sendMessage(msg.key.remoteJid, {
+        text: '⚠️ Gagal mengunduh video. Coba lagi nanti yaa~',
+      }, { quoted: msg });
+    }
+
+    await sock.sendMessage(msg.key.remoteJid, {
+      video: { url: data.videoUrl }
+    }, { quoted: msg });
+  }],
+
+  ['.ds', async (sock, msg, text) => {
+    const url = text.trim();
+    if (!url.startsWith('http')) {
+      return sock.sendMessage(msg.key.remoteJid, {
+        text: '📎 Kirim link TikTok-nya setelah perintah, contoh:\n.ds https://tiktok.com/@...',
+      }, { quoted: msg });
+    }
+
+    const data = await downloadTiktok(url);
+    if (!data) {
+      return sock.sendMessage(msg.key.remoteJid, {
+        text: '⚠️ Gagal ambil data dari TikTok.',
+      }, { quoted: msg });
+    }
+
+    await sock.sendMessage(msg.key.remoteJid, {
+      video: { url: data.videoUrl }
+    }, { quoted: msg });
+  }],
   ['.dig', require('../../commands/igDownloader')],
   ['.tl', require('../../commands/translate')],
   ['st', async (sock, msg, text) => {
