@@ -1,11 +1,11 @@
 module.exports = async function(sock, msg, nomorList, sender, userId) {
   const groupId = msg.key.remoteJid;
-  const sender = msg.key.participant || msg.key.remoteJid;
+  const realSender = msg.key.participant || msg.key.remoteJid; 
   const metadata = await sock.groupMetadata(groupId);
   const botNumber = sock.user.id.split(':')[0] + '@s.whatsapp.net';
 
   const isGroupAdmin = metadata.participants.some(
-    p => p.id === sender && (p.admin === 'admin' || p.admin === 'superadmin')
+    p => p.id === realSender && (p.admin === 'admin' || p.admin === 'superadmin')
   );
 
   if (!isGroupAdmin) {
