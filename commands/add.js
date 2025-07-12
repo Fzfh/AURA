@@ -1,5 +1,13 @@
 module.exports = async function(sock, msg, nomorList, sender, userId) {
   const groupId = msg.key.remoteJid;
+
+  if (!groupId.endsWith('@g.us')) {
+    await sock.sendMessage(groupId, {
+      text: '❌ Perintah ini hanya bisa digunakan di *grup* yaa~',
+    }, { quoted: msg });
+    return;
+  }
+
   const realSender = msg.key.participant || msg.key.remoteJid; 
   const metadata = await sock.groupMetadata(groupId);
   const botNumber = sock.user.id.split(':')[0] + '@s.whatsapp.net';
