@@ -13,6 +13,7 @@ const commandMap = new Map([
   ['.cqr', require('../../commands/createQr')],
   ['.mapqr', require('../../commands/mapqr')],
   ['.linkmap', require('../../commands/linkmap')],
+  ['ets', require('../../commands/ekstrakAudio')],
   ['.sendall', require('../../commands/sendAll')],
   ['.dyts', require('../../commands/youtubeDownloader')],
   ['.d', require('../../commands/tiktokDownloader')],
