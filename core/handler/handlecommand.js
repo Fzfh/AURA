@@ -1,3 +1,4 @@
+const { createStickerFromText } = require('../stickerHelper');
 const commandMap = new Map([
   ['.waifu', require('../../commands/waifu')],
   ['.waifuhen', require('../../commands/waifuhen')],
