@@ -112,6 +112,7 @@ if (text.startsWith('/') || text.startsWith('.')) {
     if (handledMenfess) return
 
     return await kick(sock, msg, text, isGroup);
+    return await add(sock, msg, text, sender, userId);
     
         const listBahasa = `🌐 *Daftar Kode Bahasa Umum:*
     
@@ -359,23 +360,6 @@ if (text.startsWith('/') || text.startsWith('.')) {
     if (lowerText.startsWith('.tagall') || lowerText.startsWith('tagall') || lowerText.startsWith('tag semua') || lowerText.startsWith('tag')) {
       return await tagall(sock, msg, text, isGroup);
     }
-
-    if (
-      lowerText.startsWith('.add') ||
-      lowerText.startsWith('add') ||
-      lowerText.startsWith('tambah')
-    ) {
-      const raw = text.split(' ').slice(1).join(' ');
-      const nomorList = raw.split(',').map(n => {
-        let num = n.trim();
-        if (num.startsWith('0')) num = '62' + num.slice(1);
-        return num;
-      });
-      return await add(sock, msg, nomorList, sender, userId);
-    }
-    
-
-
 
    if (['s', 'sticker'].includes(lowerText)) {
       try {
