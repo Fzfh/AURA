@@ -1,4 +1,4 @@
-module.exports = async function openCloseGroup(sock, msg, command) {
+module.exports = async function openCloseGroup(sock, msg, text) {
   const triggers = ['.open', '.close'];
   const lowerText = text.toLowerCase();
   if (!triggers.some(t => lowerText.startsWith(t))) return;
