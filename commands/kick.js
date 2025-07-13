@@ -1,4 +1,9 @@
 module.exports = async function kick(sock, msg, text, isGroup) {
+  const triggers = ['kick', 'kik', '.kick', '.kik'];
+  const lowerText = text.toLowerCase();
+
+  if (!triggers.some(t => lowerText.startsWith(t))) return;
+
   const groupId = msg.key.remoteJid;
   const senderId = msg.key.participant || msg.participant || msg.key.remoteJid;
   const botId = sock.user?.id?.split(':')[0] + '@s.whatsapp.net';
