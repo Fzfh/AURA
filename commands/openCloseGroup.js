@@ -1,4 +1,8 @@
 module.exports = async function openCloseGroup(sock, msg, command) {
+  const triggers = ['.open', '.close'];
+  const lowerText = text.toLowerCase();
+  if (!triggers.some(t => lowerText.startsWith(t))) return;
+  
   const from = msg.key.remoteJid;
   const isGroup = from.endsWith('@g.us');
 
