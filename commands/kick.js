@@ -47,6 +47,10 @@ module.exports = async function kick(sock, msg, text, isGroup) {
           text: '❌ Eitss... Ketik Kick sambil reply keaku ya?? itu namanya nyuruh aku keluar wkwkwk\n No☝🏻️ No☝🏻️ No☝🏻️ Jangan ketik Kick reply keaku lagi ya!',
         }, { quoted: msg });
       }
+      
+    if (repliedUser === senderId) {
+      return;
+     }
 
       await sock.groupParticipantsUpdate(groupId, [repliedUser], 'remove');
       return sock.sendMessage(groupId, {
