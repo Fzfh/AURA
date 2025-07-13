@@ -111,10 +111,10 @@ if (text.startsWith('/') || text.startsWith('.')) {
     const handledMenfess = await menfess(sock, msg, text)
     if (handledMenfess) return
 
-    return await kick(sock, msg, text, isGroup);
-    return await add(sock, msg, text, sender, userId);
+    if (await kick(sock, msg, text, isGroup)) return;
+    if (await add(sock, msg, text, sender, userId)) return;
     
-        const listBahasa = `🌐 *Daftar Kode Bahasa Umum:*
+    const listBahasa = `🌐 *Daftar Kode Bahasa Umum:*
     
     🇮🇩 Indonesia — \`id\`  
     🇬🇧 Inggris — \`en\`  
