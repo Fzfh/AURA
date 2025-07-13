@@ -1,11 +1,16 @@
-module.exports = async function(sock, msg, nomorList, sender, userId) {
+module.exports = async function(sock, msg, text, sender, userId) {
+  const triggers = ['add', '.add', '+', 'tambah'];
+  const lowerText = text.toLowerCase();
+
+  if (!triggers.some(t => lowerText.startsWith(t))) return false;
+
   const groupId = msg.key.remoteJid;
 
   if (!groupId.endsWith('@g.us')) {
     await sock.sendMessage(groupId, {
       text: '❌ Perintah ini hanya bisa digunakan di *grup* yaa~',
     }, { quoted: msg });
-    return;
+    return true;
   }
 
   const realSender = msg.key.participant || msg.key.remoteJid; 
@@ -20,13 +25,22 @@ module.exports = async function(sock, msg, nomorList, sender, userId) {
     await sock.sendMessage(groupId, {
       text: '🚫 Maaf, hanya *admin grup* yang boleh menggunakan perintah ini.',
     }, { quoted: msg });
-    return;
+    return true;
   }
+
+  const rawNomorList = text.split(' ').slice(1).join(' ');
+  if (!rawNomorList) {
+    await sock.sendMessage(groupId, {
+      text: '❗ Kirim seperti ini: `.add 628xxxxx, 628yyyy` untuk menambahkan member',
+    }, { quoted: msg });
+    return true;
+  }
+
+  const nomorList = rawNomorList.split(',').map(n => n.trim());
 
   for (let nomor of nomorList) {
     nomor = nomor.replace(/[^0-9]/g, '');
     if (nomor.startsWith('0')) nomor = '62' + nomor.slice(1);
-
     const jid = `${nomor}@s.whatsapp.net`;
 
     try {
@@ -52,11 +66,10 @@ module.exports = async function(sock, msg, nomorList, sender, userId) {
         await sock.sendMessage(groupId, {
           text: '❌ Bot bukan admin grup, jadi gak bisa nambahin member.',
         }, { quoted: msg });
-        return;
+        return true;
       }
 
       await sock.groupParticipantsUpdate(groupId, [jid], 'add');
-
       await sock.sendMessage(groupId, {
         text: `✅ @${nomor} berhasil ditambahkan ke grup!`,
         mentions: [jid]
@@ -83,4 +96,6 @@ module.exports = async function(sock, msg, nomorList, sender, userId) {
       }
     }
   }
+
+  return true;
 };
