@@ -32,8 +32,8 @@ module.exports = async function buatQR(sock, msg, text) {
     const tempDir = path.join(__dirname, '../temp');
     if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir);
 
-    const qrPath = path.join(tempDir, `qr-${Date.now()}.png`);
-    const logoPath = path.join(__dirname, '../media/logo.png');
+    const qrPath = path.join(tempDir, `qr-${Date.now()}.jpg`);
+    const logoPath = path.join(__dirname, '../media/logo.jpg');
 
     await QRCode.toFile(qrPath, qrText, {
       scale: 15,
