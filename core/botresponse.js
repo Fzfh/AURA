@@ -110,6 +110,8 @@ if (text.startsWith('/') || text.startsWith('.')) {
 
     const handledMenfess = await menfess(sock, msg, text)
     if (handledMenfess) return
+
+    return await kick(sock, msg, text, isGroup);
     
         const listBahasa = `🌐 *Daftar Kode Bahasa Umum:*
     
@@ -352,10 +354,6 @@ if (text.startsWith('/') || text.startsWith('.')) {
       }
     
       return;
-    }
-    
-    if (lowerText.startsWith('kick') || lowerText.startsWith('kik') || lowerText.startsWith('.kick') || lowerText.startsWith('.kik')) {
-      return await kick(sock, msg, text, isGroup);
     }
 
     if (lowerText.startsWith('.tagall') || lowerText.startsWith('tagall') || lowerText.startsWith('tag semua') || lowerText.startsWith('tag')) {
