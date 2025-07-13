@@ -8,9 +8,7 @@ module.exports = async function buatQR(sock, msg, text) {
     const sender = msg.key.participant || msg.key.remoteJid;
     const remoteJid = msg.key.remoteJid;
 
-    // Cek apakah pesan dari grup
     const isGroup = remoteJid.endsWith('@g.us');
-
     if (isGroup) {
       const metadata = await sock.groupMetadata(remoteJid);
       const admins = metadata.participants
@@ -46,29 +44,35 @@ module.exports = async function buatQR(sock, msg, text) {
     const qrImage = await Jimp.read(qrPath);
     const logo = await Jimp.read(logoPath);
 
-    logo.resize(qrImage.bitmap.width / 4, Jimp.AUTO);
+    const logoSize = qrImage.bitmap.width / 5;
+    logo.resize(logoSize, logoSize);
 
-    const x = (qrImage.bitmap.width - logo.bitmap.width) / 2;
-    const y = (qrImage.bitmap.height - logo.bitmap.height) / 2;
+    const padding = 20;
+    const box = new Jimp(logo.bitmap.width + padding, logo.bitmap.height + padding, 0xFFFFFFFF); // putih
 
-    qrImage.composite(logo, x, y, {
-      mode: Jimp.BLEND_SOURCE_OVER,
-      opacitySource: 1,
-    });
+    const offsetX = (box.bitmap.width - logo.bitmap.width) / 2;
+    const offsetY = (box.bitmap.height - logo.bitmap.height) / 2;
+
+    box.composite(logo, offsetX, offsetY);
+
+    const centerX = (qrImage.bitmap.width - box.bitmap.width) / 2;
+    const centerY = (qrImage.bitmap.height - box.bitmap.height) / 2;
+
+    qrImage.composite(box, centerX, centerY);
 
     await qrImage.writeAsync(qrPath);
 
     const media = fs.readFileSync(qrPath);
     await sock.sendMessage(remoteJid, {
       image: media,
-      caption: `✅ QR Code dengan logo berhasil dibuat`,
+      caption: `✅ QR Code dengan logo kotak berhasil dibuat!`,
     }, { quoted: msg });
 
     fs.unlinkSync(qrPath);
   } catch (err) {
     console.error('❌ Error generate QR:', err);
     await sock.sendMessage(msg.key.remoteJid, {
-      text: '⚠️ Gagal membuat QR Code. Mungkin teksnya terlalu panjang?',
+      text: '⚠️ Gagal membuat QR Code. Coba lagi nanti ya~',
     }, { quoted: msg });
   }
 };
