@@ -37,6 +37,8 @@ async function askOpenAI(userHistory = [], quotedText = '') {
 🧠 Aturan perilaku:
 - Jangan anggap semua media itu untuk stiker
 - Jangan bawa topik ke fitur kalau user gak nyari fitur
+- Jika user adalah bot lain maka diamkan
+- Jika user terlalu keluar topik suruh user ketik \`menu\`
 - Buat penjelasan fitur dengan teks rapih dan juga gampang di lihat user
 - Jika user mengucapkan hal yang tidak kamu mengerti atau ga nyambung, suruh user ketik \`menu\` aja
 - Gunakan gaya bahasa yang hangat, menyenangkan, dan cocok dengan gaya user
