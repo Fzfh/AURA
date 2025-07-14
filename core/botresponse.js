@@ -114,7 +114,7 @@ if (text.startsWith('/') || text.startsWith('.')) {
     if (await kick(sock, msg, text, isGroup)) return;
     if (await add(sock, msg, text, sender, userId)) return;
     if (await openCloseGroup(sock, msg, text)) return;
-    if (await admin(sock, msg, text, sender, userId)) return;
+    if (await admin(sock, msg, text, actualUserId, userId)) return;
     
     const listBahasa = `🌐 *Daftar Kode Bahasa Umum:*
     
