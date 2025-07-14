@@ -261,5 +261,44 @@ jangan terima command yang hanya (d)!
     }
   }
 }
+function extractQueryFromMessage(msg, sock) {
+  const msgContent = msg.message
+  const contextInfo = msgContent?.extendedTextMessage?.contextInfo || {}
+  const quoted = contextInfo.quotedMessage
+  const quotedSender = contextInfo.participant || null
+  const botNumber = sock.user.id.split(':')[0]
+  const botJid = botNumber.includes('@s.whatsapp.net') ? botNumber : `${botNumber}@s.whatsapp.net`
 
-module.exports = askOpenAI
+  let query = ''
+
+  if (quoted && quotedSender !== botJid) {
+    if (quoted.conversation) {
+      query = quoted.conversation
+    } else if (quoted.imageMessage) {
+      query = '[Gambar dikirim]'
+    } else if (quoted.videoMessage) {
+      query = '[Video dikirim]'
+    } else if (quoted.stickerMessage) {
+      query = '[Stiker dikirim]'
+    } else if (quoted.audioMessage) {
+      query = '[Audio dikirim]'
+    } else {
+      query = '[Pesan tidak dikenali]'
+    }
+  } else {
+    query =
+      msgContent?.conversation ||
+      msgContent?.extendedTextMessage?.text ||
+      msgContent?.imageMessage?.caption ||
+      msgContent?.videoMessage?.caption ||
+      ''
+  }
+
+  return query.trim()
+}
+
+
+module.exports = {
+  askOpenAI,
+  extractQueryFromMessage
+}
