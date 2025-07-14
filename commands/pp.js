@@ -1,5 +1,5 @@
 const { downloadContentFromMessage } = require('@whiskeysockets/baileys');
-const phoneNumberRegex = /^\d{8,15}$/;
+const phoneNumberRegex = /(\+?(\d{8,15}))/;
 
 module.exports = async function pp(sock, msg) {
   const sender = msg.key.remoteJid;
@@ -18,7 +18,15 @@ module.exports = async function pp(sock, msg) {
     target = contextInfo.mentionedJid[0];
 
   } else if (phoneNumberRegex.test(args)) {
-    target = args.replace(/[^0-9]/g, '') + '@s.whatsapp.net';
+    let num = args.replace(/\D/g, '');
+
+    if (num.startsWith('0')) {
+      num = '62' + num.slice(1);
+    } else if (num.startsWith('8')) {
+      num = '62' + num;
+    }
+
+    target = `${num}@s.whatsapp.net`;
 
   } else if (contextInfo?.participant) {
     target = contextInfo.participant;
@@ -29,7 +37,7 @@ module.exports = async function pp(sock, msg) {
 
   if (!target) {
     await sock.sendMessage(sender, {
-      text: '❌ Format salah. Bisa ketik:\n.pp (tag/reply)\n.pp 628xxxxx (nomor)',
+      text: '❌ Format salah. Bisa ketik:\n.pp (tag/reply)\n.pp 628xxxxx / 08xxx / +628xxxxx',
     }, { quoted: msg });
     return true;
   }
@@ -40,7 +48,7 @@ module.exports = async function pp(sock, msg) {
 
     await sock.sendMessage(sender, {
       image: { url },
-      caption: `📸 Ini foto profil @${target.split('@')[0]}`,
+      caption: `📸 berhasil mengambil foto profil @${target.split('@')[0]}`,
       mentions: [target],
     }, { quoted: msg });
 
