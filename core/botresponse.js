@@ -116,6 +116,8 @@ if (text.startsWith('/') || text.startsWith('.')) {
     if (await openCloseGroup(sock, msg, text)) return;
     if (await admin(sock, msg, text, actualUserId, userId)) return;
     if (await stickerTextCommand(sock, msg, lowerText, args)) return;
+    if (await stickerFromMediaCommand(sock, msg, lowerText)) return;
+
     
     const listBahasa = `🌐 *Daftar Kode Bahasa Umum:*
     
