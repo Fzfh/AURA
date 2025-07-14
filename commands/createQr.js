@@ -48,7 +48,7 @@ module.exports = async function buatQR(sock, msg, text) {
     logo.resize(logoSize, logoSize);
 
     const padding = 20;
-    const box = new Jimp(logo.bitmap.width + padding, logo.bitmap.height + padding, 0xFFFFFFFF); // putih
+    const box = new Jimp(logo.bitmap.width + padding, logo.bitmap.height + padding, 0xFFFFFFFF);
 
     const offsetX = (box.bitmap.width - logo.bitmap.width) / 2;
     const offsetY = (box.bitmap.height - logo.bitmap.height) / 2;
@@ -65,7 +65,7 @@ module.exports = async function buatQR(sock, msg, text) {
     const media = fs.readFileSync(qrPath);
     await sock.sendMessage(remoteJid, {
       image: media,
-      caption: `✅ QR Code dengan logo kotak berhasil dibuat!`,
+      caption: `✅ QR Code berhasil dibuat!`,
     }, { quoted: msg });
 
     fs.unlinkSync(qrPath);
