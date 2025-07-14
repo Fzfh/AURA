@@ -54,7 +54,7 @@ module.exports = async function pp(sock, msg) {
 
     await sock.sendMessage(sender, {
       image: { url },
-      caption: `📸Berhasil mengambil foto profil @${target.split('@')[0]}`,
+      caption: `📸 Berhasil mengambil foto profil @${target.split('@')[0]}`,
       mentions: [target],
     }, { quoted: msg });
 
