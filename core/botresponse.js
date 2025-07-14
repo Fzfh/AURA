@@ -364,30 +364,25 @@ if (isMentionedToBot || isMentioned || isReplyToBot || isPrivate) {
   const botJid = botNumber.includes('@s.whatsapp.net') ? botNumber : `${botNumber}@s.whatsapp.net`
 
   //  Jika reply tapi bukan reply ke bot
-  if (quoted && quotedSender !== botJid) {
-    if (quoted.conversation) {
-      query = quoted.conversation
-    } else if (quoted.imageMessage) {
-      query = '[Gambar dikirim]'
-    } else if (quoted.videoMessage) {
-      query = '[Video dikirim]'
-    } else if (quoted.locationMessage) {
-      const loc = quoted.locationMessage
-      query = `📍 Lokasi dikirim:\nLatitude: ${loc.degreesLatitude}, Longitude: ${loc.degreesLongitude}`
-      if (loc.name) query += `\n🗺️ Nama Lokasi: ${loc.name}`
-      if (loc.address) query += `\n🏠 Alamat: ${loc.address}`
-    } else {
-      query = '[Pesan tidak dikenali]'
-    }
+if (quoted && quotedSender !== botJid) {
+  if (quoted.conversation) {
+    query = quoted.conversation;
+  } else if (quoted.imageMessage) {
+    query = '[Gambar dikirim]';
+  } else if (quoted.videoMessage) {
+    query = '[Video dikirim]';
   } else {
-    // Kalau bukan reply, ambil dari isi biasa
-    query =
-      msgContent?.conversation ||
-      msgContent?.extendedTextMessage?.text ||
-      msgContent?.imageMessage?.caption ||
-      msgContent?.videoMessage?.caption ||
-      ''
+    query = '[Pesan tidak dikenali]';
   }
+} else {
+  // Kalau bukan reply, ambil dari isi biasa
+  query =
+    msgContent?.conversation ||
+    msgContent?.extendedTextMessage?.text ||
+    msgContent?.imageMessage?.caption ||
+    msgContent?.videoMessage?.caption ||
+    '';
+}
 
   if (query?.trim()) {
     try {
