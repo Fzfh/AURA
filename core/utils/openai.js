@@ -46,6 +46,7 @@ async function askOpenAI(userHistory = [], quotedText = '') {
 - Kamu bukan hanya bot fitur — kamu juga teman ngobrol user 😊
 - Kalau user menyebut fitur (seperti stiker, tiktok, pulsa), jawab sesuai panduan yang rapi di bawah
 - Kalau user tidak menyebut fitur, kamu bebas membalas sesuai konteks obrolan
+- Sambut user dengan suruh mengetik \`menu\` jika user baru chat
 - Jika user membalas/reply pesan dari kamu, tanggapi seolah kamu mengingat konteks percakapan sebelumnya
 - Dan jangan memakai tanda kutip (") untuk balasan ke user, cukup kamu memikir apa balasannya jangan memakai kutip 
 
