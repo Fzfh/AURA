@@ -115,6 +115,7 @@ if (text.startsWith('/') || text.startsWith('.')) {
     if (await add(sock, msg, text, sender, userId)) return;
     if (await openCloseGroup(sock, msg, text)) return;
     if (await admin(sock, msg, text, actualUserId, userId)) return;
+    if (await stickerTextCommand(sock, msg, lowerText, args)) return;
     
     const listBahasa = `🌐 *Daftar Kode Bahasa Umum:*
     
@@ -334,39 +335,6 @@ if (text.startsWith('/') || text.startsWith('.')) {
     if (lowerText.startsWith('.tagall') || lowerText.startsWith('tagall') || lowerText.startsWith('tag semua') || lowerText.startsWith('tag')) {
       return await tagall(sock, msg, text, isGroup);
     }
-
-   if (['s', 'sticker', '.s', '.sticker'].includes(lowerText)) {
-      try {
-        const quoted = msg.message?.extendedTextMessage?.contextInfo?.quotedMessage
-        const hasMediaQuoted = quoted?.imageMessage || quoted?.videoMessage
-
-        const hasMediaDirect = msg.message?.imageMessage || msg.message?.videoMessage
-        const caption = msg.message?.imageMessage?.caption || msg.message?.videoMessage?.caption || ''
-
-        // Kalau pakai caption langsung "s"
-        const captionMatch = ['s', 'sticker', '.s', '.sticker'].includes(caption.toLowerCase())
-
-        if (hasMediaQuoted || captionMatch) {
-          await createStickerFromMessage(sock, msg)
-        } else {
-          await sock.sendMessage(sender, {
-            text: 'Kirim gambar/video lalu reply dengan "s", atau kirim gambar/video langsung dengan caption "s" atau "sticker"',
-          }, { quoted: msg })
-        }
-      } catch (err) {
-        console.error('❌ Gagal buat stiker:', err)
-        await sock.sendMessage(sender, { text: 'Ups! Gagal bikin stiker 😖 Coba lagi ya~' }, { quoted: msg })
-      }
-      return
-    }
-
-if (lowerText.startsWith('stickertext') || lowerText.startsWith('st') || lowerText.startsWith('.st') || lowerText.startsWith('.stickertext')){
-  if (!args[0]) return sock.sendMessage(sender, { text: 'Ketik: stikertext Halo dunia!' }, { quoted: msg })
-  const isiTeks = args.join(' ')
-  const stickerBuffer = await createStickerFromText(isiTeks)
-  await sock.sendMessage(sender, { sticker: stickerBuffer }, { quoted: msg })
-}
-
 
     if (text === '.reset') {
       if (!adminList.includes(actualUserId)) {
