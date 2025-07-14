@@ -261,6 +261,19 @@ jangan terima command yang hanya (d)!
     }
   }
 }
+function extractQueryFromMessage(msg, sock) {
+  const content = msg.message?.viewOnceMessageV2?.message || msg.message;
+  const query =
+    content?.conversation ||
+    content?.extendedTextMessage?.text ||
+    content?.imageMessage?.caption ||
+    content?.videoMessage?.caption ||
+    content?.documentMessage?.caption ||
+    '';
+
+  return query;
+}
+
 async function handleOpenAIResponder(sock, msg, userId) {
   const sender = msg.key.remoteJid;
 
