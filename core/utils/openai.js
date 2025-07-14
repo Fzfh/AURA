@@ -1,4 +1,5 @@
 require('dotenv').config({ path: __dirname + '/.env' })
+const { memoryMap } = require('../botresponse') 
 const axios = require('axios')
 
 const models = [
@@ -37,6 +38,7 @@ async function askOpenAI(userHistory = [], quotedText = '') {
 - Jangan anggap semua media itu untuk stiker
 - Jangan bawa topik ke fitur kalau user gak nyari fitur
 - Buat penjelasan fitur dengan teks rapih dan juga gampang di lihat user
+- Jika user mengucapkan hal yang tidak kamu mengerti atau ga nyambung, suruh user ketik \`menu\` aja
 - Gunakan gaya bahasa yang hangat, menyenangkan, dan cocok dengan gaya user
 - Jawaban harus selalu dalam Bahasa Indonesia
 - Kamu bukan hanya bot fitur — kamu juga teman ngobrol user 😊
@@ -324,5 +326,6 @@ async function handleOpenAIResponder(sock, msg, userId) {
 module.exports = {
   askOpenAI,
   extractQueryFromMessage,
-  handleOpenAIResponder
+  handleOpenAIResponder,
+  memoryMap
 }
