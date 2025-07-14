@@ -1,5 +1,5 @@
 require('dotenv').config({ path: __dirname + '/.env' })
-const { memoryMap } = require('../botresponse') 
+const memoryMap = new Map();
 const axios = require('axios')
 
 const models = [
@@ -326,6 +326,5 @@ async function handleOpenAIResponder(sock, msg, userId) {
 module.exports = {
   askOpenAI,
   extractQueryFromMessage,
-  handleOpenAIResponder,
-  memoryMap
+  handleOpenAIResponder
 }
