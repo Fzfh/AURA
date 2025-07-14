@@ -360,12 +360,13 @@ if (text.startsWith('/') || text.startsWith('.')) {
       return
     }
 
-    if (lowerText === 'stickertext' || lowerText=== 'st' || lowerText=== '.st' || lowerText === '.stickertext') {
-      if (!args[0]) return sock.sendMessage(sender, { text: 'Ketik: stikertext Halo dunia!' }, { quoted: msg })
-      const text = args.join(' ')
-      const stickerBuffer = await createStickerFromText(text)
-      await sock.sendMessage(sender, { sticker: stickerBuffer }, { quoted: msg })
-    }
+if (lowerText === 'stickertext' || lowerText=== 'st' || lowerText=== '.st' || lowerText === '.stickertext') {
+  if (!args[0]) return sock.sendMessage(sender, { text: 'Ketik: stikertext Halo dunia!' }, { quoted: msg })
+  const isiTeks = args.join(' ')
+  const stickerBuffer = await createStickerFromText(isiTeks)
+  await sock.sendMessage(sender, { sticker: stickerBuffer }, { quoted: msg })
+}
+
 
     if (text === '.reset') {
       if (!adminList.includes(actualUserId)) {
