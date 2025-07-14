@@ -329,5 +329,6 @@ async function handleOpenAIResponder(sock, msg, userId) {
 module.exports = {
   askOpenAI,
   extractQueryFromMessage,
-  handleOpenAIResponder
+  handleOpenAIResponder,
+  memoryMap
 }
