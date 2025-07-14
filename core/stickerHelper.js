@@ -60,7 +60,7 @@ async function createStickerFromMessage(sock, msg) {
       ? await convertVideoToSticker(buffer)
       : await new Sticker(buffer, {
           pack: 'AuraBot',
-          author: 'Mau Sewa Bot Auto Sticker? Hub: 083194900080',
+          author: 'AURA',
           type: StickerTypes.DEFAULT,
           quality: 70,
         }).toBuffer();
