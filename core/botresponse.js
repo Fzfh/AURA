@@ -111,7 +111,7 @@ if (text.startsWith('/') || text.startsWith('.')) {
     const handledMenfess = await menfess(sock, msg, text)
     if (handledMenfess) return
     const fakeCmd = text.trim().split(' ')[0].toLowerCase()
-    const allCmds = ['d', 'ds', 'dig', 's', 'tl', 'una', 'na', 'tagall', 'tag', 'listbahasa', 'linkmap', 'mapqr', 'qr', 'cqr', 'waifu', 'waifuhen', 'ets', 'sm', 'show', 'sendall']
+    const allCmds = ['d', 'ds', 'dig', 's', 'st', 'stickertext', 'tl', 'una', 'na', 'tagall', 'tag', 'listbahasa', 'linkmap', 'mapqr', 'qr', 'cqr', 'waifu', 'waifuhen', 'ets', 'sm', 'show', 'sendall']
     
     if (!text.startsWith('.') && !text.startsWith('/') && !['s', 'st', 'stickertext', 'd', 'ds', 'tl', 'una', 'na', 'qr', 'cqr', 'waifu', 'waifuhen', 'ets', 'sm'].includes(text.trim().toLowerCase())) {
       if (await handleOpenAIResponder(sock, msg, userId)) return;
