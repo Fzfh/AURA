@@ -23,6 +23,14 @@ if (typeof fetch !== 'function') {
 const writeFile = promisify(fs.writeFile);
 const readFile = promisify(fs.readFile);
 
+async function stickerFromMediaCommand(sock, msg, lowerText) {
+  const trigger = ['s', '.s', 'sticker', '.sticker']
+  if (!trigger.some(t => lowerText.startsWith(t))) return false
+
+  await createStickerFromMessage(sock, msg)
+  return true
+}
+
 async function stickerTextCommand(sock, msg, lowerText, args) {
   const trigger = ['stickertext', 'st', '.st', '.stickertext']
   if (!trigger.some(t => lowerText.startsWith(t))) return false
@@ -231,5 +239,6 @@ function cleanupFiles(filePaths) {
 module.exports = {
   createStickerFromMessage,
   createStickerFromText,
-  stickerTextCommand
+  stickerTextCommand,
+  stickerFromMediaCommand
 }
