@@ -219,23 +219,6 @@ if (text.startsWith('/') || text.startsWith('.')) {
     ) {
       return await ekstrakAudio(sock, msg);
     }
-
-    if (text.startsWith('.dyts ')) {
-      const url = text.split('.dyts ')[1].trim();
-      try {
-        await sock.sendMessage(from, { text: '🎧 Mengunduh audio dari YouTube...' }, { quoted: msg });
-        const { filePath, title } = await downloadYouTubeMP3(url);
-        await sock.sendMessage(from, {
-          audio: { url: filePath },
-          mimetype: 'audio/mp4',
-          ptt: false
-        }, { quoted: msg });
-        fs.unlinkSync(filePath);
-      } catch (e) {
-        console.error('❌ Gagal download audio:', e);
-        await sock.sendMessage(from, { text: `❌ Gagal download audio:\n${e.message}` }, { quoted: msg });
-      }
-    }
     
           if (text.startsWith('.d ')) {
           const link = text.split(' ')[1];
@@ -359,7 +342,7 @@ if (text.startsWith('/') || text.startsWith('.')) {
       return await tagall(sock, msg, text, isGroup);
     }
 
-   if (['s', 'sticker'].includes(lowerText)) {
+   if (['s', 'sticker', '.s', '.sticker'].includes(lowerText)) {
       try {
         const quoted = msg.message?.extendedTextMessage?.contextInfo?.quotedMessage
         const hasMediaQuoted = quoted?.imageMessage || quoted?.videoMessage
@@ -368,7 +351,7 @@ if (text.startsWith('/') || text.startsWith('.')) {
         const caption = msg.message?.imageMessage?.caption || msg.message?.videoMessage?.caption || ''
 
         // Kalau pakai caption langsung "s"
-        const captionMatch = ['s', 'sticker'].includes(caption.toLowerCase())
+        const captionMatch = ['s', 'sticker', '.s', '.sticker'].includes(caption.toLowerCase())
 
         if (hasMediaQuoted || captionMatch) {
           await createStickerFromMessage(sock, msg)
@@ -384,7 +367,7 @@ if (text.startsWith('/') || text.startsWith('.')) {
       return
     }
 
-    if (command === 'stickertext' || command === 'st') {
+    if (lowerText === 'stickertext' || lowerText=== 'st' || lowerText=== '.st' || lowerText === '.stickertext') {
       if (!args[0]) return sock.sendMessage(sender, { text: 'Ketik: stikertext Halo dunia!' }, { quoted: msg })
       const text = args.join(' ')
       const stickerBuffer = await createStickerFromText(text)
