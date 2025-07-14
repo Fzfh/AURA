@@ -17,27 +17,33 @@ module.exports = async function pp(sock, msg) {
   if (contextInfo?.mentionedJid?.length) {
     target = contextInfo.mentionedJid[0];
 
-  } else if (phoneNumberRegex.test(args)) {
+  } else if (args) {
     let num = args.replace(/\D/g, '');
 
     if (num.startsWith('0')) {
       num = '62' + num.slice(1);
     } else if (num.startsWith('8')) {
       num = '62' + num;
+    } else if (num.startsWith('620')) {
+      num = '62' + num.slice(3);
     }
 
-    target = `${num}@s.whatsapp.net`;
+    if (num.length >= 10 && num.length <= 15) {
+      target = `${num}@s.whatsapp.net`;
+    }
+  }
 
-  } else if (contextInfo?.participant) {
+  if (!target && contextInfo?.participant) {
     target = contextInfo.participant;
+  }
 
-  } else if (!sender.endsWith('@g.us')) {
+  if (!target && !sender.endsWith('@g.us')) {
     target = sender;
   }
 
   if (!target) {
     await sock.sendMessage(sender, {
-      text: '❌ Format salah. Bisa ketik:\n.pp (tag/reply)\n.pp 628xxxxx / 08xxx / +628xxxxx',
+      text: '❌ Format salah. Ketik:\n.pp (tag/reply)\n.pp 628xxxx / 08xxxx / +62 8xxx',
     }, { quoted: msg });
     return true;
   }
@@ -48,7 +54,7 @@ module.exports = async function pp(sock, msg) {
 
     await sock.sendMessage(sender, {
       image: { url },
-      caption: `📸 berhasil mengambil foto profil @${target.split('@')[0]}`,
+      caption: `📸 Ini foto profil @${target.split('@')[0]}`,
       mentions: [target],
     }, { quoted: msg });
 
