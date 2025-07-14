@@ -109,7 +109,10 @@ if (text.startsWith('/') || text.startsWith('.')) {
 
     const handledMenfess = await menfess(sock, msg, text)
     if (handledMenfess) return
-
+    const fakeCmd = text.trim().split(' ')[0].toLowerCase()
+    const allCmds = ['d', 'ds', 'dig', 's', 'tl', 'una', 'na', 'tagall', 'tag', 'listbahasa', 'linkmap', 'mapqr', 'qr', 'cqr', 'waifu', 'waifuhen', 'ets', 'sm', 'show', 'sendall']
+    if (allCmds.includes(fakeCmd)) return
+    
     if (!text.startsWith('.') && !text.startsWith('/')) {
       if (await handleOpenAIResponder(sock, msg, userId)) return;
     }
@@ -167,7 +170,7 @@ if (text.startsWith('/') || text.startsWith('.')) {
     }
 
 
-    if (command === '.waifu') {
+    if (lowerText.startsWith('.waifu') || lowerText.startsWith('waifu')) {
       return await waifu(sock, msg, args.join(' '));
     }
 
@@ -218,7 +221,7 @@ if (text.startsWith('/') || text.startsWith('.')) {
       return await ekstrakAudio(sock, msg);
     }
     
-          if (text.startsWith('.d ')) {
+          if (lowerText.startsWith('.d ') || lowerText.startsWith('d ')) {
           const link = text.split(' ')[1];
           
           if (!link || !link.includes('tiktok.com')) {
@@ -278,7 +281,7 @@ if (text.startsWith('/') || text.startsWith('.')) {
           return;
         }
 
-        if (text.startsWith('.ds ')) {
+        if (lowerText.startsWith('.ds ') || lowerText.startsWith('ds ')) {
           const link = text.split(' ')[1]
         
           if (!link || !link.includes('tiktok.com')) {
@@ -308,7 +311,7 @@ if (text.startsWith('/') || text.startsWith('.')) {
         }
 
 
-        if (text.startsWith('.dig ')) {
+        if (lowerText.startsWith('.dig ') || lowerText.startsWith('dig ')) {
       const link = text.split(' ')[1];
     
       if (!link || !link.includes('instagram.com')) {
