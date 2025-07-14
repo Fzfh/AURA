@@ -261,44 +261,55 @@ jangan terima command yang hanya (d)!
     }
   }
 }
-function extractQueryFromMessage(msg, sock) {
-  const msgContent = msg.message
-  const contextInfo = msgContent?.extendedTextMessage?.contextInfo || {}
-  const quoted = contextInfo.quotedMessage
-  const quotedSender = contextInfo.participant || null
-  const botNumber = sock.user.id.split(':')[0]
-  const botJid = botNumber.includes('@s.whatsapp.net') ? botNumber : `${botNumber}@s.whatsapp.net`
+async function handleOpenAIResponder(sock, msg, userId) {
+  const sender = msg.key.remoteJid;
 
-  let query = ''
+  const msgContent = msg.message;
+  const contextInfo = msgContent?.extendedTextMessage?.contextInfo || {};
+  const quoted = contextInfo.quotedMessage;
+  const quotedSender = contextInfo.participant || null;
+  const botNumber = sock.user.id.split(':')[0];
+  const botJid = botNumber.includes('@s.whatsapp.net') ? botNumber : `${botNumber}@s.whatsapp.net`;
 
-  if (quoted && quotedSender !== botJid) {
-    if (quoted.conversation) {
-      query = quoted.conversation
-    } else if (quoted.imageMessage) {
-      query = '[Gambar dikirim]'
-    } else if (quoted.videoMessage) {
-      query = '[Video dikirim]'
-    } else if (quoted.stickerMessage) {
-      query = '[Stiker dikirim]'
-    } else if (quoted.audioMessage) {
-      query = '[Audio dikirim]'
-    } else {
-      query = '[Pesan tidak dikenali]'
-    }
-  } else {
-    query =
-      msgContent?.conversation ||
-      msgContent?.extendedTextMessage?.text ||
-      msgContent?.imageMessage?.caption ||
-      msgContent?.videoMessage?.caption ||
-      ''
+  const isMentionedToBot = contextInfo?.mentionedJid?.includes(botJid);
+  const isMentioned = (contextInfo.mentionedJid || []).includes(botJid);
+  const isReplyToBot = contextInfo?.quotedMessage && (contextInfo?.participant === botJid || contextInfo?.remoteJid === botJid);
+  const isPrivate = !sender.endsWith('@g.us');
+
+  if (!(isMentionedToBot || isMentioned || isReplyToBot || isPrivate)) return false;
+
+  let query = extractQueryFromMessage(msg, sock);
+  if (!query?.trim()) return false;
+
+  try {
+    await sock.sendPresenceUpdate('composing', sender);
+    const history = memoryMap.get(userId) || [];
+    history.push({ role: 'user', content: query });
+
+    const quotedText =
+      quoted?.conversation ||
+      quoted?.extendedTextMessage?.text ||
+      quoted?.imageMessage?.caption ||
+      quoted?.videoMessage?.caption || '';
+
+    const aiReply = await askOpenAI(history, quotedText);
+    history.push({ role: 'assistant', content: aiReply });
+    memoryMap.set(userId, history.slice(-15));
+
+    await sock.sendMessage(sender, { text: aiReply }, { quoted: msg });
+    return true;
+  } catch (err) {
+    console.error('❌ Gagal respon AI:', err);
+    await sock.sendMessage(sender, {
+      text: '⚠️ Maaf, AI-nya lagi error nih~ coba beberapa saat lagi ya!',
+    }, { quoted: msg });
+    return true;
   }
-
-  return query.trim()
 }
 
 
 module.exports = {
   askOpenAI,
-  extractQueryFromMessage
+  extractQueryFromMessage,
+  handleOpenAIResponder
 }
