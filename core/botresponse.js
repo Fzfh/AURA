@@ -110,7 +110,9 @@ if (text.startsWith('/') || text.startsWith('.')) {
     const handledMenfess = await menfess(sock, msg, text)
     if (handledMenfess) return
 
-    if (await handleOpenAIResponder(sock, msg, userId)) return;
+    if (!text.startsWith('.') && !text.startsWith('/')) {
+      if (await handleOpenAIResponder(sock, msg, userId)) return;
+    }
     if (await kick(sock, msg, text, isGroup)) return;
     if (await add(sock, msg, text, sender, userId)) return;
     if (await openCloseGroup(sock, msg, text)) return;
