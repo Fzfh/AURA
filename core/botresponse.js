@@ -111,7 +111,6 @@ if (text.startsWith('/') || text.startsWith('.')) {
     if (handledMenfess) return
     const fakeCmd = text.trim().split(' ')[0].toLowerCase()
     const allCmds = ['d', 'ds', 'dig', 's', 'tl', 'una', 'na', 'tagall', 'tag', 'listbahasa', 'linkmap', 'mapqr', 'qr', 'cqr', 'waifu', 'waifuhen', 'ets', 'sm', 'show', 'sendall']
-    if (allCmds.includes(fakeCmd)) return
     
     if (!text.startsWith('.') && !text.startsWith('/')) {
       if (await handleOpenAIResponder(sock, msg, userId)) return;
