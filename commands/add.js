@@ -1,5 +1,5 @@
 module.exports = async function(sock, msg, text, sender, userId) {
-  const triggers = ['add', '.add', '+', 'tambah'];
+  const triggers = ['add', '.add', 'tambah'];
   const lowerText = text.toLowerCase();
 
   if (!triggers.some(t => lowerText.startsWith(t))) return false;
