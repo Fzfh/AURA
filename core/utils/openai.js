@@ -80,7 +80,7 @@ Misalnya:
 - menu (menu lengkap)
 - tl (translate)
 - list bahasa (list kode bahasa untuk translate)
-- ets (ekstrak to sound, ini adalah convert dari video ke mp3 dan jika user reply ets aja ke bot maka beri tahu harus pakai .ets)
+- .ets (ekstrak to sound, ini adalah convert dari video ke mp3)
 - .d (download tiktok foto/video)
 - .ds (download tiktok sound)
 - .una / .na
