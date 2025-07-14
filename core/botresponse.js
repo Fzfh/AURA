@@ -1,7 +1,6 @@
 const spamTracker = new Map()
 const userStateMap = new Map()
 const mutedUsers = new Map()
-const memoryMap = new Map()
 const muteDuration = 2 * 60 * 1000
 const add = require('../commands/add');
 // const { handleAutoKick } = require('../commands/auto_kick')
@@ -11,7 +10,7 @@ const kick = require('../commands/kick')
 const menfess = require('../commands/menfess')
 const handleWelcome = require('../commands/welcome');
 const { adminList, toxicWords } = require('../setting/setting')
-const { handleOpenAIResponder } = require('../core/utils/openai')
+const { handleOpenAIResponder, memoryMap } = require('../core/utils/openai')
 const { createStickerFromMessage, createStickerFromText, stickerTextCommand, stickerFromMediaCommand } = require('../core/stickerHelper')
 const downloadTiktok = require('../commands/tiktokDownloader');
 const downloadInstagram = require('../commands/igDownloader');
