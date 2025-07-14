@@ -185,7 +185,7 @@ if (text.startsWith('/') || text.startsWith('.')) {
     }
 
 
-    if (lowerText.startsWith('.qr') || lowerText.startsWith('qr')) {
+    if (lowerText.startsWith('.qr')) {
       return await handleQR(sock, msg);
     }
     
