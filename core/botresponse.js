@@ -345,6 +345,7 @@ if (text.startsWith('/') || text.startsWith('.')) {
         }, { quoted: msg });
       }
 
+      memoryMap.delete(userId)
       memoryMap.delete(actualUserId)
       return sock.sendMessage(sender, {
         text: '🧠 Ingatan AuraBot Telah Direset, Ayo Buat Obrolan Baru~!'
