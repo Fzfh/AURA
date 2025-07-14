@@ -113,9 +113,11 @@ if (text.startsWith('/') || text.startsWith('.')) {
     const fakeCmd = text.trim().split(' ')[0].toLowerCase()
     const allCmds = ['d', 'ds', 'dig', 's', 'st', 'stickertext', 'tl', 'una', 'na', 'tagall', 'tag', 'listbahasa', 'linkmap', 'mapqr', 'qr', 'cqr', 'waifu', 'waifuhen', 'ets', 'sm', 'show', 'sendall']
     
-    if (!text.startsWith('.') && !text.startsWith('/') && !['s', 'st', 'stickertext', 'd', 'ds', 'tl', 'una', 'na', 'qr', 'cqr', 'waifu', 'waifuhen', 'ets', 'sm'].includes(text.trim().toLowerCase())) {
+    const commandName = text.trim().split(' ')[0].toLowerCase().replace(/^(\.|\/)/, '');
+    if (!['s', 'st', 'stickertext', 'd', 'ds', 'tl', 'una', 'na', 'qr', 'cqr', 'waifu', 'waifuhen', 'ets', 'sm'].includes(commandName)) {
       if (await handleOpenAIResponder(sock, msg, userId)) return;
     }
+
     if (await kick(sock, msg, text, isGroup)) return;
     if (await add(sock, msg, text, sender, userId)) return;
     if (await openCloseGroup(sock, msg, text)) return;
