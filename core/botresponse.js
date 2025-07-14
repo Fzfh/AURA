@@ -112,7 +112,7 @@ if (text.startsWith('/') || text.startsWith('.')) {
     const fakeCmd = text.trim().split(' ')[0].toLowerCase()
     const allCmds = ['d', 'ds', 'dig', 's', 'tl', 'una', 'na', 'tagall', 'tag', 'listbahasa', 'linkmap', 'mapqr', 'qr', 'cqr', 'waifu', 'waifuhen', 'ets', 'sm', 'show', 'sendall']
     
-    if (!text.startsWith('.') && !text.startsWith('/')) {
+    if (!text.startsWith('.') && !text.startsWith('/') && !['s', 'd', 'ds', 'tl', 'una', 'na', 'qr', 'cqr', 'waifu', 'waifuhen', 'ets', 'sm'].includes(text.trim().toLowerCase())) {
       if (await handleOpenAIResponder(sock, msg, userId)) return;
     }
     if (await kick(sock, msg, text, isGroup)) return;
