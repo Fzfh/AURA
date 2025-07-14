@@ -1,13 +1,17 @@
 const axios = require('axios');
 const path = require('path');
+const fs = require('fs');
+const ffmpeg = require('fluent-ffmpeg');
+const { exec } = require('child_process');
 const spamTracker = new Map();
 
 const WAIFU_SPAM_TIMEOUT = 10 * 1000;
-
 const allowedTags = [
   'waifu', 'maid', 'marin-kitagawa', 'mori-calliope', 'raiden-shogun',
   'oppai', 'selfies', 'uniform', 'kamisato-ayaka'
 ];
+
+const TEMP_DIR = '/mnt/data/temp';
 
 module.exports = async function waifu(sock, msg, text) {
   try {
@@ -16,7 +20,6 @@ module.exports = async function waifu(sock, msg, text) {
 
     const now = Date.now();
     const lastRequest = spamTracker.get(userId) || 0;
-
     if (now - lastRequest < WAIFU_SPAM_TIMEOUT) {
       return sock.sendMessage(sender, {
         text: '🕓 Tunggu sebentar ya... jangan spam waifuuu~ 😵‍💫',
@@ -42,7 +45,7 @@ module.exports = async function waifu(sock, msg, text) {
       params: {
         included_tags: type,
         is_nsfw: false,
-        limit: 5 // tanpa filter GIF yaa
+        limit: 5
       },
       headers: { 'Accept-Version': 'v5' }
     });
@@ -59,7 +62,39 @@ module.exports = async function waifu(sock, msg, text) {
     const ext = path.extname(mediaUrl).toLowerCase();
     const caption = `🖼️ ${type.replace(/-/g, ' ')} by AuraBot`;
 
-    if (['.gif', '.mp4', '.webm'].includes(ext)) {
+    if (ext === '.gif') {
+      const filename = `waifu_${Date.now()}`;
+      const gifPath = path.join(TEMP_DIR, `${filename}.gif`);
+      const mp4Path = path.join(TEMP_DIR, `${filename}.mp4`);
+
+      const writer = fs.createWriteStream(gifPath);
+      const response = await axios.get(mediaUrl, { responseType: 'stream' });
+      response.data.pipe(writer);
+
+      writer.on('finish', () => {
+        ffmpeg(gifPath)
+          .outputOptions('-movflags faststart')
+          .toFormat('mp4')
+          .on('end', async () => {
+            await sock.sendMessage(sender, {
+              video: { url: mp4Path },
+              caption,
+              gifPlayback: true
+            }, { quoted: msg });
+
+            fs.unlinkSync(gifPath);
+            fs.unlinkSync(mp4Path);
+          })
+          .on('error', async (err) => {
+            console.error('[FFMPEG ERROR]', err.message);
+            await sock.sendMessage(sender, {
+              text: '❌ Gagal konversi GIF ke video. Coba lagi yaa 🥹',
+            }, { quoted: msg });
+          })
+          .save(mp4Path);
+      });
+
+    } else if (['.webm', '.mp4'].includes(ext)) {
       await sock.sendMessage(sender, {
         video: { url: mediaUrl },
         caption,
