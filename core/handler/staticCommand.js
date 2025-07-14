@@ -24,8 +24,8 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
 ┃   ➤ Contoh: \`stickertext\` AuraBot  
 ┃  
 ┃  🎵 Ekstrak Audio dari Video
-┃   ➤ Kirim video dengan caption: \`ets\`
-┃   ➤ Atau reply ke video lalu ketik: \`ets\`
+┃   ➤ Kirim video dengan caption: \`.ets\`
+┃   ➤ Atau reply ke video lalu ketik: \`.ets\`
 ┃  
 ┃  💌 Menfess Anonim  
 ┃   ➤ \`/menfess\` 
@@ -36,8 +36,8 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
 ┃   ➤ Reply Ke shareloc untuk jadi link
 ┃
 ┃  🗺️🎛️ Cari Lokasi Google Maps ke qr code (qris)
-┃   ➤ \`.mapqr\` atau \`mapqr\` <nama daerah> 
-┃   ➤ Contoh: \`.mapqr\` atau \`mapqr\` monas Jakarta
+┃   ➤ \`.mapqr\` <nama daerah> 
+┃   ➤ Contoh: \`.mapqr\` monas Jakarta
 ┃   ➤ Reply Ke shareloc untuk jadi link
 ┃
 ┃  👰🏻 Cari Waifu Kamu!
