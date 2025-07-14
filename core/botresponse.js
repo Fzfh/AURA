@@ -29,6 +29,7 @@ const admin = require('../commands/admin');
 const buatGrup = require('../commands/buatGrup');
 const ekstrakAudio = require('../commands/ekstrakAudio');
 const openCloseGroup = require('../commands/openCloseGroup');
+const pp = require('../commands/pp');
 
 const greetedUsers = new Set()
 // const lastCommandMap = new Map()
@@ -122,6 +123,7 @@ if (text.startsWith('/') || text.startsWith('.')) {
     if (await stickerTextCommand(sock, msg, lowerText, args)) return;
     if (await stickerFromMediaCommand(sock, msg, lowerText)) return;
     if (await tiktokDownloader(sock, msg, text)) return;
+    if (await pp(sock, msg)) return;
 
     
     const listBahasa = `🌐 *Daftar Kode Bahasa Umum:*
