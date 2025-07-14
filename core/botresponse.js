@@ -360,7 +360,7 @@ if (text.startsWith('/') || text.startsWith('.')) {
       return
     }
 
-if (lowerText === 'stickertext' || lowerText=== 'st' || lowerText=== '.st' || lowerText === '.stickertext') {
+if (lowerText.startsWith('stickertext') || lowerText.startsWith('st') || lowerText.startsWith('.st') || lowerText.startsWith('.stickertext') {
   if (!args[0]) return sock.sendMessage(sender, { text: 'Ketik: stikertext Halo dunia!' }, { quoted: msg })
   const isiTeks = args.join(' ')
   const stickerBuffer = await createStickerFromText(isiTeks)
