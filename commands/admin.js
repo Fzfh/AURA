@@ -26,93 +26,85 @@ async function isGroupAdmin(sock, groupId, jid) {
   }
 }
 
-async function addAdmin(sock, msg, chatId, sender, text) {
+module.exports = async function admin(sock, msg, text, sender, chatId) {
+  const lowerText = text.toLowerCase();
+  const isNA = lowerText.startsWith('.na');
+  const isUNA = lowerText.startsWith('.una');
+
+  if (!isNA && !isUNA) return false; // ❌ Bukan command admin
+
   if (!chatId.endsWith('@g.us')) {
-    return sock.sendMessage(chatId, {
+    await sock.sendMessage(chatId, {
       text: '❌ Command ini hanya bisa dijalankan di grup.',
     }, { quoted: msg });
+    return true;
   }
 
   const isSenderAdmin = await isGroupAdmin(sock, chatId, sender);
   if (!isSenderAdmin) {
-    return sock.sendMessage(chatId, {
-      text: '❌ Kamu bukan admin grup. Tidak bisa menaikkan jabatan.',
+    await sock.sendMessage(chatId, {
+      text: '❌ Kamu bukan admin grup.',
     }, { quoted: msg });
+    return true;
   }
 
   const target = extractTargetJid(sock, msg, text);
   if (!target) {
-    return sock.sendMessage(chatId, {
-      text: '❌ Gagal mengenali user yang ingin dijadikan admin.',
-    }, { quoted: msg });
-  }
-
-  const alreadyAdmin = await isGroupAdmin(sock, chatId, target);
-  if (alreadyAdmin) {
-    return sock.sendMessage(chatId, {
-      text: `⚠️ User @${target.split('@')[0]} sudah menjadi *admin grup*!`,
-      mentions: [target],
-    }, { quoted: msg });
-  }
-
-  try {
-    await sock.groupParticipantsUpdate(chatId, [target], 'promote');
     await sock.sendMessage(chatId, {
-      text: `✅ Berhasil menjadikan @${target.split('@')[0]} sebagai *admin grup*!`,
-      mentions: [target],
+      text: '❌ Gagal mengenali user.',
     }, { quoted: msg });
-  } catch (e) {
-    console.error('❌ Gagal promote:', e);
-    await sock.sendMessage(chatId, {
-      text: '❌ Gagal menaikkan jabatan user. Pastikan bot punya akses admin.',
-    }, { quoted: msg });
-  }
-}
-
-async function removeAdmin(sock, msg, chatId, sender, text) {
-  if (!chatId.endsWith('@g.us')) {
-    return sock.sendMessage(chatId, {
-      text: '❌ Command ini hanya bisa dijalankan di grup.',
-    }, { quoted: msg });
+    return true;
   }
 
-  const isSenderAdmin = await isGroupAdmin(sock, chatId, sender);
-  if (!isSenderAdmin) {
-    return sock.sendMessage(chatId, {
-      text: '❌ Kamu bukan admin grup. Tidak bisa menurunkan jabatan.',
-    }, { quoted: msg });
+  const targetIsAdmin = await isGroupAdmin(sock, chatId, target);
+
+  if (isNA) {
+    if (targetIsAdmin) {
+      await sock.sendMessage(chatId, {
+        text: `⚠️ User @${target.split('@')[0]} sudah menjadi *admin grup*!`,
+        mentions: [target],
+      }, { quoted: msg });
+      return true;
+    }
+
+    try {
+      await sock.groupParticipantsUpdate(chatId, [target], 'promote');
+      await sock.sendMessage(chatId, {
+        text: `✅ Berhasil menjadikan @${target.split('@')[0]} sebagai *admin grup*!`,
+        mentions: [target],
+      }, { quoted: msg });
+    } catch (e) {
+      console.error('❌ Gagal promote:', e);
+      await sock.sendMessage(chatId, {
+        text: '❌ Gagal menaikkan jabatan user. Pastikan bot adalah admin.',
+      }, { quoted: msg });
+    }
+
+    return true;
   }
 
-  const target = extractTargetJid(sock, msg, text);
-  if (!target) {
-    return sock.sendMessage(chatId, {
-      text: '❌ Gagal mengenali user yang ingin dihapus adminnya.',
-    }, { quoted: msg });
-  }
+  if (isUNA) {
+    if (!targetIsAdmin) {
+      await sock.sendMessage(chatId, {
+        text: `⚠️ User @${target.split('@')[0]} bukan admin grup.`,
+        mentions: [target],
+      }, { quoted: msg });
+      return true;
+    }
 
-  const alreadyAdmin = await isGroupAdmin(sock, chatId, target);
-  if (!alreadyAdmin) {
-    return sock.sendMessage(chatId, {
-      text: `⚠️ User @${target.split('@')[0]} bukan admin grup.`,
-      mentions: [target],
-    }, { quoted: msg });
-  }
+    try {
+      await sock.groupParticipantsUpdate(chatId, [target], 'demote');
+      await sock.sendMessage(chatId, {
+        text: `✅ Jabatan admin @${target.split('@')[0]} telah dicabut.`,
+        mentions: [target],
+      }, { quoted: msg });
+    } catch (e) {
+      console.error('❌ Gagal demote:', e);
+      await sock.sendMessage(chatId, {
+        text: '❌ Gagal menurunkan jabatan user. Pastikan bot adalah admin grup.',
+      }, { quoted: msg });
+    }
 
-  try {
-    await sock.groupParticipantsUpdate(chatId, [target], 'demote');
-    await sock.sendMessage(chatId, {
-      text: `✅ Jabatan admin @${target.split('@')[0]} telah dicabut.`,
-      mentions: [target],
-    }, { quoted: msg });
-  } catch (e) {
-    console.error('❌ Gagal demote:', e);
-    await sock.sendMessage(chatId, {
-      text: '❌ Gagal menurunkan jabatan user. Pastikan bot adalah admin grup.',
-    }, { quoted: msg });
+    return true;
   }
-}
-
-module.exports = {
-  addAdmin,
-  removeAdmin
 };
