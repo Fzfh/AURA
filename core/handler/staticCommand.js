@@ -57,6 +57,12 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
 ┃   ➤ \`.dig\` link instagram 
 ┃   ➤ Contoh: \`.dig\` https://instagram.com/linkKamu
 ┃ 
+┃ 📸 Ambil Foto Profile
+┃   ➤ \`.pp\` nomor atau tag (@orang)
+┃   ➤ Jika chat pribadi bot \`.pp\` nomor
+┃   ➤ contoh: \`.pp\` 0898009090
+┃   ➤ contoh: \`.pp\` @angga
+┃ 
 ┃ 🎛️ Baca isi Qris
 ┃   ➤ \`.qr\` 
 ┃   ➤ Contoh: \`.qr\` reply ke qr code
