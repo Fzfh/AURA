@@ -114,6 +114,7 @@ if (text.startsWith('/') || text.startsWith('.')) {
     if (await kick(sock, msg, text, isGroup)) return;
     if (await add(sock, msg, text, sender, userId)) return;
     if (await openCloseGroup(sock, msg, text)) return;
+    if (await admin(sock, msg, text, sender, userId)) return;
     
     const listBahasa = `🌐 *Daftar Kode Bahasa Umum:*
     
@@ -145,14 +146,6 @@ if (text.startsWith('/') || text.startsWith('.')) {
     
     ✨ *Ketik sesuai yaa! Hindari typo biar nggak nyasar 😋*
     `
-
-    if (lowerText.startsWith('.na')) {
-      return await addAdmin(sock, msg, sender, actualUserId, text);
-    }
-
-    if (lowerText.startsWith('.una')) {
-      return await removeAdmin(sock, msg, sender, actualUserId, text);
-    }
 
     if (['/listbahasa', '.listbahasa', 'listbahasa', 'list bahasa'].includes(lowerText)) {
       return sock.sendMessage(sender, {
