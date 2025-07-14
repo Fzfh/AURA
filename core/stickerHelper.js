@@ -23,6 +23,32 @@ if (typeof fetch !== 'function') {
 const writeFile = promisify(fs.writeFile);
 const readFile = promisify(fs.readFile);
 
+async function stickerTextCommand(sock, msg, lowerText, args) {
+  const trigger = ['stickertext', 'st', '.st', '.stickertext']
+  if (!trigger.some(t => lowerText.startsWith(t))) return false
+
+  if (!args[0]) {
+    await sock.sendMessage(msg.key.remoteJid, {
+      text: 'Ketik: stikertext Halo dunia!'
+    }, { quoted: msg })
+    return true
+  }
+
+  const isiTeks = args.join(' ')
+  try {
+    const stickerBuffer = await createStickerFromText(isiTeks)
+    await sock.sendMessage(msg.key.remoteJid, { sticker: stickerBuffer }, { quoted: msg })
+  } catch (err) {
+    console.error('❌ Error stickerTextCommand:', err)
+    await sock.sendMessage(msg.key.remoteJid, {
+      text: 'Ups! Gagal bikin stiker dari teks 😖'
+    }, { quoted: msg })
+  }
+
+  return true
+}
+
+
 async function createStickerFromMessage(sock, msg) {
   try {
     const messageContent = msg.message;
@@ -205,4 +231,5 @@ function cleanupFiles(filePaths) {
 module.exports = {
   createStickerFromMessage,
   createStickerFromText,
-};
+  stickerTextCommand
+}
