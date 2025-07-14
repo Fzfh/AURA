@@ -212,7 +212,7 @@ if (text.startsWith('/') || text.startsWith('.')) {
     }
     
     if (
-      body.trim().toLowerCase() === 'ets' &&
+      body.trim().toLowerCase() === 'ets' || body.trim().toLowerCase() === '.ets' &&
       (
         msg.message?.videoMessage ||
         msg.message?.extendedTextMessage?.contextInfo?.quotedMessage?.videoMessage
