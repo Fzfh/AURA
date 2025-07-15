@@ -37,48 +37,36 @@ module.exports = async function kick(sock, msg, text, isGroup) {
       }, { quoted: msg });
     }
 
-    // Cek kalau pakai reply
+    // Tangkap reply & tag
     const quotedInfo = msg.message?.extendedTextMessage?.contextInfo;
     const repliedUser = quotedInfo?.participant;
+    const mentionedJids = quotedInfo?.mentionedJid || [];
+
+    const rawInput = text.split(' ').slice(1).join(' ');
+    let targets = [];
 
     if (repliedUser) {
-      if (repliedUser === botId) {
-        return sock.sendMessage(groupId, {
-          text: '❌ Eitss... Ketik Kick sambil reply keaku ya?? itu namanya nyuruh aku keluar wkwkwk\n No☝🏻️ No☝🏻️ No☝🏻️ Jangan ketik Kick reply keaku lagi ya!',
-        }, { quoted: msg });
-      }
-      
-    if (repliedUser === senderId) {
-      return;
-     }
-
-      await sock.groupParticipantsUpdate(groupId, [repliedUser], 'remove');
+      targets.push(repliedUser);
+    } else if (mentionedJids.length > 0) {
+      targets = mentionedJids;
+    } else if (rawInput) {
+      targets = rawInput.split(',').map(n => {
+        let num = n.trim().replace(/[^0-9]/g, '');
+        if (num.startsWith('0')) num = '62' + num.slice(1);
+        return num + '@s.whatsapp.net';
+      });
+    } else {
       return sock.sendMessage(groupId, {
-        text: `✅ Berhasil mengeluarkan:\n@${repliedUser.split('@')[0]}`,
-        mentions: [repliedUser]
+        text: '❗ Gunakan dengan *reply pesan*, *tag user*, atau ketik: `.kick 628xxxx` / `.kick 628xxxx, 62xxxxx`'
       }, { quoted: msg });
     }
 
-    // Cek kalau pakai input manual
-    const rawInput = text.split(' ').slice(1).join(' ');
-    if (!rawInput) {
-      return sock.sendMessage(groupId, {
-        text: '❗ Gunakan dengan reply pesan *atau* ketik manual: `.kick 628xxxx` atau `.kick 628xxxx, 629xxxx`'
-      }, { quoted: msg });
-    }
-
-    const targets = rawInput.split(',').map(n => {
-      let num = n.trim().replace(/[^0-9]/g, '');
-      if (num.startsWith('0')) num = '62' + num.slice(1);
-      return num + '@s.whatsapp.net';
-    });
-
-    // Hapus jika ada ID bot di daftar target
-    const filteredTargets = targets.filter(t => t !== botId);
+    // Filter ID bot dari target
+    const filteredTargets = targets.filter(t => t !== botId && t !== senderId);
 
     if (filteredTargets.length === 0) {
       return sock.sendMessage(groupId, {
-        text: '❌ Tidak ada target valid untuk dikeluarkan. Jangan coba keluarkan bot-nya dong~ 😢',
+        text: '❌ Tidak ada target valid untuk dikeluarkan. Jangan suruh aku ngeluarin diriku sendiri dong 😢',
       }, { quoted: msg });
     }
 
@@ -97,12 +85,12 @@ module.exports = async function kick(sock, msg, text, isGroup) {
     let responseText = '';
 
     if (success.length > 0) {
-      responseText += `✅ Berhasil mengeluarkan ${success.length} orang:\n`;
+      responseText += `✅ Berhasil mengeluarkan:\n`;
       responseText += success.map(jid => `@${jid.split('@')[0]}`).join('\n') + '\n\n';
     }
 
     if (failed.length > 0) {
-      responseText += `❌ Gagal mengeluarkan ${failed.length} orang:\n`;
+      responseText += `❌ Gagal mengeluarkan:\n`;
       responseText += failed.map(jid => `@${jid.split('@')[0]}`).join('\n');
     }
 
@@ -114,7 +102,7 @@ module.exports = async function kick(sock, msg, text, isGroup) {
   } catch (err) {
     console.error('❌ Gagal kick member:', err);
     return sock.sendMessage(groupId, {
-      text: '❌ Gagal mengeluarkan anggota. Pastikan bot adalah admin dan ID valid ya!'
+      text: '❌ Gagal mengeluarkan anggota. Pastikan bot adalah admin dan ID valid ya!',
     }, { quoted: msg });
   }
 };
