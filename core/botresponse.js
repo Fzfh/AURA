@@ -17,59 +17,70 @@ async function botFirstResponse({ sock, sender, msg }, options = {}) {
 
 async function handleResponder(sock, msg) {
   try {
-    if (!msg.message) return
+    if (!msg.message) return;
 
-    const sender = msg.key.remoteJid
-    const userId = sender
-    const actualUserId = msg.key.participant || sender
-    const isGroup = sender.endsWith('@g.us')
+    const sender = msg.key.remoteJid;
+    const userId = sender;
+    const actualUserId = msg.key.participant || sender;
+    const isGroup = sender.endsWith('@g.us');
 
-    const content = msg.message?.viewOnceMessageV2?.message || msg.message
-    const text = content?.conversation || content?.extendedTextMessage?.text || content?.imageMessage?.caption || content?.videoMessage?.caption || ''
-    if (!text) return
+    const content = msg.message?.viewOnceMessageV2?.message || msg.message;
+    const text = content?.conversation ||
+                 content?.extendedTextMessage?.text ||
+                 content?.imageMessage?.caption ||
+                 content?.videoMessage?.caption || '';
+    if (!text) return;
 
-    const body = text
-    const lowerText = text.toLowerCase()
-    const commandName = body.trim().split(' ')[0].toLowerCase().replace(/^\.|\//, '')
-    const args = body.trim().split(' ').slice(1)
+    const body = text;
+    const lowerText = text.toLowerCase();
+    const commandName = body.trim().split(' ')[0].toLowerCase().replace(/^\.|\//, '');
+    const args = body.trim().split(' ').slice(1);
 
     if (text.startsWith('/') || text.startsWith('.')) {
-      const now = Date.now()
-      const userSpam = spamTracker.get(userId) || []
-      const filtered = userSpam.filter(t => now - t < 10000)
-      filtered.push(now)
-      spamTracker.set(userId, filtered)
+      const now = Date.now();
+      const userSpam = spamTracker.get(userId) || [];
+      const filtered = userSpam.filter(t => now - t < 10000);
+      filtered.push(now);
+      spamTracker.set(userId, filtered);
       if (filtered.length > 5 && !adminList.includes(userId)) {
-        mutedUsers.set(userId, now + muteDuration)
-        return sock.sendMessage(sender, { text: '🔇 Kamu terlalu banyak mengirim command! Bot diam 2 menit.' }, { quoted: msg })
+        mutedUsers.set(userId, now + muteDuration);
+        return sock.sendMessage(sender, {
+          text: '🔇 Kamu terlalu banyak mengirim command! Bot diam 2 menit.'
+        }, { quoted: msg });
       }
     }
 
-    const handledStatic = await handleStaticCommand(sock, msg, lowerText, userId, sender, body)
-    if (handledStatic) return
+    const handledStatic = await handleStaticCommand(sock, msg, lowerText, userId, sender, body);
+    if (handledStatic) return;
 
-    const botJid = sock.user?.id?.split(':')[0] + '@s.whatsapp.net'
-    const mentionedJidList = content?.extendedTextMessage?.contextInfo?.mentionedJid || []
-    const isMentioned = mentionedJidList.includes(botJid)
+    const botJid = sock.user?.id?.split(':')[0] + '@s.whatsapp.net';
+    const mentionedJidList = content?.extendedTextMessage?.contextInfo?.mentionedJid || [];
+    const isMentioned = mentionedJidList.includes(botJid);
 
     if (isMentioned && !greetedUsers.has(userId)) {
-      greetedUsers.add(userId)
-      await botFirstResponse({ sock, sender, msg }, { botBehavior })
+      greetedUsers.add(userId);
+      await botFirstResponse({ sock, sender, msg }, { botBehavior });
     }
 
     for (const pattern of botResponsePatterns) {
       if (lowerText.startsWith(pattern.command) || commandName === pattern.command) {
-        await pattern.handler(sock, msg, body, args, commandName)
+        if (['na', 'una', 'admin'].includes(pattern.command)) {
+          return await pattern.handler(sock, msg, text, actualUserId, sender);
+        } else {
+          return await pattern.handler(sock, msg, body, args, commandName);
+        }
       }
     }
+
     if (!['menu', 'reset', 'clear'].includes(commandName)) {
-      await handleOpenAIResponder(sock, msg, userId)
+      await handleOpenAIResponder(sock, msg, userId);
     }
 
   } catch (err) {
-    console.error('❌ Error di handleResponder:', err)
+    console.error('❌ Error di handleResponder:', err);
   }
 }
+
 
 const registeredSockets = new WeakSet()
 
