@@ -15,7 +15,7 @@ module.exports = async function mapsQR(sock, msg, text) {
 
     if (!groupAdmins.includes(sender)) {
       return sock.sendMessage(from, {
-        text: '🚫 Hanya admin grup yang bisa pakai fitur *.mapsqr*!',
+        text: '🚫 Hanya admin grup yang bisa pakai fitur *.mapqr*!',
       }, { quoted: msg });
     }
   }
@@ -53,20 +53,26 @@ module.exports = async function mapsQR(sock, msg, text) {
 
     await QRCode.toFile(qrPath, mapsURL, {
       scale: 15,
-      margin: 3,
+      margin: 5,
       errorCorrectionLevel: 'H',
     });
 
     const qrImage = await Jimp.read(qrPath);
     const logo = await Jimp.read(logoPath);
-    logo.resize(qrImage.bitmap.width / 4, Jimp.AUTO);
 
-    const x = (qrImage.bitmap.width - logo.bitmap.width) / 2;
-    const y = (qrImage.bitmap.height - logo.bitmap.height) / 2;
-    qrImage.composite(logo, x, y, {
-      mode: Jimp.BLEND_SOURCE_OVER,
-      opacitySource: 1,
-    });
+    const logoSize = qrImage.bitmap.width / 5;
+    logo.resize(logoSize, logoSize);
+
+    const padding = 20;
+    const box = new Jimp(logo.bitmap.width + padding, logo.bitmap.height + padding, 0xFFFFFFFF);
+
+    const offsetX = (box.bitmap.width - logo.bitmap.width) / 2;
+    const offsetY = (box.bitmap.height - logo.bitmap.height) / 2;
+    box.composite(logo, offsetX, offsetY);
+
+    const centerX = (qrImage.bitmap.width - box.bitmap.width) / 2;
+    const centerY = (qrImage.bitmap.height - box.bitmap.height) / 2;
+    qrImage.composite(box, centerX, centerY);
 
     await qrImage.writeAsync(qrPath);
 
