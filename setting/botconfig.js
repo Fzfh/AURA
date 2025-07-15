@@ -41,7 +41,6 @@ const botResponsePatterns = [
   { command: 'ds', handler: returnCommand["commands_tiktokDownloader"] },
   { command: 'ets', handler: returnCommand["commands_ekstrakAudio"] },
   { command: 'pp', handler: returnCommand["commands_pp"] },
-  { command: 'bg', handler: returnCommand["commands_buatGrup"], isAdmin: true },
 
 
   // Bahasa dan Bantuan
@@ -51,6 +50,8 @@ const botResponsePatterns = [
   { command: 'kick', handler: returnCommand["commands_kick"], isAdmin: true },
   { command: 'add', handler: returnCommand["commands_add"], isAdmin: true },
   { command: 'admin', handler: returnCommand["commands_admin"], isAdmin: true },
+  { command: 'bg', handler: returnCommand["commands_buatGrup"], isAdmin: true },
+  { command: 'tag', handler: returnCommand["commands_tagall"], isAdmin: true },
   { command: 'open', handler: returnCommand["commands_openCloseGroup"], isAdmin: true },
   { command: 'close', handler: returnCommand["commands_openCloseGroup"], isAdmin: true },
   { command: 'na', handler: returnCommand["commands_admin"], isAdmin: true },
