@@ -41,7 +41,8 @@ const botResponsePatterns = [
   { command: 'ds', handler: returnCommand["commands_tiktokDownloader"] },
   { command: 'ets', handler: returnCommand["commands_ekstrakAudio"] },
   { command: 'pp', handler: returnCommand["commands_pp"] },
-  { command: 'buatgrup', handler: returnCommand["commands_buatGrup"] },
+  { command: 'bg', handler: returnCommand["commands_buatGrup"], isAdmin: true },
+
 
   // Bahasa dan Bantuan
   { command: 'listbahasa', handler: returnCommand["commands_translate"] },
