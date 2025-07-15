@@ -5,18 +5,18 @@ module.exports = async function show(sock, msg) {
   const chatId = msg.key.remoteJid;
   const isGroup = chatId.endsWith('@g.us');
 
-    if (isGroup) {
-      const metadata = await sock.groupMetadata(chatId);
-      const admins = metadata.participants
-        .filter(p => p.admin === 'admin' || p.admin === 'superadmin')
-        .map(p => p.id);
+  if (isGroup) {
+    const metadata = await sock.groupMetadata(chatId);
+    const admins = metadata.participants
+      .filter(p => p.admin === 'admin' || p.admin === 'superadmin')
+      .map(p => p.id);
 
-      if (!admins.includes(sender)) {
-        return sock.sendMessage(chatId, {
-          text: '🚫 Hanya admin grup yang boleh menggunakan perintah *show*!',
-        }, { quoted: msg });
-      }
+    if (!admins.includes(sender)) {
+      return sock.sendMessage(chatId, {
+        text: '🚫 Hanya admin grup yang boleh menggunakan perintah *show*!',
+      }, { quoted: msg });
     }
+  }
 
   try {
     const messageContent = msg.message || {};
@@ -30,6 +30,9 @@ module.exports = async function show(sock, msg) {
     }
 
     if (quoted?.imageMessage) {
+      const originalCaption = quoted.imageMessage.caption || '';
+      const finalCaption = `📸 Foto berhasil diambil ulang\nCaption: \`\`${originalCaption}\`\``;
+
       const buffer = await downloadMediaMessage(
         { message: { imageMessage: quoted.imageMessage } },
         'buffer',
@@ -39,11 +42,14 @@ module.exports = async function show(sock, msg) {
 
       return sock.sendMessage(chatId, {
         image: buffer,
-        caption: '📸 Foto berhasil diambil ulang',
+        caption: finalCaption,
       }, { quoted: msg });
     }
 
     if (quoted?.videoMessage) {
+      const originalCaption = quoted.videoMessage.caption || '';
+      const finalCaption = `🎥 Video berhasil diambil ulang\nCaption: \`\`${originalCaption}\`\``;
+
       const buffer = await downloadMediaMessage(
         { message: { videoMessage: quoted.videoMessage } },
         'buffer',
@@ -53,7 +59,7 @@ module.exports = async function show(sock, msg) {
 
       return sock.sendMessage(chatId, {
         video: buffer,
-        caption: '🎥 Video berhasil diambil ulang',
+        caption: finalCaption,
       }, { quoted: msg });
     }
 
