@@ -63,14 +63,22 @@ async function handleResponder(sock, msg) {
     }
 
     for (const pattern of botResponsePatterns) {
-      if (commandName === pattern.command) {
-        if (['na', 'una', 'admin'].includes(pattern.command)) {
-          return await pattern.handler(sock, msg, text, actualUserId, sender);
+      if (commandName !== pattern.command) continue;
+      if (['waifu', 'waifuhen'].includes(pattern.command)) {
+        if (args.length === 0 || args[0].startsWith('.')) {
+          return await pattern.handler(sock, msg, '', [], pattern.command);
         } else {
-          return await pattern.handler(sock, msg, body, args, commandName);
+          return await pattern.handler(sock, msg, body, args, pattern.command);
         }
       }
+
+      if (['na', 'una', 'admin'].includes(pattern.command)) {
+        return await pattern.handler(sock, msg, text, actualUserId, sender);
+      }
+
+      return await pattern.handler(sock, msg, body, args, commandName);
     }
+
 
     if (!['menu', 'reset', 'clear'].includes(commandName)) {
       await handleOpenAIResponder(sock, msg, userId);
