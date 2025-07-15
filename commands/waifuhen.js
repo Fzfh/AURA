@@ -1,3 +1,4 @@
+const { adminList } = require('../setting/setting');
 module.exports = async function waifuhen(sock, msg, text) {
   try {
     const sender = msg.key.remoteJid;
