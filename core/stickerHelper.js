@@ -24,19 +24,11 @@ const writeFile = promisify(fs.writeFile);
 const readFile = promisify(fs.readFile);
 
 async function stickerFromMediaCommand(sock, msg, lowerText) {
-  const trigger = ['s', '.s', 'sticker', '.sticker'];
-  const isCommand = trigger.includes(lowerText.trim().split(' ')[0]);
-  if (!isCommand) return false;
-
   await createStickerFromMessage(sock, msg);
   return true;
 }
 
 async function stickerTextCommand(sock, msg, lowerText, args) {
-  const trigger = ['stickertext', 'st', '.st', '.stickertext'];
-  const isCommand = trigger.includes(lowerText.trim().split(' ')[0]);
-  if (!isCommand) return false;
-
   if (!args[0]) {
     await sock.sendMessage(msg.key.remoteJid, {
       text: 'Ketik: stikertext Halo dunia!'
