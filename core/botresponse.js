@@ -63,7 +63,7 @@ async function handleResponder(sock, msg) {
     }
 
     for (const pattern of botResponsePatterns) {
-      if (lowerText.startsWith(pattern.command) || commandName === pattern.command) {
+      if (commandName === pattern.command)) {
         if (['na', 'una', 'admin'].includes(pattern.command)) {
           return await pattern.handler(sock, msg, text, actualUserId, sender);
         } else {
