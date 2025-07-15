@@ -55,28 +55,28 @@ function botLabel(text) {
   return `${botBehavior.botLabel} ${text}`;
 }
 
-function loadCommands(baseDir = path.join(__dirname, "../../commands")) {
+function loadCommands(...dirs) {
   const commands = {};
 
-  function traverse(dir) {
-    const files = fs.readdirSync(dir);
-    for (const file of files) {
-      const fullPath = path.join(dir, file);
-      const stat = fs.statSync(fullPath);
+  dirs.forEach((dir) => {
+    const baseFolder = path.basename(dir); // ambil nama foldernya langsung
+    const files = fs.readdirSync(dir).filter(file => file.endsWith('.js'));
 
-      if (stat.isDirectory()) {
-        traverse(fullPath);
-      } else if (file.endsWith(".js")) {
-        const relative = path.relative(baseDir, fullPath);
-        const key = relative.replace(/\\/g, "/").replace(/\.js$/, "").replace(/\//g, "_");
-        commands[key] = require(fullPath);
+    for (const file of files) {
+      const name = path.parse(file).name;
+      const key = `${baseFolder}_${name}`; // contoh: core_stickerHelper
+      const filePath = path.join(dir, file);
+      try {
+        commands[key] = require(filePath);
+      } catch (err) {
+        console.error(`❌ Gagal load ${key}:`, err.message);
       }
     }
-  }
+  });
 
-  traverse(baseDir);
   return commands;
 }
+
 
 module.exports = {
   extractText,
