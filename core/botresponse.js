@@ -114,7 +114,7 @@ if (text.startsWith('/') || text.startsWith('.')) {
     const allCmds = ['d', 'ds', 'dig', 's', 'st', 'stickertext', 'tl', 'una', 'na', 'tagall', 'tag', 'listbahasa', 'linkmap', 'mapqr', 'qr', 'cqr', 'waifu', 'waifuhen', 'ets', 'sm', 'show', 'sendall']
     
     const commandName = text.trim().split(' ')[0].toLowerCase().replace(/^(\.|\/)/, '');
-    if (!['s', 'st', 'stickertext', 'd', 'ds', 'tl', 'una', 'na', 'qr', 'cqr', 'waifu', 'waifuhen', 'ets', 'sm'].includes(commandName)) {
+    if (!['d', 'ds', 'dig', 's', 'st', 'stickertext', 'tl', 'una', 'na', 'tagall', 'tag', 'listbahasa', 'linkmap', 'mapqr', 'qr', 'cqr', 'waifu', 'waifuhen', 'ets', 'sm', 'show', 'sendall'].includes(commandName)) {
       if (await handleOpenAIResponder(sock, msg, userId)) return;
     }
 
