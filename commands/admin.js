@@ -31,7 +31,8 @@ async function isGroupAdmin(sock, groupId, jid) {
   }
 }
 
-module.exports = async function admin(sock, msg, text, sender, chatIdInput) {
+module.exports = async function admin(sock, msg, text, senderRaw, chatIdInput) {
+  const sender = senderRaw || msg.key.participant || msg.participant || msg.key.remoteJid
   const lowerText = text.toLowerCase();
   const isNA = lowerText.startsWith('.na');
   const isUNA = lowerText.startsWith('.una');
