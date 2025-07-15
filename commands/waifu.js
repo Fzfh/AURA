@@ -26,7 +26,9 @@ module.exports = async function waifu(sock, msg, text) {
       }, { quoted: msg });
     }
 
-    const type = text?.toLowerCase()?.trim();
+    const args = text?.trim().split(/\s+/);
+    const type = args[0]?.toLowerCase();
+
     if (!type) {
       return sock.sendMessage(sender, {
         text: `💡Contoh:\n.waifu maid\n.waifu raiden-shogun\n\n📜 List tag SFW:\n• ${allowedTags.join('\n• ')}`,
