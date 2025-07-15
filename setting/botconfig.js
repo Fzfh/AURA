@@ -1,8 +1,10 @@
 const { loadCommands } = require('../core/utils/utils');
+const path = require('path');
+
 
 const botBehavior = {
   botName: 'AuraBot',
-  botLabel: '[🌸 AuraBot]',
+  botLabel: '[AuraBot]',
   botMenu: '/menu',
   replyMyMessage: true,
   readMessage: true,
