@@ -23,7 +23,7 @@ console.log("🔍 Loaded Command Keys:", Object.keys(returnCommand));
 const botResponsePatterns = [
   // Commands Umum
   { command: 's', handler: returnCommand["core_stickerHelper"].stickerFromMediaCommand },
-  { command: 'st', handler: returnCommand["core_stickerHelper"].stickerFromMediaCommand },
+  { command: 'st', handler: returnCommand["core_stickerHelper"].stickerTextCommand },
   { command: 'stickertext', handler: returnCommand["core_stickerHelper"].stickerTextCommand },
   { command: 'waifu', handler: returnCommand["commands_waifu"] },
   { command: 'waifuhen', handler: returnCommand["commands_waifuhen"] },
