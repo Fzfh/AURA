@@ -15,7 +15,9 @@ function extractTargetJid(sock, msg, text) {
     const number = parts[1].replace(/\D/g, '');
     if (number.length >= 8) {
       const jid = number + '@s.whatsapp.net';
-      if (/^\d{8,}@s\.whatsapp\.net$/.test(jid)) return jid;
+      if (/^\d+@s\.whatsapp\.net$/.test(jid)) {
+        return jid;
+      }
     }
   }
 
@@ -60,11 +62,12 @@ module.exports = async function admin(sock, msg, text, senderRaw, chatIdInput) {
   }
 
   const target = extractTargetJid(sock, msg, text);
-  console.log('🔍 Target JID:', target);
 
-  if (!target || !target.endsWith('@s.whatsapp.net')) {
+  // ✅ Debugging Target
+  if (!target || typeof target !== 'string' || !target.endsWith('@s.whatsapp.net')) {
+    console.log('❌ [DEBUG] Target tidak valid:', target);
     await sock.sendMessage(chatId, {
-      text: '❌ Gagal mengenali user yang kamu maksud 😵‍💫\nCoba tag, reply, atau tulis nomornya dengan benar ya!',
+      text: '❌ Gagal mengenali user yang kamu maksud 😵‍💫\nCoba tag, reply, atau tulis nomornya!',
     }, { quoted: msg });
     return true;
   }
@@ -75,7 +78,7 @@ module.exports = async function admin(sock, msg, text, senderRaw, chatIdInput) {
     if (targetIsAdmin) {
       await sock.sendMessage(chatId, {
         text: `⚠️ User @${target.split('@')[0]} sudah jadi *admin grup*!`,
-        mentions: [target],
+        mentions: [target]
       }, { quoted: msg });
       return true;
     }
@@ -84,7 +87,7 @@ module.exports = async function admin(sock, msg, text, senderRaw, chatIdInput) {
       await sock.groupParticipantsUpdate(chatId, [target], 'promote');
       await sock.sendMessage(chatId, {
         text: `✅ Berhasil menjadikan @${target.split('@')[0]} sebagai *admin grup*! 💪`,
-        mentions: [target],
+        mentions: [target]
       }, { quoted: msg });
     } catch (e) {
       console.error('❌ Gagal promote:', e);
@@ -100,7 +103,7 @@ module.exports = async function admin(sock, msg, text, senderRaw, chatIdInput) {
     if (!targetIsAdmin) {
       await sock.sendMessage(chatId, {
         text: `⚠️ User @${target.split('@')[0]} bukan admin grup kok~ 😅`,
-        mentions: [target],
+        mentions: [target]
       }, { quoted: msg });
       return true;
     }
@@ -109,7 +112,7 @@ module.exports = async function admin(sock, msg, text, senderRaw, chatIdInput) {
       await sock.groupParticipantsUpdate(chatId, [target], 'demote');
       await sock.sendMessage(chatId, {
         text: `✅ Jabatan admin @${target.split('@')[0]} telah dicabut 😢`,
-        mentions: [target],
+        mentions: [target]
       }, { quoted: msg });
     } catch (e) {
       console.error('❌ Gagal demote:', e);
