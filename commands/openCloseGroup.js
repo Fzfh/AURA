@@ -1,4 +1,4 @@
-module.exports = async function openCloseGroup(sock, msg, text) {
+module.exports = async function openCloseGroup(sock, msg, text, args) {
   const from = msg.key.remoteJid;
   const isGroup = from.endsWith('@g.us');
 
@@ -20,8 +20,9 @@ module.exports = async function openCloseGroup(sock, msg, text) {
     }, { quoted: msg });
   }
 
-  const action = command === '.open' ? 'not_announcement' : 'announcement';
-  const statusText = command === '.open'
+  const isOpen = text.toLowerCase().includes('open');
+  const action = isOpen ? 'not_announcement' : 'announcement';
+  const statusText = isOpen
     ? '🔓 Grup telah *dibuka*!\nSekarang semua anggota bisa mengirim pesan.'
     : '🔒 Grup telah *ditutup*!\nSekarang hanya admin yang bisa mengirim pesan.';
 
