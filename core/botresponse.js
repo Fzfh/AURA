@@ -6,7 +6,6 @@ const { adminList } = require('../setting/setting')
 const spamTracker = new Map()
 const mutedUsers = new Map()
 const muteDuration = 2 * 60 * 1000
-
 const greetedUsers = new Set()
 
 async function botFirstResponse({ sock, sender, msg }, options = {}) {
@@ -49,7 +48,11 @@ async function handleResponder(sock, msg) {
     const handledStatic = await handleStaticCommand(sock, msg, lowerText, userId, sender, body)
     if (handledStatic) return
 
-    if (!greetedUsers.has(userId)) {
+    const botJid = sock.user?.id?.split(':')[0] + '@s.whatsapp.net'
+    const mentionedJidList = content?.extendedTextMessage?.contextInfo?.mentionedJid || []
+    const isMentioned = mentionedJidList.includes(botJid)
+
+    if (isMentioned && !greetedUsers.has(userId)) {
       greetedUsers.add(userId)
       await botFirstResponse({ sock, sender, msg }, { botBehavior })
     }
@@ -59,10 +62,10 @@ async function handleResponder(sock, msg) {
         return await pattern.handler(sock, msg, args.join(' '), args)
       }
     }
-
     if (!['menu', 'reset', 'clear'].includes(commandName)) {
       await handleOpenAIResponder(sock, msg, userId)
     }
+
   } catch (err) {
     console.error('❌ Error di handleResponder:', err)
   }
@@ -76,7 +79,7 @@ function registerGroupUpdateListener(sock) {
 
   sock.ev.removeAllListeners('group-participants.update')
   sock.ev.on('group-participants.update', async (update) => {
-    const handleWelcome = require('./commands/welcome')
+    const handleWelcome = require('../commands/welcome')
     await handleWelcome(sock, update)
   })
 }
