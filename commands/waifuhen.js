@@ -1,11 +1,3 @@
-const axios = require('axios');
-const path = require('path');
-const fs = require('fs');
-const { exec } = require('child_process');
-const { adminList } = require('../setting/setting');
-
-const allowedNSFW = ['ass', 'hentai', 'milf', 'oral', 'paizuri', 'ecchi', 'ero'];
-
 module.exports = async function waifuhen(sock, msg, text) {
   try {
     const sender = msg.key.remoteJid;
@@ -17,7 +9,9 @@ module.exports = async function waifuhen(sock, msg, text) {
       }, { quoted: msg });
     }
 
-    const type = text?.toLowerCase()?.trim();
+    const args = text?.trim().split(/\s+/);
+    const type = args[1]?.toLowerCase(); 
+
     if (!type) {
       return sock.sendMessage(sender, {
         text: `🔞 Gunakan: .waifuhen tag\nTag NSFW tersedia:\n• ${allowedNSFW.join('\n• ')}`
