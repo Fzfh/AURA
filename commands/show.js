@@ -31,7 +31,7 @@ module.exports = async function show(sock, msg) {
 
     if (quoted?.imageMessage) {
       const originalCaption = quoted.imageMessage.caption || '';
-      const finalCaption = `📸 Foto berhasil diambil ulang\nCaption: \`\`${originalCaption}\`\``;
+      const finalCaption = `📸 Foto berhasil diambil ulang\nCaption: \`${originalCaption}\``;
 
       const buffer = await downloadMediaMessage(
         { message: { imageMessage: quoted.imageMessage } },
