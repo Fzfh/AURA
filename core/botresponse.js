@@ -1,8 +1,7 @@
-const { botBehavior, botResponsePatterns } = require('./settings/botConfig')
-const { handleStaticCommand } = require('./core/handler/staticCommand')
-const { handleOpenAIResponder, memoryMap } = require('./core/utils/openai')
-const { adminList } = require('./setting/setting')
-const { greetIfNeeded } = require('./core/utils/greeting')
+const { botBehavior, botResponsePatterns } = require('../settings/botConfig')
+const { handleStaticCommand } = require('../core/handler/staticCommand')
+const { handleOpenAIResponder, memoryMap } = require('../core/utils/openai')
+const { adminList } = require('../setting/setting')
 
 const spamTracker = new Map()
 const mutedUsers = new Map()
