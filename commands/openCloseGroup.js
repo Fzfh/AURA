@@ -1,4 +1,4 @@
-module.exports = async function openCloseGroup(sock, msg, text, args) {
+module.exports = async function openCloseGroup(sock, msg, text, args, commandName) {
   const from = msg.key.remoteJid;
   const isGroup = from.endsWith('@g.us');
 
@@ -20,9 +20,8 @@ module.exports = async function openCloseGroup(sock, msg, text, args) {
     }, { quoted: msg });
   }
 
-  const commandWord = args[0]?.toLowerCase() || ''; 
-  const isOpen = commandWord === 'open';
-  const isClose = commandWord === 'close';
+  const isOpen = commandName === 'open';
+  const isClose = commandName === 'close';
 
   if (!isOpen && !isClose) {
     return sock.sendMessage(from, {
