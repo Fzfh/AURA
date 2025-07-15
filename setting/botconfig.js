@@ -39,7 +39,6 @@ const botResponsePatterns = [
   { command: 'dig', handler: returnCommand["commands_igDownloader"] },
   { command: 'd', handler: returnCommand["commands_tiktokDownloader"] },
   { command: 'ds', handler: returnCommand["commands_tiktokDownloader"] },
-  { command: 'tl', handler: returnCommand["commands_translate"] },
   { command: 'ets', handler: returnCommand["commands_ekstrakAudio"] },
   { command: 'pp', handler: returnCommand["commands_pp"] },
   { command: 'buatgrup', handler: returnCommand["commands_buatGrup"] },
