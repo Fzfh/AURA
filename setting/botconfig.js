@@ -1,0 +1,50 @@
+const { loadCommands } = require('./../core/utils');
+
+const botBehavior = {
+  botName: 'AuraBot',
+  botLabel: '[🌸 AuraBot]',
+  botMenu: '/menu',
+  replyMyMessage: true,
+  readMessage: true,
+  isTyping: true,
+  typingDelay: 1500
+};
+
+const returnCommand = loadCommands();
+
+const botResponsePatterns = [
+  // Commands Umum
+  { command: 's', handler: returnCommand["core_stickerHelper"].stickerFromMediaCommand },
+  { command: 'st', handler: returnCommand["core_stickerHelper"].stickerFromMediaCommand },
+  { command: 'stickertext', handler: returnCommand["core_stickerHelper"].stickerTextCommand },
+  { command: 'waifu', handler: returnCommand["commands_waifu"] },
+  { command: 'waifuhen', handler: returnCommand["commands_waifuhen"] },
+  { command: 'qr', handler: returnCommand["commands_qris"] },
+  { command: 'cqr', handler: returnCommand["commands_createQr"] },
+  { command: 'mapqr', handler: returnCommand["commands_mapqr"] },
+  { command: 'linkmap', handler: returnCommand["commands_linkmap"] },
+  { command: 'tagall', handler: returnCommand["commands_tagall"] },
+  { command: 'menfess', handler: returnCommand["commands_menfess"] },
+  { command: 'sm', handler: returnCommand["commands_stickerToMedia"] },
+  { command: 'show', handler: returnCommand["commands_show"] },
+  { command: 'sendall', handler: returnCommand["commands_sendAll"] },
+  { command: 'dig', handler: returnCommand["commands_igDownloader"] },
+  { command: 'd', handler: returnCommand["commands_youtubeDownloader"] },
+  { command: 'ds', handler: returnCommand["commands_youtubeDownloader"] },
+  { command: 'tl', handler: returnCommand["commands_translate"] },
+  { command: 'ets', handler: returnCommand["commands_ekstrakAudio"] },
+  { command: 'pp', handler: returnCommand["commands_pp"] },
+  { command: 'buatgrup', handler: returnCommand["commands_buatGrup"] },
+
+  // Bahasa dan Bantuan
+  { command: 'listbahasa', handler: returnCommand["commands_translate"] },
+
+  // Command Admin Only
+  { command: 'kick', handler: returnCommand["commands_kick"], isAdmin: true },
+  { command: 'add', handler: returnCommand["commands_add"], isAdmin: true },
+  { command: 'admin', handler: returnCommand["commands_admin"], isAdmin: true },
+  { command: 'open', handler: returnCommand["commands_openCloseGroup"], isAdmin: true },
+  { command: 'close', handler: returnCommand["commands_openCloseGroup"], isAdmin: true }
+];
+
+module.exports = { botBehavior, botResponsePatterns };
