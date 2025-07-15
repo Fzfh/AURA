@@ -10,7 +10,11 @@ const botBehavior = {
   typingDelay: 1500
 };
 
-const returnCommand = loadCommands();
+const returnCommand = loadCommands(
+  path.join(__dirname, '../commands'),
+  path.join(__dirname, '../core')
+);
+
 
 const botResponsePatterns = [
   // Commands Umum
