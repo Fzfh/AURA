@@ -64,8 +64,8 @@ async function handleResponder(sock, msg) {
 
     for (const pattern of botResponsePatterns) {
       if (commandName !== pattern.command) continue;
-      if (['waifu', 'waifuhen'].includes(pattern.command)) {
-        if (args.length === 0 || args[0].startsWith('.')) {
+       if (['waifu', 'waifuhen'].includes(pattern.command)) {
+        if (args.length === 0) {
           return await pattern.handler(sock, msg, '', [], pattern.command);
         } else {
           return await pattern.handler(sock, msg, body, args, pattern.command);
