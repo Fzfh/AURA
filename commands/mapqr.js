@@ -49,7 +49,7 @@ module.exports = async function mapsQR(sock, msg, text) {
     if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir);
 
     const qrPath = path.join(tempDir, `mapsqr-${Date.now()}.png`);
-    const logoPath = path.join(__dirname, '../media/logo.png');
+    const logoPath = path.join(__dirname, '../media/logo.jpg');
 
     await QRCode.toFile(qrPath, mapsURL, {
       scale: 15,
