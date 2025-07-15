@@ -59,7 +59,7 @@ async function handleResponder(sock, msg) {
 
     for (const pattern of botResponsePatterns) {
       if (lowerText.startsWith(pattern.command) || commandName === pattern.command) {
-        return await pattern.handler(sock, msg, body, actualUserId, sender)
+        await pattern.handler(sock, msg, body, actualUserId, sender, commandName)
       }
     }
     if (!['menu', 'reset', 'clear'].includes(commandName)) {
