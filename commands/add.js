@@ -31,7 +31,14 @@ module.exports = async function(sock, msg, text, sender, userId) {
     return true;
   }
 
-  const nomorList = rawNomorList.split(',').map(n => n.trim());
+  const nomorList = rawNomorList.split(',').map(n => {
+  let nomor = n.trim().replace(/[^+\d]/g, '');
+  if (nomor.startsWith('+')) nomor = nomor.slice(1);
+  if (nomor.startsWith('0')) nomor = '62' + nomor.slice(1);
+  else if (!nomor.startsWith('62')) nomor = '62' + nomor;
+  return nomor;
+});
+
 
   for (let nomor of nomorList) {
     nomor = nomor.replace(/[^0-9]/g, '');
