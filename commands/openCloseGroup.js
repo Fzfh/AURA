@@ -20,7 +20,16 @@ module.exports = async function openCloseGroup(sock, msg, text, args) {
     }, { quoted: msg });
   }
 
-  const isOpen = text.toLowerCase().includes('open');
+  const commandWord = args[0]?.toLowerCase() || ''; 
+  const isOpen = commandWord === 'open';
+  const isClose = commandWord === 'close';
+
+  if (!isOpen && !isClose) {
+    return sock.sendMessage(from, {
+      text: '❗ Ketik `.open` atau `.close` dengan benar yaa~',
+    }, { quoted: msg });
+  }
+
   const action = isOpen ? 'not_announcement' : 'announcement';
   const statusText = isOpen
     ? '🔓 Grup telah *dibuka*!\nSekarang semua anggota bisa mengirim pesan.'
