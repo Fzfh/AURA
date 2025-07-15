@@ -1,4 +1,6 @@
 const { adminList } = require('../setting/setting');
+const allowedNSFW = ['ass', 'hentai', 'milf', 'oral', 'paizuri', 'ecchi', 'ero'];
+
 module.exports = async function waifuhen(sock, msg, text) {
   try {
     const sender = msg.key.remoteJid;
