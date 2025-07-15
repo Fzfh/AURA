@@ -26,23 +26,20 @@ module.exports = async function(sock, msg, text, sender, userId) {
   const rawNomorList = text.split(' ').slice(1).join(' ');
   if (!rawNomorList) {
     await sock.sendMessage(groupId, {
-      text: '❗ Kirim seperti ini: `.add 628xxxxx, 628yyyy` untuk menambahkan member',
+      text: '❗ Kirim seperti ini: `.add 628xxxxx, 089xxxx, +62 8xxx` untuk menambahkan member',
     }, { quoted: msg });
     return true;
   }
 
   const nomorList = rawNomorList.split(',').map(n => {
-  let nomor = n.trim().replace(/[^+\d]/g, '');
-  if (nomor.startsWith('+')) nomor = nomor.slice(1);
-  if (nomor.startsWith('0')) nomor = '62' + nomor.slice(1);
-  else if (!nomor.startsWith('62')) nomor = '62' + nomor;
-  return nomor;
-});
-
+    let nomor = n.replace(/[^\d+]/g, ''); // hanya angka dan +
+    if (nomor.startsWith('+')) nomor = nomor.slice(1);
+    if (nomor.startsWith('0')) nomor = '62' + nomor.slice(1);
+    if (!nomor.startsWith('62')) nomor = '62' + nomor;
+    return nomor;
+  });
 
   for (let nomor of nomorList) {
-    nomor = nomor.replace(/[^0-9]/g, '');
-    if (nomor.startsWith('0')) nomor = '62' + nomor.slice(1);
     const jid = `${nomor}@s.whatsapp.net`;
 
     try {
@@ -82,7 +79,7 @@ module.exports = async function(sock, msg, text, sender, userId) {
       try {
         const code = await sock.groupInviteCode(groupId);
         await sock.sendMessage(jid, {
-          text: `Halo! 🫣\nAku nggak bisa menambahkan kamu langsung ke grup.\nTapi kamu bisa gabung lewat link ini ya:\n\n🌐 https://chat.whatsapp.com/${code}`
+          text: `Halo! 👋\nAku nggak bisa menambahkan kamu langsung ke grup.\nTapi kamu bisa gabung lewat link ini ya:\n🌐 https://chat.whatsapp.com/${code}`
         });
 
         await sock.sendMessage(groupId, {
