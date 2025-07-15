@@ -1,4 +1,4 @@
-const { botBehavior, botResponsePatterns } = require('../settings/botConfig')
+const { botBehavior, botResponsePatterns } = require('../settings/botconfig')
 const { handleStaticCommand } = require('../core/handler/staticCommand')
 const { handleOpenAIResponder, memoryMap } = require('../core/utils/openai')
 const { adminList } = require('../setting/setting')
