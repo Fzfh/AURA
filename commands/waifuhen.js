@@ -2,6 +2,7 @@ const { adminList } = require('../setting/setting');
 const axios = require('axios');
 const path = require('path');
 const fs = require('fs');
+const { exec } = require('child_process');
 
 const allowedNSFW = ['ass', 'hentai', 'milf', 'oral', 'paizuri', 'ecchi', 'ero'];
 
