@@ -20,8 +20,9 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
 ┃   ➤ Media akan didownload
 ┃  
 ┃  ✍ Sticker dari Teks  
-┃   ➤ Ketik: \`stickertext\` teks  
-┃   ➤ Contoh: \`stickertext\` AuraBot  
+┃   ➤ Ketik: \`.stickertext\` teks  
+┃   ➤ Contoh: \`.stickertext\` AuraBot  
+┃   ➤ Bisa juga: \`.st\` AuraBot
 ┃  
 ┃  🎵 Ekstrak Audio dari Video
 ┃   ➤ Kirim video dengan caption: \`.ets\`
