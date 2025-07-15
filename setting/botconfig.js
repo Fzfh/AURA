@@ -16,6 +16,8 @@ const returnCommand = loadCommands(
   path.join(__dirname, '../commands'),
   path.join(__dirname, '../core')
 );
+console.log("🔍 Loaded Command Keys:", Object.keys(returnCommand));
+
 
 
 const botResponsePatterns = [
