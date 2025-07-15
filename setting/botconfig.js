@@ -1,4 +1,4 @@
-const { loadCommands } = require('./../core/utils');
+const { loadCommands } = require('../core/utils');
 
 const botBehavior = {
   botName: 'AuraBot',
