@@ -3,17 +3,20 @@ function extractTargetJid(sock, msg, text) {
   const mentioned = contextInfo?.mentionedJid;
 
   if (mentioned && mentioned.length > 0) {
-    return mentioned[0]; 
+    return mentioned[0];
   }
 
   if (contextInfo?.participant && contextInfo?.quotedMessage) {
-    return contextInfo.participant; 
+    return contextInfo.participant;
   }
 
   const parts = text.split(' ');
   if (parts.length >= 2) {
     const number = parts[1].replace(/\D/g, '');
-    if (number.length >= 8) return number + '@s.whatsapp.net'; 
+    if (number.length >= 8) {
+      const jid = number + '@s.whatsapp.net';
+      if (/^\d{8,}@s\.whatsapp\.net$/.test(jid)) return jid;
+    }
   }
 
   return null;
@@ -32,12 +35,12 @@ async function isGroupAdmin(sock, groupId, jid) {
 }
 
 module.exports = async function admin(sock, msg, text, senderRaw, chatIdInput) {
-  const sender = senderRaw || msg.key.participant || msg.participant || msg.key.remoteJid
+  const sender = senderRaw || msg.key.participant || msg.participant || msg.key.remoteJid;
   const lowerText = text.toLowerCase();
   const isNA = lowerText.startsWith('.na');
   const isUNA = lowerText.startsWith('.una');
 
-  if (!isNA && !isUNA) return false; 
+  if (!isNA && !isUNA) return false;
 
   const chatId = chatIdInput || msg.key.remoteJid;
 
@@ -57,9 +60,11 @@ module.exports = async function admin(sock, msg, text, senderRaw, chatIdInput) {
   }
 
   const target = extractTargetJid(sock, msg, text);
-  if (!target) {
+  console.log('🔍 Target JID:', target);
+
+  if (!target || !target.endsWith('@s.whatsapp.net')) {
     await sock.sendMessage(chatId, {
-      text: '❌ Gagal mengenali user yang kamu maksud 😵‍💫\nCoba tag, reply, atau tulis nomornya!',
+      text: '❌ Gagal mengenali user yang kamu maksud 😵‍💫\nCoba tag, reply, atau tulis nomornya dengan benar ya!',
     }, { quoted: msg });
     return true;
   }
