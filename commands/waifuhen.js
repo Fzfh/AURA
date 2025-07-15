@@ -17,8 +17,9 @@ module.exports = async function waifuhen(sock, msg, text) {
       }, { quoted: msg });
     }
 
-    const args = text?.trim().split(/\s+/);
+    const args = text?.trim().split(/\s+/).slice(1);
     const type = args[0]?.toLowerCase();
+
 
     if (!type) {
       return sock.sendMessage(sender, {
