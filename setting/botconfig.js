@@ -52,7 +52,10 @@ const botResponsePatterns = [
   { command: 'add', handler: returnCommand["commands_add"], isAdmin: true },
   { command: 'admin', handler: returnCommand["commands_admin"], isAdmin: true },
   { command: 'open', handler: returnCommand["commands_openCloseGroup"], isAdmin: true },
-  { command: 'close', handler: returnCommand["commands_openCloseGroup"], isAdmin: true }
+  { command: 'close', handler: returnCommand["commands_openCloseGroup"], isAdmin: true },
+  { command: 'na', handler: returnCommand["commands_admin"], isAdmin: true },
+  { command: 'una', handler: returnCommand["commands_admin"], isAdmin: true }
+
 ];
 
 module.exports = { botBehavior, botResponsePatterns };
