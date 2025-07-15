@@ -68,17 +68,6 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
 ┃   ➤ \`.qr\` 
 ┃   ➤ Contoh: \`.qr\` reply ke qr code
 ┃   ➤ bisa juga hanya \`qr\`
-┃ 
-┃ 🌐 Translate Semua Bahasa
-┃   ➤ /tl <kode bahasa> <teks>
-┃   *CONTOH*
-┃   ➤ /tl en halo dunia
-┃   ➤ Bisa juga .tl atau tl
-┃ 
-┃ 🌐 List Kode Bahasa
-┃   ➤ /listbahasa
-┃   ➤ .listbahasa
-┃   ➤ listbahasa
 ┃  
 ┃ 🤖 Beli Bot WA  
 ┃   ➤ beli bot — Lihat harga & fitur bot  
