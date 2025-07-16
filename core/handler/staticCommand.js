@@ -210,8 +210,8 @@ Kalau kamu ingin menyimpan stiker sebagai gambar biasa (jpg/png), fitur ini akan
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 💸 *8. Buat QRIS dari Teks*
-➤ Ketik: `.cqr` [teks kamu]  
-   Contoh: `.cqr` Bayar ke Aura ya!
+➤ Ketik: \`.cqr\` [teks kamu]  
+   Contoh: \`.cqr\` Bayar ke Aura ya!
 
 📌 Penjelasan:  
 Bot akan menghasilkan gambar QR dari teks yang kamu tulis. Bisa dipakai untuk membuat QR donasi, pesan rahasia, atau tagihan.
@@ -219,8 +219,8 @@ Bot akan menghasilkan gambar QR dari teks yang kamu tulis. Bisa dipakai untuk me
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 🎵 *9. Ekstrak MP3 dari Video*
-➤ Kirim video dan beri caption: `ets`  
-➤ Atau reply ke video lalu ketik: `ets`
+➤ Kirim video dan beri caption: \`.ets\`  
+➤ Atau reply ke video lalu ketik: \`.ets\`
 
 📌 Penjelasan:  
 Bot akan mengambil suara dari video dan mengubahnya menjadi file MP3. Cocok buat nyimpan backsound atau cuplikan lagu.
