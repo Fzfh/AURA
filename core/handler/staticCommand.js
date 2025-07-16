@@ -132,61 +132,116 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
     case 'caranya':
     case 'cara nya':
       await sock.sendMessage(sender, {
-        text: `╭━━━[ *PANDUAN PENGGUNAAN* ]━━━╮
+        text: `╭━━━〔 🧑‍🏫 PANDUAN PENGGUNAAN AURABOT 〕━━━╮
 
-🎨 *1. Bikin Stiker dari Teks!*
-   ➤ Ketik: *stickertext* (teks kamu)
-   ➤ Atau pakai singkatan: *st* hello world!
-   ➤ Contoh: *stickertext Halo Auraa!*
-===========================
-🖼️ *2. Bikin Stiker dari Foto/Video*
-   ➤ Kirim foto/video dengan caption: *s* atau *sticker*
-   ➤ Atau reply media dengan "s" untuk mengubah jadi stiker otomatis!
-===========================
-👩‍🎨 *3. Cari Waifu Lucu~*
-   ➤ Ketik: *.waifu* (kategori/nama waifu)
-   ➤ Contoh: *.waifu kamisato-ayaka*
-===========================
-💌 *4. Kirim Menfess Anonim*
-   ➤ Ketik: */menfess*
-   ➤ Isi nomor tujuan & isi pesan
-   ➤ Ketik: */batal* untuk membatalkan
-===========================
+Halo @userid! 👋  
+Terima kasih telah menggunakan *AuraBot*.  
+Berikut ini panduan lengkap dan penjelasan fitur-fitur utama yang bisa kamu gunakan. Yuk kita mulai~
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎨 *1. Membuat Stiker dari Teks*
+➤ Cukup ketik:
+   *stickertext Halo Dunia*  
+   atau gunakan versi singkat:
+   *st Halo Dunia*
+
+📌 Penjelasan:  
+Bot akan membuat stiker berbasis teks dengan gaya unik. Cocok untuk kirim pesan lucu, quotes, atau greeting sticker.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🖼️ *2. Membuat Stiker dari Foto/Video*
+➤ Kirim foto/video dengan caption: *s* atau *sticker*  
+➤ Atau *balas (reply)* ke media dengan teks *s*
+
+📌 Penjelasan:  
+Bot akan otomatis mengubah media menjadi stiker WhatsApp. Bisa digunakan untuk membuat stiker dari selfie, meme, dan video pendek!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+👩‍🎨 *3. Cari Gambar Waifu Anime*
+➤ Ketik: *.waifu* [nama/kategori]  
+   Contoh: *.waifu zero-two*
+
+📌 Penjelasan:  
+Fitur ini menampilkan gambar karakter anime populer. Bisa random, atau berdasarkan nama yang kamu ketik.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💌 *4. Menfess Anonim*
+➤ Ketik: */menfess*  
+Bot akan memandumu mengirim pesan ke seseorang tanpa diketahui identitasmu.  
+➤ Untuk membatalkan, ketik: */batal*
+
+📌 Penjelasan:  
+Cocok untuk kirim pesan rahasia, menyampaikan unek-unek, atau kirim kode ke seseorang tanpa harus mengungkap identitas.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 🎞️ *5. Download Video & Musik*
-   🎵 *TikTok*
-      ➤ *.d* — otomatis deteksi foto/video
-      ➤ *.ds* — hanya musik
-   📷 *Instagram*
-      ➤ *.dig* + link
+➤ *TikTok:*  
+   *.d* = otomatis deteksi video dari link  
+   *.ds* = hanya ambil musik/audio-nya  
+➤ *Instagram:*  
+   *.dig* [link]
 
-🔗 *Contoh:* .d https://vt.tiktok.com/abc123
-===========================
-🗺️ *6. Cari Atau Generate Lokasi*
-    *Cari Lokasi*
-    ➤ .linkmap (nama daerah)
-    ➤ contoh: .linkmap Monas Jakarta
+📌 Penjelasan:  
+Bot akan mendownload video/musik dari TikTok dan Instagram berdasarkan link yang kamu kirim. Cepat, praktis, dan tanpa watermark!
 
-    *Reply Ke shareloc*
-    ➤ Reply shareloc dan ketik .linkmap untuk generate link ke google maps
-===========================
-⬆️ *7. Ambil Sticker Jadi Media*
-    *Untuk Mengambil Sticker*
-    ➤ Ketik .sm lalu reply ke sticker kamu
-===========================
-🎛️ *8. Buat qris*
-    *Untuk membuat qris cukup ketik \`.cqr\` <teks>
-    ➤ Ketik: \`.cqr\` <teks>
-    ➤ contoh: \`.cqr\` hello world
-===========================
-🎵 *9. Ekstrak Audio dari Video*
-    *Untuk meng convert dari video ke mp3 bisa dengan command \`ets\`*
-    ➤ Ketik: \`ets\` reply ke video atau kirim video dengan caption \`ets\`
-===========================
-🚪 *8. Keluar Sesi*
-   ➤ Ketik: */keluar* untuk akhiri sesi fitur
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-╰━━━━━━━━━━━━━━━━━━━━━━━╯
-✨ *Selamat Menikmati Fitur AuraBot yaaa* ✨`
+🗺️ *6. Lokasi & Link Maps*
+➤ Ketik: *.linkmap [nama lokasi]*  
+   Contoh: .linkmap Monas Jakarta  
+➤ Bisa juga reply ke *share location* lalu ketik: *.linkmap*
+
+📌 Penjelasan:  
+Bot akan membuat link Google Maps dari lokasi yang kamu kirim atau balas. Cocok untuk share titik kumpul atau lokasi janjian.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⬆️ *7. Ubah Stiker Jadi Gambar Asli*
+➤ Reply ke stiker dan ketik: *.sm*
+
+📌 Penjelasan:  
+Kalau kamu ingin menyimpan stiker sebagai gambar biasa (jpg/png), fitur ini akan mengembalikannya ke format media asli.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💸 *8. Buat QRIS dari Teks*
+➤ Ketik: `.cqr` [teks kamu]  
+   Contoh: `.cqr` Bayar ke Aura ya!
+
+📌 Penjelasan:  
+Bot akan menghasilkan gambar QR dari teks yang kamu tulis. Bisa dipakai untuk membuat QR donasi, pesan rahasia, atau tagihan.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎵 *9. Ekstrak MP3 dari Video*
+➤ Kirim video dan beri caption: `ets`  
+➤ Atau reply ke video lalu ketik: `ets`
+
+📌 Penjelasan:  
+Bot akan mengambil suara dari video dan mengubahnya menjadi file MP3. Cocok buat nyimpan backsound atau cuplikan lagu.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚪 *10. Keluar dari Sesi Aktif*
+➤ Jika kamu sedang dalam mode fitur (seperti menfess), ketik: */keluar*
+
+📌 Penjelasan:  
+Digunakan untuk membatalkan proses atau keluar dari mode interaktif jika kamu berubah pikiran.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 *Masih bingung?*
+Ketik *menu* untuk melihat semua fitur yang tersedia.  
+Bot ini terus berkembang, jadi pantau terus update-nya ya!
+
+╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯
+✨ *Selamat mencoba fitur-fitur AuraBot! Semoga bermanfaat dan bikin harimu lebih seru~* ✨
+`
       }, { quoted: msg })
       return true
 
@@ -198,7 +253,20 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
 
     case 'beli bot':
       await sock.sendMessage(sender, {
-        text: `🤖 *Harga Bot AURA:*\n• Premium - Rp70.000\n• Responder - Rp50.000`
+        text: `🤖 *Daftar Harga Bot AURA:*
+
+🔹 *Bot Premium (AI)* – Rp100.000  
+✨ Dilengkapi dengan *Artificial Intelligence (AI)*  
+🧠 Mampu membalas pesan secara otomatis dengan kecerdasan buatan.  
+Cocok untuk kamu yang ingin bot aktif layaknya asisten pribadi!
+
+🔹 *Bot Responder (Non-AI)* – Rp65.000  
+📋 Bot ini hanya merespons perintah dan menampilkan menu.  
+❌ Tidak menggunakan AI  
+Cocok untuk kebutuhan bot sederhana dan fungsional.
+
+🎯 Pilih sesuai kebutuhanmu, dan biarkan bot AURA bantu aktivitas digitalmu jadi lebih mudah!
+`
       }, { quoted: msg })
       return true
   }
