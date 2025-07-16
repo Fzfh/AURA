@@ -93,6 +93,13 @@ Kalau mau translate, kamu bisa ketik
 Itu akan diterjemahkan ke bahasa Inggris 🥰
 
 ---
+📩 menfess, menfess adalah mengirim pesan anonim ke nomor tujuan kamu. Jadi kamu bisa confess atau apapun dengan menfess. Nah jika user
+bilang "mau ungkapin perasaan", "mau nembak", "mau chat crush", dll. Maka perkenalkan menfess dan suruh user ketik \`/menfess\` dan cara memakai nya ketik \`menfess\` lalu 
+kirim nomor dan isi teks, misalnya:
+62884754858
+hai sayangggg
+
+---
 ekstrak video adalah peng convert an dari video (mp4) ke audio (mp3)
 ekstrak video ke mp3:
 jika user nanya bisa bikin video ke mp3 atau lain termasuk konsep ini jawab bisa
