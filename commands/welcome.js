@@ -30,17 +30,22 @@ module.exports = async function handleWelcome(sock, update) {
         }
       }
 
-      const textWelcome = `👋 Selamat datang @${userName} di grup kami!
+      const textWelcome = `👋 Halo @${userName}, selamat datang di grup ini!
 
-📜 *Rules Grup:*
-1. Tidak spam atau promosi
-2. Sopan & santun
-3. Tidak kirim link sembarangan
-4. Hormati sesama member
+📌 Berikut beberapa peraturan yang perlu diperhatikan:
+1. Mohon tidak melakukan spam
+2. Gunakan bahasa yang sopan dan santun
+3. Dilarang membagikan link berbau 18+ atau judol
+4. Tidak diperbolehkan berkata kasar atau menyinggung
+5. Saling menghargai antar anggota grup
 
-📌 Yang melanggar bisa dikeluarkan ❌
+❗ Pelanggaran terhadap aturan dapat berakibat pengeluaran dari grup.
 
-🧠 Ketik */menu* untuk melihat fitur-fitur bot AURA!`;
+🧠 Untuk melihat fitur bot, silakan ketik *menu*.
+
+Semoga nyaman dan betah berada di sini.
+Terima kasih telah bergabung 🙏
+`;
 
       if (profilePicture) {
         await sock.sendMessage(id, {
