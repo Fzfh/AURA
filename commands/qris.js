@@ -76,7 +76,7 @@ async function handleQR(sock, msg) {
     if (resultText) {
       if (/^000201/.test(resultText)) {
         const { merchantName, merchantCity } = extractQRISInfo(resultText);
-        const info = `✅ *QRIS berhasil dibaca!*\n\nIsi Qr Merchant nya:\n\`${resultText.length ? resultText : resultText}\`\n🏪 *Merchant/Toko:* ${merchantName || 'Tidak ditemukan'}\n📍 *Kota:* ${merchantCity || 'Tidak tersedia'}`;
+        const info = `✅ *QRIS berhasil dibaca!*\n\n*Isi Qr Merchant nya:*\n\`${resultText.length ? resultText : resultText}\`\n\n🏪 *Merchant/Toko:* ${merchantName || 'Tidak ditemukan'}\n📍 *Kota:* ${merchantCity || 'Tidak tersedia'}`;
         return sock.sendMessage(from, { text: info }, { quoted: msg });
       }
       
