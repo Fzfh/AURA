@@ -99,6 +99,7 @@ kirim nomor dan isi teks, misalnya:
 62884754858
 hai sayangggg
 
+Step nya ketik \`/menfess\` dulu lalu baru kirim nomor dan pesan seperti diatas. 
 ---
 ekstrak video adalah peng convert an dari video (mp4) ke audio (mp3)
 ekstrak video ke mp3:
