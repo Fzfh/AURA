@@ -65,8 +65,8 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
 ┃   ➤ Contoh: \`.pp\` 628xxx atau \`.pp\` @username
 ┃
 ┃ 🎛️ *Baca Isi QR Code*
-┃   ➤ Reply QR dan ketik: \`.qr\`
-┃   ➤ Bisa juga langsung ketik \`.qr\`
+┃   ➤ Reply QR dan ketik: \`.sqr\`
+┃   ➤ Bisa juga langsung ketik \`.sqr\`
 ┃
 ┃ 🤖 *Beli Bot WA*
 ┃   ➤ Ketik: \`beli bot\` untuk info harga & fitur
