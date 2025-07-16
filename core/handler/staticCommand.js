@@ -240,7 +240,7 @@ Digunakan untuk membatalkan proses atau keluar dari mode interaktif jika kamu be
 Ketik *menu* untuk melihat semua fitur yang tersedia.  
 Bot ini terus berkembang, jadi pantau terus update-nya ya!
 
-╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯
+╰━━━━━━━━━━━━━━━━━━━━━━━━━━╯
 ✨ *Selamat mencoba fitur-fitur AuraBot! Semoga bermanfaat dan bikin harimu lebih seru~* ✨
 `,
       mentions: [actualUserId]
