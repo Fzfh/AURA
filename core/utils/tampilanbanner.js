@@ -17,24 +17,22 @@ function centerText(text) {
 function tampilkanBanner(botName = "AURABOT") {
   console.clear();
 
-  // Banner figlet gradient
   const banner = figlet.textSync(botName, {
     font: "Standard",
     horizontalLayout: "default",
     verticalLayout: "default",
   });
 
-  console.log(gradient.pastel.multiline(centerText(banner)));
+  console.log("\n" + gradient.pastel.multiline(centerText(banner)) + "\n");
 
-  // INFO LOGIN (chalk diperbaiki)
-  const info = chalk.bold.whiteBright(
-    `🟢 Status: Menunggu login ke WhatsApp\n\n` +
-    `📲 Pilih salah satu metode:\n` +
-    `   ▶ Jalankan: ${chalk.cyan("node start --qrcode")} untuk QR Code\n` +
-    `   ▶ Jalankan: ${chalk.cyan("node start --prcode=628xxxx")} untuk Pairing Code\n\n` +
-    `💡 Catatan:\n` +
-    ` - Jangan pakai +62, spasi, atau 08xxx\n` +
-    ` - Format WA harus: 628xxxxxx`
+  const info = chalk.whiteBright.bold(
+    `${chalk.green("🟢 STATUS:")} Menunggu login ke WhatsApp\n\n` +
+    `${chalk.cyan("📲 PILIH METODE LOGIN:")}\n` +
+    `   ▶ ${chalk.bold("node start --qrcode")}  ${chalk.dim("// QR Code login")}\n` +
+    `   ▶ ${chalk.bold("node start --prcode=628xxxx")}  ${chalk.dim("// Pairing Code login")}\n\n` +
+    `${chalk.yellow("💡 CATATAN:")}\n` +
+    ` - Jangan pakai ${chalk.red("+62")}, spasi, atau ${chalk.red("08xxx")}\n` +
+    ` - Gunakan format: ${chalk.greenBright("628xxxxxx")}`
   );
 
   const box = boxen(info, {
@@ -46,15 +44,15 @@ function tampilkanBanner(botName = "AURABOT") {
     titleAlignment: "center",
   });
 
-  // Center box
+
   const boxLines = box.split("\n");
   boxLines.forEach(line => {
     const pad = Math.max(0, Math.floor((terminalWidth - line.length) / 2));
     console.log(" ".repeat(pad) + line);
   });
 
-  // Branding bawah
-  console.log(centerText(gradient.fruit("📛 BOT BY FAZRI")));
+  const credit = "📛 BOT BY FAZRI";
+  console.log("\n" + centerText(gradient.instagram(credit)) + "\n");
 }
 
 module.exports = tampilkanBanner;
