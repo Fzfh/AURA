@@ -3,7 +3,7 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
   const from = msg.key.remoteJid
   const sender = from
   const actualUserId = msg.key.participant || msg.participant || userId;
-  const userName = actualUserId.split('@')[0];
+  const userName = msg.pushName || actualUserId.split('@')[0];
   
   switch (lowerText) {
     case '/menu':
