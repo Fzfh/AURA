@@ -133,7 +133,7 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
     case 'caranya':
     case 'cara nya':
       await sock.sendMessage(sender, {
-        text: `╭━━━〔 🧑‍🏫 PANDUAN PENGGUNAAN AURABOT 〕━━━╮
+        text: `╭━━━〔 PANDUAN PENGGUNAAN 〕━━━╮
 
 Halo  @${actualUserId.split('@')[0]}! 👋  
 Terima kasih telah menggunakan *AuraBot*.  
