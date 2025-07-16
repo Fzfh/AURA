@@ -22,7 +22,14 @@ module.exports = async function buatQR(sock, msg, text) {
       }
     }
 
-    const qrText = text.trim();
+    let qrText = text.trim();
+
+if (qrText.startsWith('.cqr')) {
+  qrText = qrText.slice(4).trim();
+} else if (qrText.startsWith('cqr')) {
+  qrText = qrText.slice(3).trim();
+}
+
     if (!qrText) {
       return sock.sendMessage(remoteJid, {
         text: '❌ Format salah!\nKetik: *.cqr teks_kamu*',
