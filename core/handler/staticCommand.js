@@ -118,7 +118,7 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
 🧠 Ketik sesuai menu ya, dan hindari typo biar AURABOT nggak salah paham 😄  
 
 ✨ Selamat mencoba dan semoga membantu aktivitasmu!
-`
+`,
        mentions: [actualUserId]
       }, { quoted: msg })
       return true
@@ -242,7 +242,7 @@ Bot ini terus berkembang, jadi pantau terus update-nya ya!
 
 ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯
 ✨ *Selamat mencoba fitur-fitur AuraBot! Semoga bermanfaat dan bikin harimu lebih seru~* ✨
-`
+`,
       mentions: [actualUserId]
       }, { quoted: msg })
       return true
