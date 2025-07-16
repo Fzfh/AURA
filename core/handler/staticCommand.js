@@ -11,7 +11,7 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
     case '.menu':
       await sock.sendMessage(sender, {
        text: `╭━━━〔 ✨ MENU UTAMA AURABOT ✨ 〕━━━╮  
-┃ 👋 Hai @${userName}, selamat datang!
+┃ 👋 Hai @${actualUserId.split('@')[0]}, selamat datang!
 ┃ Berikut daftar fitur yang bisa kamu gunakan:
 ┃
 ┃ 🖼 *Sticker dari Gambar/Video*
@@ -135,7 +135,7 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
       await sock.sendMessage(sender, {
         text: `╭━━━〔 🧑‍🏫 PANDUAN PENGGUNAAN AURABOT 〕━━━╮
 
-Halo @${userName}! 👋  
+Halo  @${actualUserId.split('@')[0]}! 👋  
 Terima kasih telah menggunakan *AuraBot*.  
 Berikut ini panduan lengkap dan penjelasan fitur-fitur utama yang bisa kamu gunakan. Yuk kita mulai~
 
