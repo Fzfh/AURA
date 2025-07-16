@@ -2,6 +2,7 @@ const { adminList } = require('../../setting/setting')
 async function handleStaticCommand(sock, msg, lowerText, userId, body) {
   const from = msg.key.remoteJid
   const sender = from
+  const userName = user.split('@')[0];
   const actualUserId = msg.key.participant || msg.participant || userId;
   
   switch (lowerText) {
@@ -9,115 +10,114 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
     case 'menu':
     case '.menu':
       await sock.sendMessage(sender, {
-       text: `╭━━━[ ✨ AURA BOT MENU ✨ ]━━━╮  
-┃  
-┃  🖼 Sticker dari Gambar/Video  
-┃   ➤ Kirim media (foto/video)  
-┃   ➤ Tambahkan caption: \`s\` atau \`sticker\`
-┃  
-┃  ⬆️ Ambil Sticker Jadi Media
-┃   ➤ Reply Ke sticker ketik \`.sm\` 
-┃   ➤ Media akan didownload
-┃  
-┃  ✍ Sticker dari Teks  
-┃   ➤ Ketik: \`.stickertext\` teks  
-┃   ➤ Contoh: \`.stickertext\` AuraBot  
-┃   ➤ Bisa juga: \`.st\` AuraBot
-┃  
-┃  🎵 Ekstrak Audio dari Video
-┃   ➤ Kirim video dengan caption: \`.ets\`
-┃   ➤ Atau reply ke video lalu ketik: \`.ets\`
-┃  
-┃  💌 Menfess Anonim  
-┃   ➤ \`/menfess\` 
-┃  
-┃  🗺️ Cari Lokasi Google Maps
-┃   ➤ \`.linkmap\` <nama daerah> 
-┃   ➤ Contoh: \`.linkmap\` monas Jakarta
-┃   ➤ Reply Ke shareloc untuk jadi link
+       text: `╭━━━〔 ✨ MENU UTAMA AURABOT ✨ 〕━━━╮  
+┃ 👋 Hai @${userName}, selamat datang!
+┃ Berikut daftar fitur yang bisa kamu gunakan:
 ┃
-┃  🗺️🎛️ Cari Lokasi Google Maps ke qr code (qris)
-┃   ➤ \`.mapqr\` <nama daerah> 
-┃   ➤ Contoh: \`.mapqr\` monas Jakarta
-┃   ➤ Reply Ke shareloc untuk jadi link
+┃ 🖼 *Sticker dari Gambar/Video*
+┃   ➤ Kirim foto/video + caption: \`s\` atau \`sticker\`
+┃   ➤ Bot akan otomatis mengubah jadi stiker
 ┃
-┃  👰🏻 Cari Waifu Kamu!
-┃   ➤ \`.waifu\` <jenis waifu>
-┃   ➤ Contoh: \`.waifu\` neko
+┃ ⬆️ *Ambil Sticker Jadi Gambar/Video*
+┃   ➤ Reply ke stiker, lalu ketik: \`.sm\`
+┃   ➤ Bot akan mengembalikannya jadi media asli
 ┃
-┃ ⬇ Download VT Tiktok (Foto & Video)
-┃   ➤ \`.d\` link tiktok 
-┃   ➤ Contoh: .d https://tiktok.com/linkKamu  
-┃ 
-┃ ⬇ Download Sound VT Tiktok  
-┃   ➤ \`.ds\` link tiktok  
-┃   ➤ Contoh: \`.ds\` https://tiktok.com/linkKamu  
-┃   
-┃ ⬇ Download Reels Instagram  
-┃  *IG DOWNLOAD 1 MENIT, JANGAN SPAM!*
-┃   ➤ \`.dig\` link instagram 
-┃   ➤ Contoh: \`.dig\` https://instagram.com/linkKamu
-┃ 
-┃ 📸 Ambil Foto Profile
-┃   ➤ \`.pp\` nomor atau tag (@orang)
-┃   ➤ Jika chat pribadi bot \`.pp\` nomor
-┃   ➤ contoh: \`.pp\` 0898009090
-┃   ➤ contoh: \`.pp\` @angga
-┃ 
-┃ 🎛️ Baca isi Qris
-┃   ➤ \`.qr\` 
-┃   ➤ Contoh: \`.qr\` reply ke qr code
-┃   ➤ bisa juga hanya \`qr\`
-┃  
-┃ 🤖 Beli Bot WA  
-┃   ➤ beli bot — Lihat harga & fitur bot  
-┃  
-┃ ❓ BINGUNG?? KETIK COMMAND INI AJA!!  
-┃   ➤ tutorial / tutor  
-┃   ➤ admin Bot — Hubungi langsung via WA  
-╰━━━━━━━━━━━━━━━━━━━━━━━╯  
+┃ ✍️ *Sticker dari Teks*
+┃   ➤ \`.stickertext\` teks kamu
+┃   ➤ Contoh: \`.stickertext Halo\`
+┃   ➤ Bisa juga singkat: \`.st AuraBot\`
+┃
+┃ 🎵 *Ekstrak Audio dari Video*
+┃   ➤ Kirim video + caption: \`.ets\`
+┃   ➤ Atau reply video lalu ketik: \`.ets\`
+┃
+┃ 💌 *Menfess Anonim*
+┃   ➤ Ketik: \`/menfess\` lalu ikuti instruksi
+┃
+┃ 🗺️ *Cari Lokasi (Google Maps)*
+┃   ➤ \`.linkmap\` [nama lokasi]
+┃   ➤ Contoh: \`.linkmap Monas Jakarta\`
+┃   ➤ Bisa juga reply shareloc lalu ketik \`.linkmap\`
+┃
+┃ 🗺️🎛️ *Cari Lokasi dan Convert ke QR (MapQR)*
+┃   ➤ \`.mapqr\` [nama lokasi]
+┃   ➤ Contoh: \`.mapqr Monas Jakarta\`
+┃   ➤ Bisa reply shareloc juga
+┃
+┃ 👰🏻 *Cari Waifu Lucu*
+┃   ➤ \`.waifu\` [jenis/nama waifu]
+┃   ➤ Contoh: \`.waifu neko\`
+┃
+┃ ⬇️ *Download TikTok (Video & Foto)*
+┃   ➤ \`.d\` [link TikTok]
+┃   ➤ Contoh: \`.d https://tiktok.com/xxx\`
+┃
+┃ ⬇️ *Download Musik TikTok*
+┃   ➤ \`.ds\` [link TikTok]
+┃   ➤ Contoh: \`.ds https://tiktok.com/xxx\`
+┃
+┃ ⬇️ *Download Reels Instagram*
+┃   ⚠️ *IG butuh waktu ±1 menit, jangan spam ya!*
+┃   ➤ \`.dig\` [link Instagram]
+┃
+┃ 📸 *Ambil Foto Profil*
+┃   ➤ \`.pp\` [nomor atau @tag]
+┃   ➤ Contoh: \`.pp\` 628xxx atau \`.pp\` @username
+┃
+┃ 🎛️ *Baca Isi QR Code*
+┃   ➤ Reply QR dan ketik: \`.qr\`
+┃   ➤ Bisa juga langsung ketik \`.qr\`
+┃
+┃ 🤖 *Beli Bot WA*
+┃   ➤ Ketik: \`beli bot\` untuk info harga & fitur
+┃
+┃ ❓ *Bingung Gunain Bot?*
+┃   ➤ Ketik: \`tutorial\` atau \`tutor\`
+┃   ➤ Hubungi Owner, Ketik: \`admin\`
 
-╭━[ 🔒 KHUSUS ADMIN GRUP ]━╮  
-┃  📸 Ambil Foto/video Sekali lihat
-┃   ➤ \`.show\` atau show
-┃   ➤ Contoh: \`.show\` lalu reply ke foto/video 1x lihat  
+╰━━━━━━━━━━━━━━━━━━━━━━━━━━╯  
+
+╭━━━〔 🔒 FITUR ADMIN GRUP 〕━━━╮  
+┃ 📸 *Lihat Media Sekali Lihat (1x View)*
+┃   ➤ \`.show\` lalu reply ke foto/video 1x lihat
 ┃
-┃  🔒 Open & Close Group
-┃   ➤ Open: \`.open\`
-┃   ➤ Close: \`.close\`
+┃ 🔓 *Buka/Tutup Grup Chat*
+┃   ➤ \`.open\` = Buka  
+┃   ➤ \`.close\` = Tutup
 ┃
-┃  ⤴️ Promote Member jadi Admin
-┃   ➤ \`.na\` reply ke user atau tag
-┃   ➤ Contoh: \`.na\` @aurabot atau reply
+┃ ⤴️ *Promote Member Jadi Admin*
+┃   ➤ \`.na\` + reply atau @tag
+┃   ➤ Contoh: \`.na\` @aurabot
 ┃
-┃  ⤵️ Demote Admin jadi Member
-┃   ➤ \`.una\` reply ke user atau tag
-┃   ➤ Contoh: \`.una\` @aurabot atau reply
+┃ ⤵️ *Demote Admin ke Member*
+┃   ➤ \`.una\` + reply atau @tag
+┃   ➤ Contoh: \`.una\` @aurabot
 ┃
-┃  👤 Tambah Member
-┃   ➤ tambah, add,
-┃   ➤ tambah <nomor>
-┃   ➤ contoh: tambah 628787
-┃   ➤ contoh: add 628787
+┃ 👥 *Tambah Member ke Grup*
+┃   ➤ \`add\` atau \`tambah\` [nomor]
+┃   ➤ Contoh: \`tambah 628123456789\`
 ┃
-┃  👥 Tag Semua Member Grup  
+┃ 🗣️ *Tag Semua Anggota Grup*
 ┃   ➤ \`.tagall\`  
-┃   ➤ Contoh: .tagall Halo semua  
-┃  
-┃  🧾 Buat QR Code dengan Logo  
-┃   ➤ \`.cqr\` isi teks  
-┃   ➤ Contoh: \`.cqr\` halo dunia  
-┃  
-┃  🏗️ Buat Grup Baru via Bot  
-┃   ➤ .bg <nama grup>  
-┃   ➤ Contoh: \`.bg auragrup\`  
-┃   ➤ Tambah member langsung:  
-┃   ➤ \`.bg auragrup add 62812345, 62854321\`  
-╰━━━━━━━━━━━━━━━━━━━━━━╯  
+┃   ➤ Contoh: \`.tagall Halo semua!\`
+┃
+┃ 🧾 *Buat QR Code dengan Logo*
+┃   ➤ \`.cqr\` [teks]
+┃   ➤ Contoh: \`.cqr\` halo dunia
+┃
+┃ 🏗️ *Buat Grup Baru via Bot*
+┃   ➤ \`.bg\` [nama grup]
+┃   ➤ Contoh: \`.bg Aura Squad\`
+┃   ➤ Tambah member langsung:
+┃     \`.bg Aura Squad add 62812,62813\`
 
-💡Kalau Kamu admin di grup maka kamu bisa menikmati semua fitur ya!
-🧠 Ketik sesuai menu ya adick-adickk!  
-📌 Hindari typo biar AURABOT gak Misskom 🤖🔥
+╰━━━━━━━━━━━━━━━━━━━━━━━━━━╯  
+
+💡 *Tips:*  
+➤ Kalau kamu admin, kamu bisa akses semua fitur admin secara otomatis!  
+🧠 Ketik sesuai menu ya, dan hindari typo biar AURABOT nggak salah paham 😄  
+
+✨ Selamat mencoba dan semoga membantu aktivitasmu!
 `
       }, { quoted: msg })
       return true
@@ -134,7 +134,7 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
       await sock.sendMessage(sender, {
         text: `╭━━━〔 🧑‍🏫 PANDUAN PENGGUNAAN AURABOT 〕━━━╮
 
-Halo @userid! 👋  
+Halo @${userName}! 👋  
 Terima kasih telah menggunakan *AuraBot*.  
 Berikut ini panduan lengkap dan penjelasan fitur-fitur utama yang bisa kamu gunakan. Yuk kita mulai~
 
@@ -247,7 +247,17 @@ Bot ini terus berkembang, jadi pantau terus update-nya ya!
 
     case 'admin':
       await sock.sendMessage(sender, {
-        text: `👩‍💻 *Hubungi Admin AURA BOT:*\n\n📞 wa.me/62895326679840\n🕐 Online: 09.00 - 22.00 WIB\n\nButuh bantuan? hubungi admin aja yaa! Fast Respon! ✨`
+        text: `👩‍💻 *Hubungi Admin AURA BOT*
+
+📞 WhatsApp: [\`Klik untuk chat\`](https://wa.me/62895326679840)  
+🕐 Waktu Layanan: 09.00 – 22.00 WIB  
+⚡ Status: Fast Respon (selama jam aktif)
+
+🔹 Punya pertanyaan, kendala, atau ingin beli bot?  
+Silakan hubungi admin langsung melalui WhatsApp.
+
+💬 Kami siap bantu kamu dengan sepenuh hati!
+`
       }, { quoted: msg })
       return true
 
