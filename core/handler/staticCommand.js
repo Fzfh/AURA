@@ -2,7 +2,7 @@ const { adminList } = require('../../setting/setting')
 async function handleStaticCommand(sock, msg, lowerText, userId, body) {
   const from = msg.key.remoteJid
   const sender = from
-  const userName = user.split('@')[0];
+  const userName = actualUserId.split('@')[0];
   const actualUserId = msg.key.participant || msg.participant || userId;
   
   switch (lowerText) {
