@@ -10,9 +10,9 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
     case 'menu':
     case '.menu':
       await sock.sendMessage(sender, {
-       text: `╭━━━〔 ✨ MENU UTAMA AURABOT ✨ 〕━━━╮  
+       text: `╭━━━〔 ✨ MENU UTAMA ✨ 〕━━━╮  
 ┃ 👋 Hai @${actualUserId.split('@')[0]}, selamat datang!
-┃ Berikut daftar fitur yang bisa kamu gunakan:
+┃ ini daftar fitur member yang bisa kamu gunakan:
 ┃
 ┃ 🖼 *Sticker dari Gambar/Video*
 ┃   ➤ Kirim foto/video + caption: \`s\` atau \`sticker\`
@@ -74,7 +74,6 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
 ┃ ❓ *Bingung Gunain Bot?*
 ┃   ➤ Ketik: \`tutorial\` atau \`tutor\`
 ┃   ➤ Hubungi Owner, Ketik: \`admin\`
-
 ╰━━━━━━━━━━━━━━━━━━━━━━━━━━╯  
 
 ╭━━━〔 🔒 FITUR ADMIN GRUP 〕━━━╮  
@@ -100,6 +99,10 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
 ┃ 🗣️ *Tag Semua Anggota Grup*
 ┃   ➤ \`.tagall\`  
 ┃   ➤ Contoh: \`.tagall Halo semua!\`
+┃
+┃ 📵 *Hapus Pesan*
+┃   ➤ \`.del\`
+┃   ➤ Reply ke pesan lalu ketik \`.del\`
 ┃
 ┃ 🧾 *Buat QR Code dengan Logo*
 ┃   ➤ \`.cqr\` [teks]
