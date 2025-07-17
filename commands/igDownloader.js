@@ -1,32 +1,32 @@
-const axios = require('axios');
+const { instagramdl } = require('@bochilteam/scraper');
 
-async function downloadInstagram(url, retry = 3) {
-  while (retry--) {
-    try {
-      const res = await axios.get(`https://api.saveig.app/api/ajaxSearch`, {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-          'User-Agent': 'Mozilla/5.0',
-        },
-        params: { q: url },
-        timeout: 7000 // agar gak nunggu lama
-      });
+module.exports = async function downloadInstagram(sock, msg, text, args) {
+  const from = msg.key.remoteJid;
+  const url = args[0];
 
-      const data = res.data;
-      if (!data || !data.medias || data.medias.length === 0)
-        throw new Error('Tidak ada media yang ditemukan.');
-
-      return {
-        videoUrl: data.medias[0].url,
-        all: data
-      };
-    } catch (err) {
-      console.error('⚠️ IG Downloader Error:', err.message || err);
-      await new Promise(resolve => setTimeout(resolve, 1500)); // tunggu 1.5 detik
-    }
+  if (!url || !url.includes("instagram.com")) {
+    return sock.sendMessage(from, { text: "❌ Link Instagram tidak valid!" }, { quoted: msg });
   }
 
-  return null;
-}
+  await sock.sendMessage(from, { text: "⏳ Sedang memproses link-nya ya sayang~" }, { quoted: msg });
 
-module.exports = downloadInstagram;
+  try {
+    const result = await instagramdl(url);
+
+    if (!result || result.length === 0) {
+      throw new Error("Media tidak ditemukan.");
+    }
+
+    for (const media of result) {
+      if (media.type === 'video') {
+        await sock.sendMessage(from, { video: { url: media.url } }, { quoted: msg });
+      } else if (media.type === 'image') {
+        await sock.sendMessage(from, { image: { url: media.url } }, { quoted: msg });
+      }
+    }
+
+  } catch (err) {
+    console.error("IG Downloader Error:", err.message || err);
+    await sock.sendMessage(from, { text: "❌ Gagal download media dari Instagram." }, { quoted: msg });
+  }
+};
