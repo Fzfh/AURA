@@ -2,14 +2,15 @@ async function downloadInstagram(url) {
   try {
     console.log('🧪 Received IG URL:', url, '| Type:', typeof url);
 
+    if (typeof url === 'object' && typeof url.text === 'string') {
+      url = url.text;
+    }
 
     const trimmedUrl = String(url).trim();
 
-
     if (!/^https?:\/\/(www\.)?instagram\.com\/(reel|p|tv)\/[a-zA-Z0-9_\-]+/.test(trimmedUrl)) {
-  throw new Error('URL Instagram tidak valid');
-}
-
+      throw new Error('URL Instagram tidak valid');
+    }
 
     const response = await axios.get("https://instavideodownloader-com.onrender.com/api/video", {
       params: {
@@ -37,5 +38,4 @@ async function downloadInstagram(url) {
     return null;
   }
 }
-
 module.exports = downloadInstagram;
