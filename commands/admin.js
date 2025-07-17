@@ -10,18 +10,27 @@ function extractTargetJid(sock, msg, text) {
     return contextInfo.participant;
   }
 
-  const parts = text.split(' ');
+  const parts = text.trim().split(/\s+/);
   if (parts.length >= 2) {
-    const number = parts[1].replace(/\D/g, '');
-    if (number.length >= 8) {
-      const jid = number + '@s.whatsapp.net';
-      if (/^\d+@s\.whatsapp\.net$/.test(jid)) {
-        return jid;
-      }
+    let number = parts[1];
+
+    number = number.replace(/[^\d+]/g, '');
+
+    if (number.startsWith('+')) {
+      number = number.slice(1);
+    } else if (number.startsWith('0')) {
+      number = '62' + number.slice(1); 
+    }
+
+    if (/^\d{8,}$/.test(number)) {
+      const jid = `${number}@s.whatsapp.net`;
+      return jid;
     }
   }
+
   return null;
 }
+
 
 async function isGroupAdmin(sock, groupId, jid) {
   try {
@@ -47,7 +56,7 @@ module.exports = async function admin(sock, msg, text, senderRaw, chatIdInput) {
 
   if (!chatId.endsWith('@g.us')) {
     await sock.sendMessage(chatId, {
-      text: '❌ Perintah ini hanya bisa digunakan di grup, sayang~ 😖',
+      text: '❌ Perintah ini hanya bisa digunakan di grup',
     }, { quoted: msg });
     return true;
   }
