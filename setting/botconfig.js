@@ -25,43 +25,35 @@ const botResponsePatterns = [
   { command: 's', handler: returnCommand["core_stickerHelper"].stickerFromMediaCommand },
   { command: 'st', handler: returnCommand["core_stickerHelper"].stickerTextCommand },
   { command: 'stickertext', handler: returnCommand["core_stickerHelper"].stickerTextCommand },
-  { command: 'waifu', handler: returnCommand["commands_waifu_waifu"] },
-  { command: 'waifuhen', handler: returnCommand["commands_waifu_waifuhen"] },
-  { command: 'sqr', handler: returnCommand["commands_readqr_qris"] },
-  { command: 'cqr', handler: returnCommand["commands_create_createQr"] },
-  { command: 'mapqr', handler: returnCommand["commands_create_mapqr"] },
-  { command: 'linkmap', handler: returnCommand["commands_create_linkmap"] },
-  { command: 'menfess', handler: returnCommand["commands_menfess_menfess"] },
-  { command: 'sm', handler: returnCommand["commands_sticker_stickerToMedia"] },
-  { command: 'sendall', handler: returnCommand["commands_sendall_sendAll"] },
-  { command: 'dig', handler: returnCommand["commands_download_igDownloader"] },
-  { command: 'd', handler: returnCommand["commands_download_tiktokDownloader"] },
-  { command: 'ds', handler: returnCommand["commands_download_tiktokDownloader"] },
-  { command: 'ets', handler: returnCommand["commands_audio_ekstrakAudio"] },
-  { command: 'pp', handler: returnCommand["commands_picture_pp"] },
+  { command: 'waifu', handler: returnCommand["commands_waifu"] },
+  { command: 'waifuhen', handler: returnCommand["commands_waifuhen"] },
+  { command: 'sqr', handler: returnCommand["commands_qris"] },
+  { command: 'cqr', handler: returnCommand["commands_createQr"] },
+  { command: 'mapqr', handler: returnCommand["commands_mapqr"] },
+  { command: 'linkmap', handler: returnCommand["commands_linkmap"] },
+  { command: 'menfess', handler: returnCommand["commands_menfess"] },
+  { command: 'sm', handler: returnCommand["commands_stickerToMedia"] },
+  { command: 'sendall', handler: returnCommand["commands_sendAll"] },
+  { command: 'dig', handler: returnCommand["commands_igDownloader"] },
+  { command: 'd', handler: returnCommand["commands_tiktokDownloader"] },
+  { command: 'ds', handler: returnCommand["commands_tiktokDownloader"] },
+  { command: 'ets', handler: returnCommand["commands_ekstrakAudio"] },
+  { command: 'pp', handler: returnCommand["commands_pp"] },
 
   // Command Admin Only
-  { command: 'kick', handler: returnCommand["commands_grup_kick"], isAdmin: true },
-  { command: 'add', handler: returnCommand["commands_grup_add"], isAdmin: true },
-  { command: 'admin', handler: returnCommand["commands_grup_admin"], isAdmin: true },
-  { command: 'bg', handler: returnCommand["commands_create_buatGrup"], isAdmin: true },
-  { command: 'tag', handler: returnCommand["commands_grup_tagall"], isAdmin: true },
-  { command: 'open', handler: returnCommand["commands_grup_openCloseGroup"], isAdmin: true },
-  { command: 'close', handler: returnCommand["commands_grup_openCloseGroup"], isAdmin: true },
-  { command: 'na', handler: returnCommand["commands_grup_admin"], isAdmin: true },
-  { command: 'una', handler: returnCommand["commands_grup_admin"], isAdmin: true },
-  { command: 'del', handler: returnCommand["commands_grup_delete"], isAdmin: true},
-  { command: 'show', handler: returnCommand["commands_picture_show"], isAdmin: true }
+  { command: 'kick', handler: returnCommand["commands_kick"], isAdmin: true },
+  { command: 'add', handler: returnCommand["commands_add"], isAdmin: true },
+  { command: 'admin', handler: returnCommand["commands_admin"], isAdmin: true },
+  { command: 'bg', handler: returnCommand["commands_buatGrup"], isAdmin: true },
+  { command: 'tag', handler: returnCommand["commands_tagall"], isAdmin: true },
+  { command: 'open', handler: returnCommand["commands_openCloseGroup"], isAdmin: true },
+  { command: 'close', handler: returnCommand["commands_openCloseGroup"], isAdmin: true },
+  { command: 'na', handler: returnCommand["commands_admin"], isAdmin: true },
+  { command: 'una', handler: returnCommand["commands_admin"], isAdmin: true },
+  { command: 'del', handler: returnCommand["commands_delete"], isAdmin: true},
+  { command: 'show', handler: returnCommand["commands_show"], isAdmin: true }
 
 ];
-console.log("🔍 Mengecek semua handler apakah valid function...");
-for (let p of botResponsePatterns) {
-  if (typeof p.handler !== 'function') {
-    console.error(`❌ Handler BUKAN function! Command: '${p.command}' >>`, p.handler);
-  } else {
-    console.log(`✅ Handler OK untuk command: '${p.command}'`);
-  }
-}
 
 
 module.exports = { botBehavior, botResponsePatterns };
