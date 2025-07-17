@@ -86,7 +86,6 @@ module.exports = async function tagall(sock, msg, text, isGroup) {
       text: customMsg,
       mentions
     }, { quoted: msg });
-
   } catch (err) {
     console.error('❌ Gagal tagall:', err);
     return sock.sendMessage(groupId, {
