@@ -41,8 +41,7 @@ async function igDownloaderHandler(sock, msg, text) {
   }
 
   await sock.sendMessage(from, {
-    video: { url: result.videoUrl },
-    caption: result.desc || '📥 Berikut videonya.',
+    video: { url: result.videoUrl }
   }, { quoted: msg });
 
   return true;
