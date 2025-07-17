@@ -25,8 +25,8 @@ const botResponsePatterns = [
   { command: 's', handler: returnCommand["core_stickerHelper"].stickerFromMediaCommand },
   { command: 'st', handler: returnCommand["core_stickerHelper"].stickerTextCommand },
   { command: 'stickertext', handler: returnCommand["core_stickerHelper"].stickerTextCommand },
-  { command: 'waifu', handler: returnCommand["commands_waifu"] },
-  { command: 'waifuhen', handler: returnCommand["commands_waifuhen"] },
+  { command: 'waifu', handler: returnCommand["commands_waifu_waifu"] },
+  { command: 'waifuhen', handler: returnCommand["commands_waifu_waifuhen"] },
   { command: 'sqr', handler: returnCommand["commands_qris"] },
   { command: 'cqr', handler: returnCommand["commands_create_createQr"] },
   { command: 'mapqr', handler: returnCommand["commands_create_mapqr"] },
@@ -37,7 +37,7 @@ const botResponsePatterns = [
   { command: 'dig', handler: returnCommand["commands_download_igDownloader"] },
   { command: 'd', handler: returnCommand["commands_download_tiktokDownloader"] },
   { command: 'ds', handler: returnCommand["commands_download_tiktokDownloader"] },
-  { command: 'ets', handler: returnCommand["commands_ekstrakAudio"] },
+  { command: 'ets', handler: returnCommand["commands_audio_ekstrakAudio"] },
   { command: 'pp', handler: returnCommand["commands_picture_pp"] },
 
 
