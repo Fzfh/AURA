@@ -1,21 +1,13 @@
-async function downloadInstagram(url) {
+async function downloadInstagram(rawInput) {
   try {
-    console.log('🧪 Received IG URL:', url, '| Type:', typeof url);
+    console.log('🧪 Received IG URL:', rawInput, '| Type:', typeof rawInput);
 
-    if (typeof url === 'object' && typeof url.text === 'string') {
-      url = url.text;
-    }
+    const extractedUrl = extractInstagramUrl(rawInput);
 
-    const trimmedUrl = String(url).trim();
-
-    if (!/^https?:\/\/(www\.)?instagram\.com\/(reel|p|tv)\/[a-zA-Z0-9_\-]+/.test(trimmedUrl)) {
-      throw new Error('URL Instagram tidak valid');
-    }
+    if (!extractedUrl) throw new Error('URL Instagram tidak valid');
 
     const response = await axios.get("https://instavideodownloader-com.onrender.com/api/video", {
-      params: {
-        postUrl: trimmedUrl
-      },
+      params: { postUrl: extractedUrl },
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
         'Accept': 'application/json',
@@ -38,4 +30,13 @@ async function downloadInstagram(url) {
     return null;
   }
 }
+
+function extractInstagramUrl(input) {
+  if (typeof input === 'string') return input;
+
+  const json = JSON.stringify(input);
+  const match = json.match(/https:\/\/www\.instagram\.com\/(reel|p|tv)\/[a-zA-Z0-9_\-]+/);
+  return match ? match[0] : null;
+}
+
 module.exports = downloadInstagram;
