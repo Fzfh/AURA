@@ -36,9 +36,9 @@ const botResponsePatterns = [
   { command: 'sm', handler: returnCommand["commands_stickerToMedia"] },
   { command: 'show', handler: returnCommand["commands_show"] },
   { command: 'sendall', handler: returnCommand["commands_sendAll"] },
-  { command: 'dig', handler: returnCommand["commands_igDownloader"] },
-  { command: 'd', handler: returnCommand["commands_tiktokDownloader"] },
-  { command: 'ds', handler: returnCommand["commands_tiktokDownloader"] },
+  { command: 'dig', handler: returnCommand["commands_download_igDownloader"] },
+  { command: 'd', handler: returnCommand["commands_download_tiktokDownloader"] },
+  { command: 'ds', handler: returnCommand["commands_download_tiktokDownloader"] },
   { command: 'ets', handler: returnCommand["commands_ekstrakAudio"] },
   { command: 'pp', handler: returnCommand["commands_pp"] },
 
