@@ -1,5 +1,8 @@
 async function downloadInstagram(url) {
   try {
+    console.log('🧪 Received IG URL:', url, '| Type:', typeof url);
+
+
     const trimmedUrl = String(url).trim();
 
 
