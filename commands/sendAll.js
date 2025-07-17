@@ -40,7 +40,7 @@ async function sendAll(sock, senderJid, text) {
       }
     });
 
-    await delay(1200); // delay biar aman
+    await delay(1200);
   }
 }
 
