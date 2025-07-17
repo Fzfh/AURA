@@ -42,7 +42,6 @@ module.exports = async function waifu(sock, msg, text) {
     }
 
     spamTracker.set(userId, now);
-
     const res = await axios.get(`https://api.waifu.im/search`, {
       params: {
         included_tags: type,
