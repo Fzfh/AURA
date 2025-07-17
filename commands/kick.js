@@ -60,8 +60,7 @@ module.exports = async function kick(sock, msg, text, isGroup) {
         text: '❗ Gunakan dengan *reply pesan*, *tag user*, atau ketik: `.kick 628xxxx` / `.kick 628xxxx, 62xxxxx`'
       }, { quoted: msg });
     }
-
-    // Filter ID bot dari target
+    
     const filteredTargets = targets.filter(t => t !== botId && t !== senderId);
 
     if (filteredTargets.length === 0) {
