@@ -27,22 +27,18 @@ const botResponsePatterns = [
   { command: 'stickertext', handler: returnCommand["core_stickerHelper"].stickerTextCommand },
   { command: 'waifu', handler: returnCommand["commands_waifu_waifu"] },
   { command: 'waifuhen', handler: returnCommand["commands_waifu_waifuhen"] },
-  { command: 'sqr', handler: returnCommand["commands_qris"] },
+  { command: 'sqr', handler: returnCommand["commands_readqr_qris"] },
   { command: 'cqr', handler: returnCommand["commands_create_createQr"] },
   { command: 'mapqr', handler: returnCommand["commands_create_mapqr"] },
   { command: 'linkmap', handler: returnCommand["commands_create_linkmap"] },
-  { command: 'menfess', handler: returnCommand["commands_menfess"] },
+  { command: 'menfess', handler: returnCommand["commands_menfess_menfess"] },
   { command: 'sm', handler: returnCommand["commands_sticker_stickerToMedia"] },
-  { command: 'sendall', handler: returnCommand["commands_sendAll"] },
+  { command: 'sendall', handler: returnCommand["commands_sendall_sendAll"] },
   { command: 'dig', handler: returnCommand["commands_download_igDownloader"] },
   { command: 'd', handler: returnCommand["commands_download_tiktokDownloader"] },
   { command: 'ds', handler: returnCommand["commands_download_tiktokDownloader"] },
   { command: 'ets', handler: returnCommand["commands_audio_ekstrakAudio"] },
   { command: 'pp', handler: returnCommand["commands_picture_pp"] },
-
-
-  // Bahasa dan Bantuan
-  { command: 'listbahasa', handler: returnCommand["commands_translate"] },
 
   // Command Admin Only
   { command: 'kick', handler: returnCommand["commands_grup_kick"], isAdmin: true },
