@@ -41,7 +41,7 @@ module.exports = async function handleWelcome(sock, update) {
 
 ❗ Pelanggaran terhadap aturan dapat berakibat pengeluaran dari grup.
 
-🧠 Untuk melihat fitur bot, silakan ketik *menu*.
+🧠 Untuk melihat fitur bot, silakan ketik *menu*
 
 Semoga nyaman dan betah berada di sini.
 Terima kasih telah bergabung 🙏
