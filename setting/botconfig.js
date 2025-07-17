@@ -55,7 +55,8 @@ const botResponsePatterns = [
   { command: 'open', handler: returnCommand["commands_openCloseGroup"], isAdmin: true },
   { command: 'close', handler: returnCommand["commands_openCloseGroup"], isAdmin: true },
   { command: 'na', handler: returnCommand["commands_admin"], isAdmin: true },
-  { command: 'una', handler: returnCommand["commands_admin"], isAdmin: true }
+  { command: 'una', handler: returnCommand["commands_admin"], isAdmin: true },
+  { command: 'del', handler: returnCommand["commands_delete"], isAdmin: true}
 
 ];
 
