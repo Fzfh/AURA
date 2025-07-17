@@ -12,6 +12,7 @@ module.exports = async function igDownloaderHandler(sock, msg, text, args) {
 
   try {
     const res = await instagramDownload(link);
+    console.log('📦 Hasil Instagram Download:', result);
     if (!res.status || !res.result) throw new Error("Download gagal");
 
     for (const item of res.result) {
