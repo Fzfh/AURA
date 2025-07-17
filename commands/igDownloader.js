@@ -1,53 +1,56 @@
-const axios = require('axios');
+const { instagramdl } = require('@xct007/igdl');
 
-module.exports = async function downloadInstagram(sock, msg, text, args) {
+async function downloadInstagram(sock, msg, args) {
   const from = msg.key.remoteJid;
   const url = args[0];
 
   if (!url || !url.includes("instagram.com")) {
-    return sock.sendMessage(from, { text: "❌ Link Instagram tidak valid!" }, { quoted: msg });
+    return sock.sendMessage(from, {
+      text: "❌ Link Instagram tidak valid. Contoh: .ig https://www.instagram.com/reel/xxxxx"
+    }, { quoted: msg });
   }
 
-  await sock.sendMessage(from, { text: "⏳ Lagi download dari Instagram ya sayang~ Tunggu sebentar 💕" }, { quoted: msg });
+  await sock.sendMessage(from, {
+    text: "⏳ Serra lagi ambil media-nya dari Instagram yaa~"
+  }, { quoted: msg });
 
   try {
-    const response = await axios.post(
-      'https://snapinsta.app/action.php',
-      new URLSearchParams({
-        url: url,
-        action: 'post'
-      }),
-      {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Origin': 'https://snapinsta.app',
-          'Referer': 'https://snapinsta.app/',
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
-        }
-      }
-    );
+    const res = await instagramdl(url);
 
-    const html = response.data;
-
-    const urls = [...html.matchAll(/href="(https:\/\/[^"]+\.cdninstagram[^"]+)"/g)].map(x => x[1]);
-
-    if (urls.length === 0) {
-      throw new Error("❌ Gagal menemukan media dari Instagram.");
+    if (!res || res.length === 0) {
+      return sock.sendMessage(from, {
+        text: "❌ Tidak bisa menemukan media di link tersebut."
+      }, { quoted: msg });
     }
 
-    // Kirim semua media
-    for (const mediaUrl of urls) {
-      if (mediaUrl.includes(".mp4")) {
-        await sock.sendMessage(from, { video: { url: mediaUrl } }, { quoted: msg });
-      } else if (mediaUrl.match(/\.(jpe?g|png|webp)$/)) {
-        await sock.sendMessage(from, { image: { url: mediaUrl } }, { quoted: msg });
+    for (const media of res) {
+      if (media.type === 'video') {
+        await sock.sendMessage(from, {
+          video: { url: media.url }
+        }, { quoted: msg });
+      } else if (media.type === 'image') {
+        await sock.sendMessage(from, {
+          image: { url: media.url }
+        }, { quoted: msg });
       } else {
-        await sock.sendMessage(from, { text: `🔗 Media: ${mediaUrl}` }, { quoted: msg });
+        await sock.sendMessage(from, {
+          text: `📛 Tidak bisa kirim media bertipe: ${media.type}`
+        }, { quoted: msg });
       }
     }
 
   } catch (err) {
-    console.error("IG Downloader Snapinsta Error:", err);
-    await sock.sendMessage(from, { text: "❌ Gagal download media dari SnapInsta. Mungkin link-nya tidak valid atau sedang error." }, { quoted: msg });
+    console.error("IGDL Error:", err);
+    await sock.sendMessage(from, {
+      text: "❌ Gagal mengambil media dari Instagram. Mungkin link-nya private atau error jaringan."
+    }, { quoted: msg });
   }
+}
+
+module.exports = {
+  name: 'ig',
+  aliases: ['instagram', 'igdl'],
+  description: 'Download media dari Instagram (foto, video, reels)',
+  category: 'downloader',
+  execute: downloadInstagram
 };
