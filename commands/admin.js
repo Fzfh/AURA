@@ -11,24 +11,21 @@ function extractTargetJid(sock, msg, text) {
   }
 
   const parts = text.trim().split(/\s+/);
-  if (parts.length >= 2) {
-    let number = parts[1];
+  let number = parts.slice(1).join('').replace(/[^+\d]/g, '');
 
-    number = number.replace(/[^+\d]/g, '');
+  if (number.startsWith('+')) {
+    number = number.slice(1);
+  } else if (number.startsWith('0')) {
+    number = '62' + number.slice(1);
+  }
 
-    if (number.startsWith('+')) {
-      number = number.slice(1);
-    } else if (number.startsWith('0')) {
-      number = '62' + number.slice(1);
-    }
-
-    if (/^\d{8,}$/.test(number)) {
-      return `${number}@s.whatsapp.net`;
-    }
+  if (/^\d{8,}$/.test(number)) {
+    return `${number}@s.whatsapp.net`;
   }
 
   return null;
 }
+
 
 
 async function isGroupAdmin(sock, groupId, jid) {
