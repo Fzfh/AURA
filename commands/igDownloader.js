@@ -1,28 +1,27 @@
 const axios = require('axios');
 
-function cleanInstagramUrl(url) {
+function extractInstagramPath(url) {
   try {
-    let cleaned = url.trim();
+    const u = new URL(url);
+    let pathname = u.pathname;
 
-    // Hapus parameter setelah tanda tanya
-    cleaned = cleaned.split('?')[0];
-
-    // Hapus trailing slash
-    if (cleaned.endsWith('/')) {
-      cleaned = cleaned.slice(0, -1);
+    // pastikan tanpa trailing slash
+    if (pathname.endsWith('/')) {
+      pathname = pathname.slice(0, -1);
     }
 
-    return cleaned;
-  } catch {
-    return url; 
+    return pathname;
+  } catch (err) {
+    return null;
   }
 }
 
 async function downloadInstagram(url) {
   try {
-    const cleanedUrl = cleanInstagramUrl(url);
+    const postPath = extractInstagramPath(url);
+    if (!postPath) throw new Error('URL Instagram tidak valid');
 
-    const response = await axios.get(`https://instavideodownloader-com.onrender.com/api/video?postUrl=${encodeURIComponent(cleanedUrl)}`, {
+    const response = await axios.get(`https://instavideodownloader-com.onrender.com/api/video?postUrl=${encodeURIComponent(postPath)}`, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36',
         'Accept': 'application/json',
