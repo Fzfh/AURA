@@ -42,6 +42,7 @@ async function downloadInstagram(url) {
 
     return {
       videoUrl: data.data.videoUrl,
+      console.log('[DEBUG] Raw URL:', url);
       musicUrl: null,
       all: data.data
     };
