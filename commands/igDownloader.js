@@ -1,56 +1,47 @@
-const { instagramdl } = require('@xct007/igdl');
-
-async function downloadInstagram(sock, msg, args) {
-  const from = msg.key.remoteJid;
-  const url = args[0];
-
-  if (!url || !url.includes("instagram.com")) {
-    return sock.sendMessage(from, {
-      text: "❌ Link Instagram tidak valid. Contoh: .ig https://www.instagram.com/reel/xxxxx"
-    }, { quoted: msg });
-  }
-
-  await sock.sendMessage(from, {
-    text: "⏳ Serra lagi ambil media-nya dari Instagram yaa~"
-  }, { quoted: msg });
-
-  try {
-    const res = await instagramdl(url);
-
-    if (!res || res.length === 0) {
-      return sock.sendMessage(from, {
-        text: "❌ Tidak bisa menemukan media di link tersebut."
-      }, { quoted: msg });
-    }
-
-    for (const media of res) {
-      if (media.type === 'video') {
-        await sock.sendMessage(from, {
-          video: { url: media.url }
-        }, { quoted: msg });
-      } else if (media.type === 'image') {
-        await sock.sendMessage(from, {
-          image: { url: media.url }
-        }, { quoted: msg });
-      } else {
-        await sock.sendMessage(from, {
-          text: `📛 Tidak bisa kirim media bertipe: ${media.type}`
-        }, { quoted: msg });
-      }
-    }
-
-  } catch (err) {
-    console.error("IGDL Error:", err);
-    await sock.sendMessage(from, {
-      text: "❌ Gagal mengambil media dari Instagram. Mungkin link-nya private atau error jaringan."
-    }, { quoted: msg });
-  }
-}
+const insta = require('instagram-url-direct');
 
 module.exports = {
   name: 'ig',
   aliases: ['instagram', 'igdl'],
   description: 'Download media dari Instagram (foto, video, reels)',
   category: 'downloader',
-  execute: downloadInstagram
+
+  async downloadInstagram(sock, msg, args) {
+    const from = msg.key.remoteJid;
+    const url = args[0];
+
+    if (!url || !url.includes("instagram.com")) {
+      return sock.sendMessage(from, {
+        text: "❌ Link Instagram tidak valid.\nContoh: .ig https://www.instagram.com/reel/xxxxx"
+      }, { quoted: msg });
+    }
+
+    await sock.sendMessage(from, {
+      text: "⏳ Serra lagi download kontennya dari Instagram ya~ tungguin sebentar..."
+    }, { quoted: msg });
+
+    try {
+      const res = await insta.getInfo(url);
+
+      if (!res || !res.url_list || res.url_list.length === 0) {
+        return sock.sendMessage(from, {
+          text: "❌ Tidak bisa menemukan media dari link tersebut."
+        }, { quoted: msg });
+      }
+
+      for (const mediaUrl of res.url_list) {
+        if (mediaUrl.includes('.mp4')) {
+          await sock.sendMessage(from, { video: { url: mediaUrl } }, { quoted: msg });
+        } else {
+          await sock.sendMessage(from, { image: { url: mediaUrl } }, { quoted: msg });
+        }
+      }
+
+    } catch (err) {
+      console.error("InstagramDL Error:", err);
+      await sock.sendMessage(from, {
+        text: "❌ Gagal mengambil media dari Instagram. Coba pakai link publik atau pastikan jaringannya lancar ya!"
+      }, { quoted: msg });
+    }
+  }
 };
