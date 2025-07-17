@@ -6,7 +6,6 @@ const kataTerlarang = [
 
 module.exports = async function menfess(sock, msg, text) {
   if (typeof text !== 'string') return false
-
   const sender = msg.key.remoteJid
   const userId = msg.key.participant || sender
   const fromBot = msg.key.fromMe
