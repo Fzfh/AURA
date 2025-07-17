@@ -85,7 +85,7 @@ module.exports = async function admin(sock, msg, text, senderRaw, chatIdInput) {
     try {
       await sock.groupParticipantsUpdate(chatId, [target], 'promote');
       await sock.sendMessage(chatId, {
-        text: `✅ Berhasil menjadikan @${target.split('@')[0]} sebagai *admin grup*! 💪`,
+        text: `✅ Berhasil menjadikan @${target.split('@')[0]} sebagai *admin grup*!`,
         mentions: [target]
       }, { quoted: msg });
     } catch (e) {
