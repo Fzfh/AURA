@@ -27,5 +27,4 @@ async function handleAutoKick(sock, msg) {
     }
   }
 }
-
 module.exports = { handleAutoKick }
