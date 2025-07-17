@@ -28,18 +28,17 @@ const botResponsePatterns = [
   { command: 'waifu', handler: returnCommand["commands_waifu"] },
   { command: 'waifuhen', handler: returnCommand["commands_waifuhen"] },
   { command: 'sqr', handler: returnCommand["commands_qris"] },
-  { command: 'cqr', handler: returnCommand["commands_createQr"] },
-  { command: 'mapqr', handler: returnCommand["commands_mapqr"] },
-  { command: 'linkmap', handler: returnCommand["commands_linkmap"] },
+  { command: 'cqr', handler: returnCommand["commands_create_createQr"] },
+  { command: 'mapqr', handler: returnCommand["commands_create_mapqr"] },
+  { command: 'linkmap', handler: returnCommand["commands_create_linkmap"] },
   { command: 'menfess', handler: returnCommand["commands_menfess"] },
-  { command: 'sm', handler: returnCommand["commands_stickerToMedia"] },
-  { command: 'show', handler: returnCommand["commands_show"] },
+  { command: 'sm', handler: returnCommand["commands_sticker_stickerToMedia"] },
   { command: 'sendall', handler: returnCommand["commands_sendAll"] },
   { command: 'dig', handler: returnCommand["commands_download_igDownloader"] },
   { command: 'd', handler: returnCommand["commands_download_tiktokDownloader"] },
   { command: 'ds', handler: returnCommand["commands_download_tiktokDownloader"] },
   { command: 'ets', handler: returnCommand["commands_ekstrakAudio"] },
-  { command: 'pp', handler: returnCommand["commands_pp"] },
+  { command: 'pp', handler: returnCommand["commands_picture_pp"] },
 
 
   // Bahasa dan Bantuan
@@ -49,13 +48,14 @@ const botResponsePatterns = [
   { command: 'kick', handler: returnCommand["commands_grup_kick"], isAdmin: true },
   { command: 'add', handler: returnCommand["commands_grup_add"], isAdmin: true },
   { command: 'admin', handler: returnCommand["commands_grup_admin"], isAdmin: true },
-  { command: 'bg', handler: returnCommand["commands_buatGrup"], isAdmin: true },
+  { command: 'bg', handler: returnCommand["commands_create_buatGrup"], isAdmin: true },
   { command: 'tag', handler: returnCommand["commands_grup_tagall"], isAdmin: true },
   { command: 'open', handler: returnCommand["commands_grup_openCloseGroup"], isAdmin: true },
   { command: 'close', handler: returnCommand["commands_grup_openCloseGroup"], isAdmin: true },
   { command: 'na', handler: returnCommand["commands_grup_admin"], isAdmin: true },
   { command: 'una', handler: returnCommand["commands_grup_admin"], isAdmin: true },
-  { command: 'del', handler: returnCommand["commands_grup_delete"], isAdmin: true}
+  { command: 'del', handler: returnCommand["commands_grup_delete"], isAdmin: true},
+  { command: 'show', handler: returnCommand["commands_picture_show"], isAdmin: true }
 
 ];
 
