@@ -16,7 +16,6 @@ function extractQRISInfo(data) {
 
   const merchantName = tag59Match ? tag59Match[1].replace(/\*/g, ' ').trim() : null;
   const merchantCity = tag60Match ? tag60Match[1].replace(/\*/g, ' ').trim() : null;
-
   return { merchantName, merchantCity };
 }
 
