@@ -15,7 +15,10 @@ async function downloadInstagram(url) {
     return {
       videoUrl: data.data.url[0].url,
       musicUrl: null,
-      all: data.data
+      all: {
+        thumbnail: data.data.thumbnail,
+        desc: data.data.description || '',
+      }
     };
 
   } catch (err) {
