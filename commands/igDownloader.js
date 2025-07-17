@@ -2,7 +2,12 @@ const axios = require('axios');
 
 function extractInstagramPath(url) {
   try {
-    const u = new URL(url);
+    const trimmedUrl = url.trim();
+    if (!/^https?:\/\/(www\.)?instagram\.com\/[a-zA-Z0-9_\-\/?=]+/.test(trimmedUrl)) {
+      return null;
+    }
+
+    const u = new URL(trimmedUrl);
     let pathname = u.pathname;
 
     // pastikan tanpa trailing slash
@@ -15,6 +20,7 @@ function extractInstagramPath(url) {
     return null;
   }
 }
+
 
 async function downloadInstagram(url) {
   try {
