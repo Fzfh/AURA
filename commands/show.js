@@ -1,5 +1,4 @@
 const { downloadMediaMessage } = require('@whiskeysockets/baileys');
-
 module.exports = async function show(sock, msg) {
   const sender = msg.key.participant || msg.key.remoteJid;
   const chatId = msg.key.remoteJid;
