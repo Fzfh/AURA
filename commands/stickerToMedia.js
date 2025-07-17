@@ -47,7 +47,6 @@ module.exports = async function stickerToMedia(sock, msg) {
     fs.writeFileSync(webpPath, mediaBuffer);
 
     if (isAnimated) {
-  // Langsung kirim aja .webp nya
   await sock.sendMessage(sender, {
     document: { url: webpPath },
     mimetype: 'image/webp',
