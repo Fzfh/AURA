@@ -1,6 +1,6 @@
 const insta = require('instagram-url-direct');
 
-async function downloadInstagram(sock, msg, args) {
+async function handler(sock, msg, args) {
   const from = msg.key.remoteJid;
   const url = args[0];
 
@@ -44,5 +44,5 @@ module.exports = {
   aliases: ['instagram', 'igdl'],
   description: 'Download media dari Instagram (foto, video, reels)',
   category: 'downloader',
-  downloadInstagram
+  handler
 };
