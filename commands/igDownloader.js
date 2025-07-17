@@ -18,6 +18,12 @@ async function downloadInstagram(url) {
     console.error('IG Downloader Error:', err.message || err);
     return null;
   }
+  if (!video) {
+  await sock.sendMessage(from, {
+    text: '❌ Maaf, server IG lagi sibuk atau down. Coba lagi beberapa saat ya~ 💔'
+  }, { quoted: msg });
+  return;
+}
 }
 
 module.exports = downloadInstagram;
