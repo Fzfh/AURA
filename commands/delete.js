@@ -7,7 +7,7 @@ module.exports = async function handleDelete(sock, msg, store) {
   if (!msg.message?.extendedTextMessage?.contextInfo?.stanzaId) {
     return sock.sendMessage(from, {
       text: '❌ Balas pesan yang ingin dihapus dengan mengetik *.del*',
-    }, { quoted: msg });
+    }, { quoted: msg }); 
   }
 
   if (isGroup) {
