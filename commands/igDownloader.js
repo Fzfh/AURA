@@ -1,29 +1,27 @@
-const downloadInstagram = require('./downloadInstagram');
+const axios = require('axios');
 
-async function igDownloaderHandler(sock, msg, commandArgs, from) {
+async function downloadInstagram(url) {
   try {
-    const url = commandArgs[0];
-    if (!url || !url.includes('instagram.com')) {
-      await sock.sendMessage(from, { text: '📛 Masukkan URL Instagram yang valid.' }, { quoted: msg });
-      return;
+    const response = await axios.get(`https://instavideodownloader-com.onrender.com/api/video?postUrl=${encodeURIComponent(url)}`);
+    const data = response.data;
+
+    if (data.status !== 'success' || !data.data.videoUrl) {
+      throw new Error('Video tidak ditemukan');
     }
 
-    const result = await downloadInstagram(url);
-
-    if (!result || !result.videoUrl) {
-      await sock.sendMessage(from, { text: '❌ Gagal mengambil video dari Instagram.' }, { quoted: msg });
-      return;
-    }
-
-    await sock.sendMessage(from, {
-      video: { url: result.videoUrl },
-      caption: `✅ Berhasil mengunduh video!\n\n📝 ${result.all.desc || 'Tidak ada deskripsi.'}`
-    }, { quoted: msg });
-
-  } catch (e) {
-    console.error('IG Downloader Error:', e?.message || e);
-    await sock.sendMessage(from, { text: '🚨 Error saat mengunduh dari Instagram. Coba lagi nanti ya!' }, { quoted: msg });
+    return {
+      videoUrl: data.data.videoUrl,
+      musicUrl: null,
+      all: {
+        thumbnail: data.data.thumbnail || '',
+        title: data.data.title || '',
+        username: data.data.username || ''
+      }
+    };
+  } catch (err) {
+    console.error('IG Downloader Error:', err.message || err);
+    return null;
   }
 }
 
-module.exports = { igDownloaderHandler };
+module.exports = downloadInstagram;
