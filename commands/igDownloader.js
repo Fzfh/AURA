@@ -1,6 +1,7 @@
 async function downloadInstagram(url) {
   try {
-    const trimmedUrl = url.trim();
+    const trimmedUrl = String(url).trim();
+
 
     // Validasi URL
     if (!/^https?:\/\/(www\.)?instagram\.com\/[a-zA-Z0-9_\-\/?=]+/.test(trimmedUrl)) {
