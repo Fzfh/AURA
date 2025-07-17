@@ -14,17 +14,16 @@ function extractTargetJid(sock, msg, text) {
   if (parts.length >= 2) {
     let number = parts[1];
 
-    number = number.replace(/[^\d+]/g, '');
+    number = number.replace(/[^+\d]/g, '');
 
     if (number.startsWith('+')) {
       number = number.slice(1);
     } else if (number.startsWith('0')) {
-      number = '62' + number.slice(1); 
+      number = '62' + number.slice(1);
     }
 
     if (/^\d{8,}$/.test(number)) {
-      const jid = `${number}@s.whatsapp.net`;
-      return jid;
+      return `${number}@s.whatsapp.net`;
     }
   }
 
