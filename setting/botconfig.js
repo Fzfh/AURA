@@ -31,7 +31,6 @@ const botResponsePatterns = [
   { command: 'cqr', handler: returnCommand["commands_createQr"] },
   { command: 'mapqr', handler: returnCommand["commands_mapqr"] },
   { command: 'linkmap', handler: returnCommand["commands_linkmap"] },
-  { command: 'tagall', handler: returnCommand["commands_tagall"] },
   { command: 'menfess', handler: returnCommand["commands_menfess"] },
   { command: 'sm', handler: returnCommand["commands_stickerToMedia"] },
   { command: 'show', handler: returnCommand["commands_show"] },
@@ -47,16 +46,16 @@ const botResponsePatterns = [
   { command: 'listbahasa', handler: returnCommand["commands_translate"] },
 
   // Command Admin Only
-  { command: 'kick', handler: returnCommand["commands_kick"], isAdmin: true },
-  { command: 'add', handler: returnCommand["commands_add"], isAdmin: true },
-  { command: 'admin', handler: returnCommand["commands_admin"], isAdmin: true },
+  { command: 'kick', handler: returnCommand["commands_grup_kick"], isAdmin: true },
+  { command: 'add', handler: returnCommand["commands_grup_add"], isAdmin: true },
+  { command: 'admin', handler: returnCommand["commands_grup_admin"], isAdmin: true },
   { command: 'bg', handler: returnCommand["commands_buatGrup"], isAdmin: true },
-  { command: 'tag', handler: returnCommand["commands_tagall"], isAdmin: true },
-  { command: 'open', handler: returnCommand["commands_openCloseGroup"], isAdmin: true },
-  { command: 'close', handler: returnCommand["commands_openCloseGroup"], isAdmin: true },
-  { command: 'na', handler: returnCommand["commands_admin"], isAdmin: true },
-  { command: 'una', handler: returnCommand["commands_admin"], isAdmin: true },
-  { command: 'del', handler: returnCommand["commands_delete"], isAdmin: true}
+  { command: 'tag', handler: returnCommand["commands_grup_tagall"], isAdmin: true },
+  { command: 'open', handler: returnCommand["commands_grup_openCloseGroup"], isAdmin: true },
+  { command: 'close', handler: returnCommand["commands_grup_openCloseGroup"], isAdmin: true },
+  { command: 'na', handler: returnCommand["commands_grup_admin"], isAdmin: true },
+  { command: 'una', handler: returnCommand["commands_grup_admin"], isAdmin: true },
+  { command: 'del', handler: returnCommand["commands_grup_delete"], isAdmin: true}
 
 ];
 
