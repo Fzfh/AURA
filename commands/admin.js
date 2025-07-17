@@ -20,7 +20,6 @@ function extractTargetJid(sock, msg, text) {
       }
     }
   }
-
   return null;
 }
 
