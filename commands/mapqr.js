@@ -75,7 +75,6 @@ module.exports = async function mapsQR(sock, msg, text) {
     qrImage.composite(box, centerX, centerY);
 
     await qrImage.writeAsync(qrPath);
-
     const media = fs.readFileSync(qrPath);
     await sock.sendMessage(from, {
       image: media,
