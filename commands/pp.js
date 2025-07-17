@@ -64,7 +64,6 @@ module.exports = async function pp(sock, msg) {
     await sock.sendMessage(sender, {
       text: `❌ Gagal ambil foto profil. Bisa jadi karena:\n• Tidak punya foto profil\n• Privasi dikunci\n• Nomor salah`,
     }, { quoted: msg });
-
     return true;
   }
 };
