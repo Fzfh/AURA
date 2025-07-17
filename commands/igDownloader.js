@@ -1,48 +1,23 @@
-const insta = require('instagram-url-direct');
+const axios = require('axios');
 
-async function handler(sock, msg, args) {
-  const from = msg.key.remoteJid;
-  const url = args[0];
-
-  if (!url || !url.includes("instagram.com")) {
-    return sock.sendMessage(from, {
-      text: "❌ Link Instagram tidak valid.\nContoh: .ig https://www.instagram.com/reel/xxxxx"
-    }, { quoted: msg });
-  }
-
-  await sock.sendMessage(from, {
-    text: "⏳ Serra lagi download kontennya dari Instagram ya~ tungguin sebentar..."
-  }, { quoted: msg });
-
+async function downloadInstagram(url) {
   try {
-    const res = await insta.getInfo(url);
+    const response = await axios.get(`https://instavideodownloader-com.onrender.com/api/video?postUrl=${encodeURIComponent(url)}`);
+    const data = response.data;
 
-    if (!res || !res.url_list || res.url_list.length === 0) {
-      return sock.sendMessage(from, {
-        text: "❌ Tidak bisa menemukan media dari link tersebut."
-      }, { quoted: msg });
+    if (data.status !== 'success' || !data.data.videoUrl) {
+      throw new Error('Video tidak ditemukan');
     }
 
-    for (const mediaUrl of res.url_list) {
-      if (mediaUrl.includes('.mp4')) {
-        await sock.sendMessage(from, { video: { url: mediaUrl } }, { quoted: msg });
-      } else {
-        await sock.sendMessage(from, { image: { url: mediaUrl } }, { quoted: msg });
-      }
-    }
-
+    return {
+      videoUrl: data.data.videoUrl,
+      musicUrl: null,
+      all: data.data
+    };
   } catch (err) {
-    console.error("InstagramDL Error:", err);
-    await sock.sendMessage(from, {
-      text: "❌ Gagal mengambil media dari Instagram. Coba pakai link publik atau pastikan jaringannya lancar ya!"
-    }, { quoted: msg });
+    console.error('IG Downloader Error:', err.message || err);
+    return null;
   }
 }
 
-module.exports = {
-  name: 'ig',
-  aliases: ['instagram', 'igdl'],
-  description: 'Download media dari Instagram (foto, video, reels)',
-  category: 'downloader',
-  handler
-};
+module.exports = downloadInstagram;
