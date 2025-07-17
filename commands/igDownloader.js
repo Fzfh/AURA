@@ -1,30 +1,29 @@
-const axios = require('axios');
+const downloadInstagram = require('./downloadInstagram');
 
-async function downloadInstagram(url) {
+async function igDownloaderHandler(sock, msg, commandArgs, from) {
   try {
-    const response = await axios.post('https://igdl.red/api/instagram', {
-      url: url
-    });
-
-    const data = response.data;
-
-    if (!data || !data.success || !data.data || !data.data.url[0]) {
-      throw new Error('Gagal mendapatkan video.');
+    const url = commandArgs[0];
+    if (!url || !url.includes('instagram.com')) {
+      await sock.sendMessage(from, { text: '📛 Masukkan URL Instagram yang valid.' }, { quoted: msg });
+      return;
     }
 
-    return {
-      videoUrl: data.data.url[0].url,
-      musicUrl: null,
-      all: {
-        thumbnail: data.data.thumbnail,
-        desc: data.data.description || '',
-      }
-    };
+    const result = await downloadInstagram(url);
 
-  } catch (err) {
-    console.error('IG Downloader Error:', err.message || err);
-    return null;
+    if (!result || !result.videoUrl) {
+      await sock.sendMessage(from, { text: '❌ Gagal mengambil video dari Instagram.' }, { quoted: msg });
+      return;
+    }
+
+    await sock.sendMessage(from, {
+      video: { url: result.videoUrl },
+      caption: `✅ Berhasil mengunduh video!\n\n📝 ${result.all.desc || 'Tidak ada deskripsi.'}`
+    }, { quoted: msg });
+
+  } catch (e) {
+    console.error('IG Downloader Error:', e?.message || e);
+    await sock.sendMessage(from, { text: '🚨 Error saat mengunduh dari Instagram. Coba lagi nanti ya!' }, { quoted: msg });
   }
 }
 
-module.exports = downloadInstagram;
+module.exports = { igDownloaderHandler };
