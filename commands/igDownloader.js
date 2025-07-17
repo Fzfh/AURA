@@ -26,4 +26,4 @@ async function downloadInstagram(url) {
     return null;
   }
 }
-module.export = downloadInstagram;
+module.exports = downloadInstagram;
