@@ -54,5 +54,14 @@ const botResponsePatterns = [
   { command: 'show', handler: returnCommand["commands_picture_show"], isAdmin: true }
 
 ];
+console.log("🔍 Mengecek semua handler apakah valid function...");
+for (let p of botResponsePatterns) {
+  if (typeof p.handler !== 'function') {
+    console.error(`❌ Handler BUKAN function! Command: '${p.command}' >>`, p.handler);
+  } else {
+    console.log(`✅ Handler OK untuk command: '${p.command}'`);
+  }
+}
+
 
 module.exports = { botBehavior, botResponsePatterns };
