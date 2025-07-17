@@ -39,6 +39,7 @@ module.exports = async function openCloseGroup(sock, msg, text, args, commandNam
     await sock.sendMessage(from, {
       text: statusText,
     }, { quoted: msg });
+    
   } catch (err) {
     console.error('❌ Gagal mengubah pengaturan grup:', err);
     await sock.sendMessage(from, {
