@@ -81,7 +81,7 @@ module.exports = async function(sock, msg, text, sender, userId) {
         await sock.sendMessage(jid, {
           text: `Halo! 👋\nAku nggak bisa menambahkan kamu langsung ke grup.\nTapi kamu bisa gabung lewat link ini ya:\n🌐 https://chat.whatsapp.com/${code}`
         });
-
+        
         await sock.sendMessage(groupId, {
           text: `⚠️ Gagal menambahkan @${nomor}, tapi link undangan sudah dikirim ke dia ✉️`,
           mentions: [jid]
