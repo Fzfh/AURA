@@ -1,17 +1,6 @@
 const { loadCommands } = require('../core/utils/utils');
 const path = require('path');
 
-
-const botBehavior = {
-  botName: 'AuraBot',
-  botLabel: '[AuraBot]',
-  botMenu: '/menu',
-  replyMyMessage: true,
-  readMessage: true,
-  isTyping: true,
-  typingDelay: 1500
-};
-
 const returnCommand = loadCommands(
   path.join(__dirname, '../commands'),
   path.join(__dirname, '../core')
