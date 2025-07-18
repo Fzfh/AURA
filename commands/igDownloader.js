@@ -2,21 +2,17 @@ const axios = require('axios');
 
 async function downloadInstagram(url) {
   try {
-    const resVideo = await axios.get(`https://instavideodownloader-com.onrender.com/api/video?postUrl=${encodeURIComponent(url)}`);
-    const resImage = await axios.get(`https://instavideodownloader-com.onrender.com/api/image?postUrl=${encodeURIComponent(url)}`);
+    const response = await axios.get(`https://instavideodownloader-com.onrender.com/api/video?postUrl=${encodeURIComponent(url)}`);
+    const data = response.data;
 
-    const videoData = resVideo.data;
-    const imageData = resImage.data;
-
-    if (videoData.status !== 'success' && imageData.status !== 'success') {
-      throw new Error('Media tidak ditemukan');
+    if (data.status !== 'success' || !data.data.videoUrl) {
+      throw new Error('Video tidak ditemukan');
     }
 
     return {
-      videoUrl: videoData?.data?.videoUrl || null,
-      imageUrl: imageData?.data?.imageUrl || null,
-      thumbnail: videoData?.data?.thumbnail || imageData?.data?.thumbnail || null,
-      desc: videoData?.data?.description || imageData?.data?.description || ''
+      videoUrl: data.data.videoUrl,
+      thumbnail: data.data.thumbnail,
+      desc: data.data.description || '',
     };
   } catch (err) {
     console.error('IG Downloader Error:', err.message || err);
@@ -39,28 +35,15 @@ async function igDownloaderHandler(sock, msg, text) {
 
   const result = await downloadInstagram(link);
 
-  if (!result || (!result.videoUrl && !result.imageUrl)) {
-    await sock.sendMessage(from, { text: '❌ Tidak dapat mengunduh media dari Instagram.' }, { quoted: msg });
+  if (!result || !result.videoUrl) {
+    await sock.sendMessage(from, { text: '❌ Gagal mengunduh video dari Instagram.' }, { quoted: msg });
     return true;
   }
 
-  if (result.videoUrl) {
-    await sock.sendMessage(from, {
-      text: '🎥 Mengirim video Instagram...',
-    }, { quoted: msg });
-    await sock.sendMessage(from, {
-      video: { url: result.videoUrl },
-    }, { quoted: msg });
-  }
-
-  if (result.imageUrl) {
-    await sock.sendMessage(from, {
-      text: '📸 Mengirim foto Instagram...',
-    }, { quoted: msg });
-    await sock.sendMessage(from, {
-      image: { url: result.imageUrl },
-    }, { quoted: msg });
-  }
+  await sock.sendMessage(from, {
+    video: { url: result.videoUrl }
+  }, { quoted: msg });
+  
 
   return true;
 }
