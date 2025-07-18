@@ -1,5 +1,5 @@
 const axios = require('axios');
-const igDirect = require('instagram-url-direct');
+const { getMedia } = require('instagram-scraper-api');
 
 module.exports = async function downloadInstagram(sock, msg, text) {
   const from = msg.key.remoteJid;
@@ -35,17 +35,14 @@ module.exports = async function downloadInstagram(sock, msg, text) {
     console.warn('⚠️ Fallback: API utama gagal:', err.message);
 
     try {
-      const libRes = await igDirect.getInfo(link);
-
-      if (libRes?.url_list && libRes.url_list.length > 0) {
-        const vid = libRes.url_list.find(x => x.includes('.mp4'));
-        const img = libRes.url_list.find(x => x.includes('.jpg') || x.includes('.png'));
-
+      const media = await getMedia(link);
+      if (media && media.length > 0) {
+        const item = media[0];
         result = {
-          videoUrl: vid || null,
-          imageUrl: img || null,
+          videoUrl: item.type === 'video' ? item.url : null,
+          imageUrl: item.type === 'image' ? item.url : null,
           thumbnail: null,
-          desc: libRes.description || ''
+          desc: item.caption || ''
         };
       }
     } catch (fallbackErr) {
