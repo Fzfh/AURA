@@ -250,22 +250,6 @@ Bot ini terus berkembang, jadi pantau terus update-nya ya!
       }, { quoted: msg })
       return true
 
-    case 'admin':
-      await sock.sendMessage(sender, {
-        text: `👩‍💻 *Hubungi Admin AURA BOT*
-
-📞 WhatsApp: [\`Klik untuk chat\`](https://wa.me/62895326679840)  
-🕐 Waktu Layanan: 09.00 – 22.00 WIB  
-⚡ Status: Fast Respon (selama jam aktif)
-
-🔹 Punya pertanyaan, kendala, atau ingin beli bot?  
-Silakan hubungi admin langsung melalui WhatsApp.
-
-💬 Kami siap bantu kamu dengan sepenuh hati!
-`
-      }, { quoted: msg })
-      return true
-
     case 'beli bot':
       await sock.sendMessage(sender, {
         text: `🤖 *Daftar Harga Bot AURA:*
