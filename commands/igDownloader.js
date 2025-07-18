@@ -1,5 +1,5 @@
 const axios = require('axios');
-const igDirect = require('instagram-url-direct');
+const { InstagramUrlDirect } = require('instagram-url-direct');
 
 module.exports = async function downloadInstagram(sock, msg, text) {
   const from = msg.key.remoteJid;
@@ -35,7 +35,7 @@ module.exports = async function downloadInstagram(sock, msg, text) {
     console.warn('⚠️ Fallback: API utama gagal:', err.message);
 
     try {
-      const libRes = await igDirect(link);
+      const libRes = await InstagramUrlDirect(link);
 
       if (libRes?.url_list && libRes.url_list.length > 0) {
         const img = libRes.url_list.find(x => x.includes('.jpg') || x.includes('.png'));
