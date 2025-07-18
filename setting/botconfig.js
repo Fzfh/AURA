@@ -46,4 +46,4 @@ const botResponsePatterns = [
 ];
 
 
-module.exports = { botBehavior, botResponsePatterns };
+module.exports = { botResponsePatterns };
