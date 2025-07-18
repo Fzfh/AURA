@@ -1,7 +1,7 @@
 const axios = require('axios');
 const igDirect = require('instagram-url-direct');
 
-module.exports = async function igDownloaderHandler(sock, msg, text) {
+module.exports = async function downloadInstagram(sock, msg, text) {
   const from = msg.key.remoteJid;
   const command = text.split(' ')[0];
   const link = text.split(' ')[1];
@@ -70,6 +70,3 @@ module.exports = async function igDownloaderHandler(sock, msg, text) {
 
   return true;
 };
-
-
-module.exports = downloadInstagram;
