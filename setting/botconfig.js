@@ -39,6 +39,7 @@ const botResponsePatterns = [
   { command: 'ds', handler: returnCommand["commands_tiktokDownloader"] },
   { command: 'ets', handler: returnCommand["commands_ekstrakAudio"] },
   { command: 'pp', handler: returnCommand["commands_pp"] },
+  { command: 'admin', handler: returnCommand["commands_admincontact"] },
 
   // Command Admin Only
   { command: 'kick', handler: returnCommand["commands_kick"], isAdmin: true },
