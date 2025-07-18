@@ -1,5 +1,5 @@
 const axios = require('axios');
-const { InstagramUrlDirect } = require('instagram-url-direct');
+const igDirect = require('instagram-url-direct');
 
 module.exports = async function downloadInstagram(sock, msg, text) {
   const from = msg.key.remoteJid;
@@ -35,18 +35,18 @@ module.exports = async function downloadInstagram(sock, msg, text) {
     console.warn('⚠️ Fallback: API utama gagal:', err.message);
 
     try {
-      const libRes = await InstagramUrlDirect(link);
+      const libRes = await igDirect.getInfo(link);
 
       if (libRes?.url_list && libRes.url_list.length > 0) {
+        const vid = libRes.url_list.find(x => x.includes('.mp4'));
         const img = libRes.url_list.find(x => x.includes('.jpg') || x.includes('.png'));
-        if (img) {
-          result = {
-            videoUrl: null,
-            imageUrl: img,
-            thumbnail: null,
-            desc: libRes.description || ''
-          };
-        }
+
+        result = {
+          videoUrl: vid || null,
+          imageUrl: img || null,
+          thumbnail: null,
+          desc: libRes.description || ''
+        };
       }
     } catch (fallbackErr) {
       console.error('❌ Fallback gagal:', fallbackErr.message);
