@@ -8,61 +8,39 @@ async function downloadInstagram(url) {
     const videoData = resVideo.data;
     const imageData = resImage.data;
 
-    if (videoData.status !== 'success' && imageData.status !== 'success') {
-      throw new Error('Media tidak ditemukan');
+    if (
+      (videoData.status !== 'success' || !videoData?.data?.videoUrl) &&
+      (imageData.status !== 'success' || !imageData?.data?.imageUrl)
+    ) {
+      throw new Error('API utama gagal');
     }
 
     return {
       videoUrl: videoData?.data?.videoUrl || null,
-      imageUrl: imageData?.data?.imageUrl || null,
-      thumbnail: videoData?.data?.thumbnail || imageData?.data?.thumbnail || null,
+      imageUrl: imageData?.data?.imageUrl || imageData?.data?.thumbnail || null,
       desc: videoData?.data?.description || imageData?.data?.description || ''
     };
   } catch (err) {
-    console.error('IG Downloader Error:', err.message || err);
-    return null;
+    console.warn('[Fallback] API utama gagal:', err.message);
+
+    try {
+      const fallback = await axios.get(`https://latam-api.vercel.app/api/instagram?url=${encodeURIComponent(url)}`);
+      const data = fallback.data;
+
+      if (!data || data?.error || (!data?.video && !data?.image)) {
+        throw new Error('Fallback gagal');
+      }
+
+      return {
+        videoUrl: data.video || null,
+        imageUrl: data.image || null,
+        desc: data.caption || ''
+      };
+    } catch (err2) {
+      console.error('[IG Downloader Fallback Error]:', err2.message || err2);
+      return null;
+    }
   }
 }
 
-async function igDownloaderHandler(sock, msg, text) {
-  const from = msg.key.remoteJid;
-  const command = text.split(' ')[0];
-  const link = text.split(' ')[1];
-
-  if (!['.dig', 'dig'].includes(command)) return false;
-  if (!link || !link.includes('instagram.com')) {
-    await sock.sendMessage(from, { text: '❌ Link Instagram tidak valid!' }, { quoted: msg });
-    return true;
-  }
-
-  await sock.sendMessage(from, { text: '⏳ Sedang memproses link Instagram...' }, { quoted: msg });
-
-  const result = await downloadInstagram(link);
-
-  if (!result || (!result.videoUrl && !result.imageUrl)) {
-    await sock.sendMessage(from, { text: '❌ Tidak dapat mengunduh media dari Instagram.' }, { quoted: msg });
-    return true;
-  }
-
-  if (result.videoUrl) {
-    await sock.sendMessage(from, {
-      text: '🎥 Mengirim video Instagram...',
-    }, { quoted: msg });
-    await sock.sendMessage(from, {
-      video: { url: result.videoUrl },
-    }, { quoted: msg });
-  }
-
-  if (result.imageUrl) {
-    await sock.sendMessage(from, {
-      text: '📸 Mengirim foto Instagram...',
-    }, { quoted: msg });
-    await sock.sendMessage(from, {
-      image: { url: result.imageUrl },
-    }, { quoted: msg });
-  }
-
-  return true;
-}
-
-module.exports = igDownloaderHandler;
+module.exports = downloadInstagram;
