@@ -22,19 +22,14 @@ module.exports = async function buatQR(sock, msg, text) {
       }
     }
 
-    let qrText = text.trim().toLowerCase;
+  let qrText = text.trim().toLowerCase();
+  
+  if (qrText.startsWith('.cqr')) {
+    qrText = qrText.slice(4).trim();
+  } else if (qrText.startsWith('cqr')) {
+    qrText = qrText.slice(3).trim();
+  }
 
-if (qrText.startsWith('.cqr')) {
-  qrText = qrText.slice(4).trim();
-} else if (qrText.startsWith('cqr')) {
-  qrText = qrText.slice(3).trim();
-}
-    
-if (qrText.startsWith('cqr')) {
-  qrText = qrText.slice(3).trim();
-} else if (qrText.startsWith('cqr')) {
-  qrText = qrText.slice(3).trim();
-}
 
     if (!qrText) {
       return sock.sendMessage(remoteJid, {
