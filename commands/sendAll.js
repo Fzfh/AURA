@@ -1,40 +1,35 @@
-const { adminList } = require('../setting/setting');
-const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-function toJidString(jidObjOrStr) {
-  if (typeof jidObjOrStr === 'string') return jidObjOrStr;
-  if (typeof jidObjOrStr === 'object' && jidObjOrStr.user && jidObjOrStr.server)
-    return `${jidObjOrStr.user}@${jidObjOrStr.server}`;
-  return ''; // fallback
-}
+const { adminList } = require('../setting/setting');
+
+const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 async function sendAll(sock, senderJid, text) {
   if (!adminList.includes(senderJid)) {
-    await sock.sendMessage(senderJid, {
-      text: '❌ Kamu tidak punya izin untuk menjalankan perintah ini.'
-    });
+    await sock.sendMessage(senderJid, { text: '❌ Kamu tidak punya izin untuk menjalankan perintah ini.' });
     return;
   }
 
-  const botNumber = toJidString(sock.user.id);
+  await sock.sendMessage(from, { text: '🔄 Mengirim ke semua kontak yang 1 grup...' }, { quoted: msg });
+
+  const botNumber = sock.user.id;
   const groups = await sock.groupFetchAllParticipating();
   const groupIds = Object.keys(groups);
   const uniqueContacts = new Set();
 
   for (const gid of groupIds) {
     const group = groups[gid];
-    const isSenderInGroup = group.participants.some(p => toJidString(p.id) === senderJid);
+    const isSenderInGroup = group.participants.some(p => p.id === senderJid);
     if (!isSenderInGroup) continue;
 
     for (const participant of group.participants) {
-      const jid = toJidString(participant.id);
-      if (jid && jid !== senderJid && jid !== botNumber) {
+      const jid = participant.id;
+      if (jid !== senderJid && jid !== botNumber) {
         uniqueContacts.add(jid);
       }
     }
   }
 
-  for (const jid of uniqueContacts) {
+ for (const jid of uniqueContacts) {
     try {
       await sock.sendMessage(jid, {
         text: text,
@@ -51,11 +46,12 @@ async function sendAll(sock, senderJid, text) {
         }
       });
 
-      await delay(1200); // biar aman dikit
+      await delay(1200); 
     } catch (err) {
-      console.error(`❌ Gagal kirim ke ${jid}:`, err.message);
+      console.error(❌ Gagal kirim ke ${jid}:, err.message);
     }
   }
+  await sock.sendMessage(from, { text: '✅ Pesan berhasil dikirim!' }, { quoted: msg });
 }
 
 module.exports = sendAll;
