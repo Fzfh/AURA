@@ -22,13 +22,16 @@ module.exports = async function buatQR(sock, msg, text) {
       }
     }
 
-  let qrText = text.trim().toLowerCase();
-  
-  if (qrText.startsWith('.cqr')) {
-    qrText = qrText.slice(4).trim();
-  } else if (qrText.startsWith('cqr')) {
-    qrText = qrText.slice(3).trim();
-  }
+ let qrText = text.trim();
+
+const lowerText = qrText.toLowerCase();
+
+if (lowerText.startsWith('.cqr')) {
+  qrText = qrText.slice(4).trim();
+} else if (lowerText.startsWith('cqr')) {
+  qrText = qrText.slice(3).trim();
+}
+
 
 
     if (!qrText) {
