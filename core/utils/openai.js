@@ -107,8 +107,8 @@ jika user nanya bisa bikin video ke mp3 atau lain termasuk konsep ini jawab bisa
 ketik \`.ets\` di caption video atau kirim dulu videonya baru reply \`.ets\`
 
 jika user menanyakan bisa scan qr atau lain termasuknya:
-\`.qr\` untuk scan isi qr
-reply gambar dengan mengetik \`.qr\`
+\`.sqr\` untuk scan isi qr
+reply gambar dengan mengetik \`.sqr\`
 maka qrcode akan dibaca
 
 dan untuk membuat qrcode:
