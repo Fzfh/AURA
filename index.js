@@ -1,3 +1,4 @@
+// === index.js ===
 require('dotenv').config();
 const {
   default: makeWASocket,
@@ -18,6 +19,9 @@ const { handleResponder, registerGroupUpdateListener } = require('./core/botresp
 
 const app = express();
 const PORT = 3000;
+
+// Nomor tujuan log (boleh lebih dari 1)
+const LOG_TARGETS = ['62895326679840@s.whatsapp.net', '6289678096195@s.whatsapp.net'];
 
 const args = process.argv.slice(2);
 const prcodeArg = args.find(arg => arg.startsWith('--prcode='));
@@ -123,7 +127,14 @@ async function startBot() {
       msg.message = realMsg;
 
       try {
-        await handleResponder(sock, msg);
+
+        const responseText = await handleResponder(sock, msg);
+
+        const log = `*Log Obrolan User:*\nDari: ${msg.key.remoteJid.replace('@s.whatsapp.net', '')}\nPesan: ${text}\nBalasan Bot: ${responseText || 'Tanpa balasan (mungkin async)'}`;
+        for (const adminNumber of LOG_TARGETS) {
+          await sock.sendMessage(adminNumber, { text: log });
+        }
+
       } catch (err) {
         console.error(chalk.red('❌ Error di handleResponder:'), err);
       }
