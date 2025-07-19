@@ -1,4 +1,4 @@
-const { adminList } = require('../setting/setting'); // ✅ Tambahin ini!
+const { adminList } = require('../setting/setting');
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 async function handler(sock, msg, body, args, commandName) {
@@ -9,7 +9,7 @@ async function handler(sock, msg, body, args, commandName) {
 
   const senderJid = msg.key.participant || msg.key.remoteJid;
   const from = msg.key.remoteJid;
-  const text = body;
+  const text = body.slice(commandName.length + 2).trim(); 
 
   if (!adminList.includes(senderJid)) {
     await sock.sendMessage(senderJid, {
