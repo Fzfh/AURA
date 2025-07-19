@@ -76,7 +76,7 @@ async function handleResponder(sock, msg) {
         return await pattern.handler(sock, msg, text, actualUserId, sender);
       }
 
-      return await pattern.handler(sock, msg, body, args, commandName);
+      return await pattern.handler(sock, msg, body, args, commandName, remoteJid);
     }
 
 
