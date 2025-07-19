@@ -1,125 +1,158 @@
-const { handleOpenAIResponder } = require('../core/utils/openai')
-const { botResponsePatterns } = require('../setting/botconfig')
-const { adminList, logReceivers } = require('../setting/setting')
-const { handleStaticCommand } = require('../core/handler/staticCommand')
+require('dotenv').config();
+const {
+  default: makeWASocket,
+  useMultiFileAuthState,
+  makeCacheableSignalKeyStore,
+  fetchLatestBaileysVersion,
+  DisconnectReason,
+} = require('@whiskeysockets/baileys');
 
-const spamTracker = new Map()
-const mutedUsers = new Map()
-const muteDuration = 2 * 60 * 1000
+const fs = require('fs');
+const P = require('pino');
+const qrcode = require('qrcode-terminal');
+const chalk = require('chalk');
+const express = require('express');
 
-async function handleResponder(sock, msg) {
+const tampilkanBanner = require('./core/utils/tampilanbanner');
+const { handleResponder, registerGroupUpdateListener } = require('./core/botresponse');
+
+const app = express();
+const PORT = 3000;
+
+// 💌 Nomor admin penerima log
+const LOG_TARGETS = ['62895326679840@s.whatsapp.net', '6289678096195@s.whatsapp.net'];
+
+const args = process.argv.slice(2);
+const prcodeArg = args.find(arg => arg.startsWith('--prcode='));
+const phoneNumber = prcodeArg ? prcodeArg.split('=')[1] : null;
+const qrMode = args.includes('--qrcode');
+
+let latestQR = null;
+let qrRetryInterval = null;
+let pairingRetryTimeout = null;
+let pairingRequested = false;
+
+function extractMessageContent(msg) {
+  const isViewOnce = !!msg.message?.viewOnceMessageV2;
+  const realMsg = isViewOnce ? msg.message.viewOnceMessageV2.message : msg.message;
+  const text =
+    realMsg?.conversation ||
+    realMsg?.extendedTextMessage?.text ||
+    realMsg?.imageMessage?.caption ||
+    realMsg?.videoMessage?.caption ||
+    '';
+  return { text, realMsg };
+}
+
+async function startBot() {
   try {
-    if (!msg.message) return;
+    const { state, saveCreds } = await useMultiFileAuthState('./auth_info');
+    const { version } = await fetchLatestBaileysVersion();
 
-    const sender = msg.key.remoteJid;
-    const actualUserId = msg.key.participant || sender;
-    const isGroup = sender.endsWith('@g.us');
-    const userId = sender;
+    const sock = makeWASocket({
+      logger: P({ level: 'silent' }),
+      version,
+      auth: {
+        creds: state.creds,
+        keys: makeCacheableSignalKeyStore(state.keys, P({ level: 'silent' })),
+      },
+      printQRInTerminal: false,
+    });
 
-    const content = msg.message?.viewOnceMessageV2?.message || msg.message;
-    const text = content?.conversation ||
-                 content?.extendedTextMessage?.text ||
-                 content?.imageMessage?.caption ||
-                 content?.videoMessage?.caption || '';
-    if (!text) return;
+    sock.ev.on('creds.update', saveCreds);
 
-    const body = text;
-    const lowerText = text.toLowerCase();
-    const commandName = body.trim().split(' ')[0].toLowerCase().replace(/^\.|\//, '');
-    const args = body.trim().split(' ').slice(1);
+    sock.ev.on('connection.update', async (update) => {
+      const { connection, lastDisconnect, qr } = update;
 
-    let botReply = '';
+      if (qr && qrMode) {
+        latestQR = qr;
+        console.log(chalk.yellowBright('\n📸 Scan QR berikut ini:\n'));
+        qrcode.generate(qr, { small: true });
 
-    // Anti-spam
-    if (text.startsWith('/') || text.startsWith('.')) {
-      const now = Date.now();
-      const userSpam = spamTracker.get(userId) || [];
-      const filtered = userSpam.filter(t => now - t < 10000);
-      filtered.push(now);
-      spamTracker.set(userId, filtered);
-      if (filtered.length > 5 && !adminList.includes(userId)) {
-        mutedUsers.set(userId, now + muteDuration);
-        botReply = '🔇 Kamu terlalu banyak mengirim command! Bot diam 2 menit.';
-        await sock.sendMessage(sender, { text: botReply }, { quoted: msg });
-        await sendLog(sock, sender, body, botReply, isGroup, msg);
-        return;
-      }
-    }
-
-    // Static Command
-    const staticReply = await handleStaticCommand(sock, msg, lowerText, userId, sender, body);
-    if (staticReply) {
-      botReply = staticReply;
-      await sock.sendMessage(sender, { text: botReply }, { quoted: msg });
-      await sendLog(sock, sender, body, botReply, isGroup, msg);
-      return;
-    }
-
-    // Custom Command Pattern
-    for (const pattern of botResponsePatterns) {
-      if (commandName !== pattern.command) continue;
-      let replyText = '';
-
-      if (['waifu', 'waifuhen'].includes(pattern.command)) {
-        replyText = await pattern.handler(sock, msg, body, args, commandName);
-      } else if (['na', 'una', 'admin'].includes(pattern.command)) {
-        replyText = await pattern.handler(sock, msg, text, actualUserId, sender);
-      } else {
-        replyText = await pattern.handler(sock, msg, body, args, commandName);
+        if (qrRetryInterval) clearInterval(qrRetryInterval);
+        qrRetryInterval = setInterval(() => {
+          if (latestQR) {
+            console.log(chalk.yellow('\n🔁 QR ulang karena belum discan:\n'));
+            qrcode.generate(latestQR, { small: true });
+          }
+        }, 60000);
       }
 
-      if (replyText) {
-        botReply = replyText;
-        await sock.sendMessage(sender, { text: botReply }, { quoted: msg });
-        await sendLog(sock, sender, body, botReply, isGroup, msg);
-      }
-      return;
-    }
+      if (qr && phoneNumber && !pairingRequested) {
+        pairingRequested = true;
 
-    if (!['menu', 'reset', 'clear'].includes(commandName)) {
-      const aiReply = await handleOpenAIResponder(sock, msg, userId);
-      if (aiReply) {
-        botReply = aiReply;
-        await sock.sendMessage(sender, { text: botReply }, { quoted: msg });
-        await sendLog(sock, sender, body, aiReply, isGroup, msg);
+        const requestPairing = async () => {
+          try {
+            console.log(chalk.cyan(`🔐 Mode pairing aktif dengan nomor: ${phoneNumber}`));
+            const code = await sock.requestPairingCode(phoneNumber);
+            const formatted = code.slice(0, 4) + '-' + code.slice(4);
+            console.log(chalk.yellowBright(`\n🔑 Masukkan kode ini di WhatsApp:\n\n${chalk.bold(formatted)}\n`));
+          } catch (err) {
+            console.error(chalk.red('❌ Gagal generate pairing code. Ulang dalam 10 detik...'));
+            pairingRetryTimeout = setTimeout(requestPairing, 10000);
+          }
+        };
+
+        requestPairing();
       }
-      return;
-    }
+
+      if (connection === 'open') {
+        console.log(chalk.greenBright('\n✅ Bot berhasil terhubung ke WhatsApp!'));
+        console.log(chalk.cyanBright('✨ AURABOT SIAP MELAYANI TUAN AURA 😎\n'));
+        if (qrRetryInterval) clearInterval(qrRetryInterval);
+        if (pairingRetryTimeout) clearTimeout(pairingRetryTimeout);
+        registerGroupUpdateListener(sock);
+      }
+
+      if (connection === 'close') {
+        const reason = lastDisconnect?.error?.output?.statusCode;
+        if (reason === DisconnectReason.loggedOut) {
+          fs.rmSync('./auth_info', { recursive: true, force: true });
+          console.log(chalk.redBright('\n❌ Logout terdeteksi. Restarting...\n'));
+          setTimeout(startBot, 2000);
+        } else {
+          console.log(chalk.redBright('\n🔁 Koneksi terputus. Mencoba ulang...\n'));
+          setTimeout(startBot, 3000);
+        }
+      }
+    });
+
+    sock.ev.on('messages.upsert', async ({ messages, type }) => {
+      if (!messages || type !== 'notify') return;
+      const msg = messages[0];
+      if (!msg.message) return;
+
+      const { text, realMsg } = extractMessageContent(msg);
+      msg.message = realMsg;
+
+      try {
+        const responseText = await handleResponder(sock, msg);
+
+        const logMessage = `📥 *Log Obrolan User:*\n👤 Dari: ${msg.key.remoteJid.replace('@s.whatsapp.net', '')}\n🗨️ Pesan: ${text}\n🤖 Balasan Bot: ${responseText || 'Tidak ada balasan (mungkin async)'}`;
+
+        for (const adminNumber of LOG_TARGETS) {
+          await sock.sendMessage(adminNumber, { text: logMessage });
+        }
+
+      } catch (err) {
+        console.error(chalk.red('❌ Error di handleResponder:'), err);
+      }
+    });
 
   } catch (err) {
-    console.error('❌ Error di handleResponder:', err);
+    console.error(chalk.bgRed('🔥 Gagal memulai bot:'), err);
   }
 }
 
-async function sendLog(sock, sender, userMsg, botReply, isGroup, msg) {
-  const groupName = isGroup && msg.pushName ? msg.pushName : '-';
-  const time = new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' });
+// Untuk tampilan jika akses via browser
+app.get('/qr', (req, res) => {
+  res.send('🛑 QR ditampilkan langsung di terminal.');
+});
 
-  const formatted = `📋 *Log Obrolan Bot*\n` +
-    `Waktu: ${time}\n` +
-    `Dari: ${sender}${isGroup ? `\n👥 Grup: ${groupName}` : ''}\n` +
-    `Pesan: ${userMsg}\n` +
-    `Balasan:\n${botReply || 'Tanpa balasan'}`;
+// Start express server
+app.listen(PORT, '0.0.0.0', () =>
+  console.log(chalk.cyanBright(`🌐 Web server aktif di http://localhost:${PORT} (/qr optional)`))
+);
 
-  for (const admin of logReceivers) {
-    await sock.sendMessage(admin, { text: formatted });
-  }
-}
-
-const registeredSockets = new WeakSet();
-
-function registerGroupUpdateListener(sock) {
-  if (registeredSockets.has(sock)) return;
-  registeredSockets.add(sock);
-
-  sock.ev.removeAllListeners('group-participants.update');
-  sock.ev.on('group-participants.update', async (update) => {
-    const handleWelcome = require('../commands/welcome');
-    await handleWelcome(sock, update);
-  });
-}
-
-module.exports = {
-  handleResponder,
-  registerGroupUpdateListener
-};
+tampilkanBanner();
+startBot();
