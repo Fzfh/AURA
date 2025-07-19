@@ -9,7 +9,7 @@ async function sendAll(sock, senderJid, text) {
     return;
   }
 
-  const botNumber = sock.user.id;
+  const botNumber = sock.user.id.split(':')[0] + '@s.whatsapp.net';
   const groups = await sock.groupFetchAllParticipating();
   const groupIds = Object.keys(groups);
   const uniqueContacts = new Set();
