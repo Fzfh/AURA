@@ -1,5 +1,4 @@
 const { adminList } = require('../setting/setting');
-
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 async function sendAll(sock, senderJid, text) {
@@ -17,39 +16,40 @@ async function sendAll(sock, senderJid, text) {
 
   for (const gid of groupIds) {
     const group = groups[gid];
-    const isSenderInGroup = group.participants.some(p => p.id === senderJid);
+    const isSenderInGroup = group.participants.some(p => String(p.id) === String(senderJid));
     if (!isSenderInGroup) continue;
 
     for (const participant of group.participants) {
-      const jid = participant.id;
+      const jid = String(participant.id);
       if (jid !== senderJid && jid !== botNumber) {
-        uniqueContacts.add(String(jid));
+        uniqueContacts.add(jid); // pastikan isinya string
       }
     }
   }
 
   for (const jid of uniqueContacts) {
-    await sock.sendMessage(jid, {
-      text: text,
-      contextInfo: {
-        quotedMessage: {
-          extendedTextMessage: {
-            text: 'WhatsApp Bot — Aura Store',
-            contextInfo: {
-              externalAdReply: {
-                title: 'WhatsApp',
-                body: 'Status',
-                mediaType: 1,
-                showAdAttribution: true,
-                thumbnail: null, 
-              }
-            }
+    try {
+      await sock.sendMessage(jid, {
+        text: text, // pesan utama dari command, contoh: ".send halo"
+        contextInfo: {
+          messageStubType: 20, // bikin efek balasan status
+          quotedMessage: {
+            messageContextInfo: {}, // untuk validasi internal biar nggak error
+          },
+          externalAdReply: {
+            title: 'Aura Bot 💫',
+            body: 'Status',
+            mediaType: 1,
+            showAdAttribution: true,
+            thumbnail: null // kamu bisa isi buffer kalau mau ada gambar
           }
         }
-      }
-    });
+      });
 
-    await delay(1200); 
+      await delay(1200); // delay antar pengiriman biar aman
+    } catch (err) {
+      console.error(`❌ Gagal kirim ke ${jid}:`, err.message);
+    }
   }
 }
 
