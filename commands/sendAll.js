@@ -2,7 +2,7 @@ const { adminList } = require('../setting/setting');
 
 module.exports = {
   name: 'sa',
-  async handler(sock, msg, args, from) {
+  async handler(sock, msg, body, args, commandName, from) {
     const sender = msg.key.remoteJid;
 
     // Cek apakah pengirim adalah admin
