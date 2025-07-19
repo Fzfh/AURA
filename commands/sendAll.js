@@ -40,28 +40,15 @@ async function handler({ sock, msg, senderJid, text }) {
     }
   }
 
-  // Kirim ke semua kontak unik
   for (const jid of uniqueContacts) {
     try {
-      await sock.sendMessage(jid, {
-        text: text,
-        contextInfo: {
-          messageStubType: 20,
-          quotedMessage: { messageContextInfo: {} },
-          externalAdReply: {
-            title: 'Aura Bot 💫',
-            body: 'Status',
-            mediaType: 1,
-            showAdAttribution: true,
-            thumbnail: null
-          }
-        }
-      });
-
-      await delay(1200); // delay antar kirim
+      await sock.sendMessage(jid, { text });
+      count++;
     } catch (err) {
-      console.error(`❌ Gagal kirim ke ${jid}:`, err.message);
+      console.error(`Γ¥î Gagal kirim ke ${jid}:`, err);
     }
+
+    await delay(2000); // Delay antar pesan agar tidak dianggap spam
   }
 
   await sock.sendMessage(from, {
