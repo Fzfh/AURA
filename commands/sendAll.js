@@ -1,13 +1,12 @@
-const { adminList } = require('../setting/setting');
-const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
-
-async function handler({ sock, msg, senderJid, text }) {
+async function handler(sock, msg, body, args, commandName) {
   if (!msg || !msg.key || !msg.key.remoteJid) {
     console.error("❌ msg tidak valid di sendAll.js");
     return;
   }
 
+  const senderJid = msg.key.participant || msg.key.remoteJid;
   const from = msg.key.remoteJid;
+  const text = body;
 
   // Cek apakah user adalah admin
   if (!adminList.includes(senderJid)) {
@@ -26,7 +25,6 @@ async function handler({ sock, msg, senderJid, text }) {
   const groupIds = Object.keys(groups);
   const uniqueContacts = new Set();
 
-  // Loop semua grup yang diikuti bot
   for (const gid of groupIds) {
     const group = groups[gid];
     const isSenderInGroup = group.participants.some(p => p.id === senderJid);
@@ -40,20 +38,19 @@ async function handler({ sock, msg, senderJid, text }) {
     }
   }
 
+  let count = 0;
   for (const jid of uniqueContacts) {
     try {
       await sock.sendMessage(jid, { text });
       count++;
     } catch (err) {
-      console.error(`Γ¥î Gagal kirim ke ${jid}:`, err);
+      console.error(`❌ Gagal kirim ke ${jid}:`, err);
     }
-
-    await delay(2000); // Delay antar pesan agar tidak dianggap spam
+    await delay(2000);
   }
 
   await sock.sendMessage(from, {
-    text: '✅ Pesan berhasil dikirim!'
+    text: `✅ Pesan berhasil dikirim ke ${count} kontak.`
   }, { quoted: msg });
 }
-
-module.exports = { handler };
+module.exports = handler;
