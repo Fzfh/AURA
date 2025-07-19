@@ -1,49 +1,42 @@
 const { adminList } = require('../setting/setting');
-const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-async function handler({ sock, msg, senderJid, text }) {
-  if (!msg || !msg.key || !msg.key.remoteJid) {
-    console.error("❌ msg tidak valid di sendAll.js");
-    return;
-  }
+module.exports = {
+  name: 'sa',
+  async handler(sock, msg, args, from) {
+    const sender = msg.key.remoteJid;
 
-  const from = msg.key.remoteJid;
-
-  // Cek apakah user adalah admin
-  if (!adminList.includes(senderJid)) {
-    await sock.sendMessage(senderJid, {
-      text: '❌ Kamu tidak punya izin untuk menjalankan perintah ini.'
-    });
-    return;
-  }
-
-  await sock.sendMessage(from, {
-    text: '🔄 Mengirim ke semua kontak yang 1 grup...'
-  }, { quoted: msg });
-
-  const botNumber = sock.user.id;
-  const groups = await sock.groupFetchAllParticipating();
-  const groupIds = Object.keys(groups);
-  const uniqueContacts = new Set();
-
-  // Loop semua grup yang diikuti bot
-  for (const gid of groupIds) {
-    const group = groups[gid];
-    const isSenderInGroup = group.participants.some(p => p.id === senderJid);
-    if (!isSenderInGroup) continue;
-
-    for (const participant of group.participants) {
-      const jid = participant.id;
-      if (jid !== senderJid && jid !== botNumber) {
-        uniqueContacts.add(jid);
-      }
+    // Cek apakah pengirim adalah admin
+    if (!adminList.includes(sender)) {
+      return sock.sendMessage(from, { text: '❌ Hanya admin yang bisa pakai perintah ini!' });
     }
-  }
 
-  // Kirim ke semua kontak unik
-  for (const jid of uniqueContacts) {
-    try {
-      await sock.sendMessage(jid, {
+    // Cek apakah command dikirim dari private chat
+    const isFromPrivate = !from.endsWith('@g.us');
+    if (!isFromPrivate) {
+      return sock.sendMessage(from, { text: '⚠️ Command ini hanya bisa dipakai di private chat!' });
+    }
+
+    // Ambil isi pesan
+    const text = args.join(' ');
+    if (!text) {
+      return sock.sendMessage(from, { text: '⚠️ Harap masukkan teks setelah .sa' });
+    }
+
+    // Ambil semua grup yang bot gabung
+    const allChats = await sock.groupFetchAllParticipating();
+    const groupList = Object.values(allChats);
+
+    let totalSent = 0;
+
+    for (const group of groupList) {
+      const metadata = await sock.groupMetadata(group.id);
+      const isSenderInGroup = metadata.participants.some(p => p.id === sender);
+
+      if (!isSenderInGroup) continue;
+
+      const members = metadata.participants.map(p => p.id).filter(id => id !== sock.user.id);
+
+      const messagePayload = {
         text: text,
         contextInfo: {
           messageStubType: 20,
@@ -56,17 +49,23 @@ async function handler({ sock, msg, senderJid, text }) {
             thumbnail: null
           }
         }
-      });
+      };
 
-      await delay(1200); // delay antar kirim
-    } catch (err) {
-      console.error(`❌ Gagal kirim ke ${jid}:`, err.message);
+      for (const member of members) {
+        try {
+          await sock.sendMessage(member, messagePayload);
+          totalSent++;
+          await delay(1500); // jeda biar nggak ke-detect spam
+        } catch (err) {
+          console.log(`❌ Gagal kirim ke ${member}:`, err.message);
+        }
+      }
     }
+
+    await sock.sendMessage(from, { text: `✅ Terkirim ke ${totalSent} pengguna dari grup yang kamu ikuti.` });
   }
+};
 
-  await sock.sendMessage(from, {
-    text: '✅ Pesan berhasil dikirim!'
-  }, { quoted: msg });
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
-
-module.exports = { handler };
