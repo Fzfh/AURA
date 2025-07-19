@@ -4,7 +4,9 @@ const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 async function sendAll(sock, senderJid, text) {
   if (!adminList.includes(senderJid)) {
-    await sock.sendMessage(senderJid, { text: '❌ Kamu tidak punya izin untuk menjalankan perintah ini.' });
+    await sock.sendMessage(senderJid, {
+      text: '❌ Kamu tidak punya izin untuk menjalankan perintah ini.'
+    });
     return;
   }
 
@@ -30,17 +32,24 @@ async function sendAll(sock, senderJid, text) {
     await sock.sendMessage(jid, {
       text: text,
       contextInfo: {
-        externalAdReply: {
-          showAdAttribution: true, 
-          title: 'WhatsApp Business',
-          body: 'WA BOT BY AURA BOT',
-          mediaType: 1,
-          sourceUrl: 'https://wa.me/' + senderJid.split('@')[0],
+        quotedMessage: {
+          extendedTextMessage: {
+            text: 'WhatsApp Bot — Aura Store',
+            contextInfo: {
+              externalAdReply: {
+                title: 'WhatsApp',
+                body: 'Status',
+                mediaType: 1,
+                showAdAttribution: true,
+                thumbnail: null, 
+              }
+            }
+          }
         }
       }
     });
 
-    await delay(1200);
+    await delay(1200); 
   }
 }
 
