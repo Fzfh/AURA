@@ -22,7 +22,7 @@ const botResponsePatterns = [
   { command: 'linkmap', handler: returnCommand["commands_linkmap"] },
   { command: 'menfess', handler: returnCommand["commands_menfess"] },
   { command: 'sm', handler: returnCommand["commands_stickerToMedia"] },
-  { command: 'sa', handler: returnCommand["commands_sendAll"] },
+  { command: 'sa', handler: returnCommand["commands_sendAll"].handler },
   { command: 'dig', handler: returnCommand["commands_igDownloader"] },
   { command: 'd', handler: returnCommand["commands_tiktokDownloader"] },
   { command: 'ds', handler: returnCommand["commands_tiktokDownloader"] },
