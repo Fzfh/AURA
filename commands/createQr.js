@@ -29,6 +29,12 @@ if (qrText.startsWith('.cqr')) {
 } else if (qrText.startsWith('cqr')) {
   qrText = qrText.slice(3).trim();
 }
+    
+if (qrText.startsWith('cqr')) {
+  qrText = qrText.slice(3).trim();
+} else if (qrText.startsWith('cqr')) {
+  qrText = qrText.slice(3).trim();
+}
 
     if (!qrText) {
       return sock.sendMessage(remoteJid, {
