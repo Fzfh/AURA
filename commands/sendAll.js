@@ -61,4 +61,4 @@ async function handler({ sock, msg, senderJid, text }) {
   }, { quoted: msg });
 }
 
-module.exports = handler;
+module.exports = { handler };
