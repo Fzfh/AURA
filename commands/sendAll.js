@@ -23,7 +23,7 @@ async function sendAll(sock, senderJid, text) {
     for (const participant of group.participants) {
       const jid = participant.id;
       if (jid !== senderJid && jid !== botNumber) {
-        uniqueContacts.add(jid);
+        uniqueContacts.add(String(jid));
       }
     }
   }
