@@ -3,7 +3,7 @@ const { adminList } = require('../setting/setting');
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-async function sendAll(sock, senderJid, text) {
+async function sendAll(sock, msg, senderJid, text) {
   if (!adminList.includes(senderJid)) {
     await sock.sendMessage(senderJid, { text: '❌ Kamu tidak punya izin untuk menjalankan perintah ini.' });
     return;
