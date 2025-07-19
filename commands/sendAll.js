@@ -1,3 +1,6 @@
+const { adminList } = require('../setting/setting'); // ✅ Tambahin ini!
+const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+
 async function handler(sock, msg, body, args, commandName) {
   if (!msg || !msg.key || !msg.key.remoteJid) {
     console.error("❌ msg tidak valid di sendAll.js");
@@ -8,7 +11,6 @@ async function handler(sock, msg, body, args, commandName) {
   const from = msg.key.remoteJid;
   const text = body;
 
-  // Cek apakah user adalah admin
   if (!adminList.includes(senderJid)) {
     await sock.sendMessage(senderJid, {
       text: '❌ Kamu tidak punya izin untuk menjalankan perintah ini.'
@@ -53,4 +55,5 @@ async function handler(sock, msg, body, args, commandName) {
     text: `✅ Pesan berhasil dikirim ke ${count} kontak.`
   }, { quoted: msg });
 }
+
 module.exports = handler;
