@@ -10,7 +10,7 @@ const {
   HybridBinarizer
 } = require('@zxing/library');
 
-// Ekstrak informasi dari QRIS
+// Ekstrak info dari QRIS
 function extractQRISInfo(data) {
   const tag59Match = data.match(/591[0-9](.*?)60/);
   const tag60Match = data.match(/601[0-9](.*?)62/);
@@ -20,13 +20,26 @@ function extractQRISInfo(data) {
   return { merchantName, merchantCity };
 }
 
-// Ekstrak informasi dari QR WiFi
+// Ekstrak info dari QR WiFi (urutan fleksibel)
 function extractWiFiInfo(data) {
-  const match = data.match(/^WIFI:T:(.*?);S:(.*?);P:(.*?);;/);
+  const match = data.match(/^WIFI:(.*?);;$/);
   if (!match) return null;
 
-  const [, type, ssid, password] = match;
-  return { ssid, password, type };
+  const fields = match[1].split(';');
+  const info = {};
+  for (const field of fields) {
+    const [key, value] = field.split(':');
+    if (key && value) {
+      info[key] = value;
+    }
+  }
+
+  return {
+    ssid: info.S,
+    password: info.P,
+    type: info.T,
+    hidden: info.H === 'true'
+  };
 }
 
 async function handleQR(sock, msg) {
@@ -90,22 +103,22 @@ async function handleQR(sock, msg) {
         return sock.sendMessage(from, { text: info }, { quoted: msg });
       }
 
-      // Deteksi QR Wi-Fi
-      if (/^WIFI:T:/.test(resultText)) {
+      // Deteksi Wi-Fi
+      if (/^WIFI:/.test(resultText)) {
         const wifiInfo = extractWiFiInfo(resultText);
         if (wifiInfo) {
-          const wifiMsg = `📶 *QR Wi-Fi Terdeteksi!*\n\n🔐 *Tipe:* ${wifiInfo.type || 'Tidak diketahui'}\n📡 *Nama WiFi:* ${wifiInfo.ssid || 'Tidak ditemukan'}\n🔑 *Password:* ${wifiInfo.password || 'Kosong / Terbuka'}`;
+          const wifiMsg = `📶 *QR Wi-Fi Terdeteksi!*\n\n🔐 *Tipe:* ${wifiInfo.type || 'Tidak diketahui'}\n📡 *Nama WiFi:* ${wifiInfo.ssid || 'Tidak ditemukan'}\n🔑 *Password:* ${wifiInfo.password || 'Kosong / Terbuka'}\n🙈 *Hidden:* ${wifiInfo.hidden ? 'Iya (disembunyikan)' : 'Tidak'}`;
           return sock.sendMessage(from, { text: wifiMsg }, { quoted: msg });
         }
       }
 
-      // Jika QR biasa
+      // Jika QR biasa (text / link / apapun)
       return sock.sendMessage(from, {
         text: `✅ *QR berhasil dibaca!*\n\n\`Isi QR:\`\n${resultText.length > 300 ? resultText.slice(0, 300) + '... (terpotong)' : resultText}`,
       }, { quoted: msg });
     }
 
-    // Jika tidak terbaca sama sekali
+    // Gagal terbaca sama sekali
     return sock.sendMessage(from, {
       text: '❌ QR tidak terbaca, bahkan oleh scanner cadangan 😭\n\nCoba pastikan:\n- Gambar cukup besar\n- QR tidak terlalu buram\n- Bukan QR view-once yang blur~',
     }, { quoted: msg });
