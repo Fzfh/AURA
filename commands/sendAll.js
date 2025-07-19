@@ -9,7 +9,9 @@ async function handler(sock, msg, body, args, commandName) {
 
   const senderJid = msg.key.participant || msg.key.remoteJid;
   const from = msg.key.remoteJid;
-  const text = body.slice(commandName.length + 2).trim(); 
+  const prefix = body.startsWith('.') ? '.' : '';
+  const text = body.slice(prefix.length + commandName.length).trim();
+
 
   if (!adminList.includes(senderJid)) {
     await sock.sendMessage(senderJid, {
