@@ -2,28 +2,25 @@ module.exports = {
   name: 'p',
   category: 'group',
   async handler(sock, msg, args) {
-    const { remoteJid, key } = msg
+    const { remoteJid } = msg
     const contextInfo = msg.message?.extendedTextMessage?.contextInfo
 
-    // Cek apakah user reply pesan
-    if (!contextInfo?.stanzaId) {
+    // Pastikan ada reply
+    if (!contextInfo?.stanzaId || !contextInfo?.participant) {
       return sock.sendMessage(remoteJid, {
         text: '❌ Balas pesan yang mau di-pin dulu yaa~',
       }, { quoted: msg })
     }
 
-    const quoted = {
+    // Ambil data quoted key
+    const quotedKey = {
       remoteJid,
       fromMe: false,
-      id: contextInfo.stanzaId
+      id: contextInfo.stanzaId,
+      participant: contextInfo.participant
     }
 
-    // Tambahkan participant jika ada (biasanya di grup)
-    if (contextInfo.participant) {
-      quoted.participant = contextInfo.participant
-    }
-
-    // Durasi default 1 hari
+    // Durasi: default 1 hari
     let days = parseInt(args[0]) || 1
     if (![1, 7, 30].includes(days)) {
       return sock.sendMessage(remoteJid, {
@@ -32,20 +29,16 @@ module.exports = {
     }
 
     // Pin pesan
-    await sock.chatModify(
-      { pin: true },
-      remoteJid,
-      [quoted]
-    )
+    await sock.chatModify({ pin: true }, remoteJid, [quotedKey])
 
     await sock.sendMessage(remoteJid, {
       text: `📌 Pesan berhasil dipin selama ${days} hari!`,
     }, { quoted: msg })
 
-    // Timer auto-unpin
+    // Timer unpin otomatis
     const timeout = days * 24 * 60 * 60 * 1000
     setTimeout(() => {
-      sock.chatModify({ pin: false }, remoteJid, [quoted])
+      sock.chatModify({ pin: false }, remoteJid, [quotedKey])
         .then(() => console.log(`📍 Unpinned otomatis setelah ${days} hari`))
         .catch(err => console.error('❌ Gagal unpin:', err))
     }, timeout)
