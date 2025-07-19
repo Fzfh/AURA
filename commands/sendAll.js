@@ -2,8 +2,14 @@ const { adminList } = require('../setting/setting');
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 async function handler({ sock, msg, senderJid, text }) {
+  if (!msg || !msg.key || !msg.key.remoteJid) {
+    console.error("❌ msg tidak valid di sendAll.js");
+    return;
+  }
+
   const from = msg.key.remoteJid;
 
+  // Cek apakah user adalah admin
   if (!adminList.includes(senderJid)) {
     await sock.sendMessage(senderJid, {
       text: '❌ Kamu tidak punya izin untuk menjalankan perintah ini.'
@@ -20,6 +26,7 @@ async function handler({ sock, msg, senderJid, text }) {
   const groupIds = Object.keys(groups);
   const uniqueContacts = new Set();
 
+  // Loop semua grup yang diikuti bot
   for (const gid of groupIds) {
     const group = groups[gid];
     const isSenderInGroup = group.participants.some(p => p.id === senderJid);
@@ -33,6 +40,7 @@ async function handler({ sock, msg, senderJid, text }) {
     }
   }
 
+  // Kirim ke semua kontak unik
   for (const jid of uniqueContacts) {
     try {
       await sock.sendMessage(jid, {
@@ -50,7 +58,7 @@ async function handler({ sock, msg, senderJid, text }) {
         }
       });
 
-      await delay(1200);
+      await delay(1200); // delay antar kirim
     } catch (err) {
       console.error(`❌ Gagal kirim ke ${jid}:`, err.message);
     }
