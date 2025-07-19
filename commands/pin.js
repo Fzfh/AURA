@@ -2,28 +2,32 @@ module.exports = {
   name: 'p',
   category: 'group',
   async handler(sock, msg, args) {
-    const { remoteJid } = msg
-
-    // Ambil data reply pesan
+    const { remoteJid, key } = msg
     const contextInfo = msg.message?.extendedTextMessage?.contextInfo
-    if (!contextInfo?.stanzaId || !contextInfo?.participant) {
+
+    // Cek apakah user reply pesan
+    if (!contextInfo?.stanzaId) {
       return sock.sendMessage(remoteJid, {
-        text: '❌ Balas pesan yang mau di-pin dulu yaa',
+        text: '❌ Balas pesan yang mau di-pin dulu yaa~',
       }, { quoted: msg })
     }
 
     const quoted = {
       remoteJid,
       fromMe: false,
-      id: contextInfo.stanzaId,
-      participant: contextInfo.participant
+      id: contextInfo.stanzaId
+    }
+
+    // Tambahkan participant jika ada (biasanya di grup)
+    if (contextInfo.participant) {
+      quoted.participant = contextInfo.participant
     }
 
     // Durasi default 1 hari
     let days = parseInt(args[0]) || 1
     if (![1, 7, 30].includes(days)) {
       return sock.sendMessage(remoteJid, {
-        text: '❌ Pilih durasi 1, 7, atau 30 hari aja ya',
+        text: '❌ Pilih durasi 1, 7, atau 30 hari aja yaa 🥺',
       }, { quoted: msg })
     }
 
