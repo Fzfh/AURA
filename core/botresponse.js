@@ -1,20 +1,28 @@
-const { handleOpenAIResponder } = require('../core/utils/openai')
 const { botResponsePatterns } = require('../setting/botconfig')
-const { adminList, logReceivers } = require('../setting/setting')
 const { handleStaticCommand } = require('../core/handler/staticCommand')
+const { handleOpenAIResponder, memoryMap } = require('../core/utils/openai')
+const { adminList } = require('../setting/setting')
 
 const spamTracker = new Map()
 const mutedUsers = new Map()
 const muteDuration = 2 * 60 * 1000
+const greetedUsers = new Set()
+
+async function botFirstResponse({ sock, sender, msg }, options = {}) {
+  const botName = options.botBehavior?.botName || 'Bot'
+  const botMenu = options.botBehavior?.botMenu || '/menu'
+  const greetingText = `Halo! Saya *${botName}* 🤖.\nKetik *${botMenu}* untuk melihat menu yang tersedia yaa~`
+  await sock.sendMessage(sender, { text: greetingText }, { quoted: msg })
+}
 
 async function handleResponder(sock, msg) {
   try {
     if (!msg.message) return;
 
     const sender = msg.key.remoteJid;
+    const userId = sender;
     const actualUserId = msg.key.participant || sender;
     const isGroup = sender.endsWith('@g.us');
-    const userId = sender;
 
     const content = msg.message?.viewOnceMessageV2?.message || msg.message;
     const text = content?.conversation ||
@@ -28,9 +36,6 @@ async function handleResponder(sock, msg) {
     const commandName = body.trim().split(' ')[0].toLowerCase().replace(/^\.|\//, '');
     const args = body.trim().split(' ').slice(1);
 
-    let botReply = '';
-
-    // 🚫 Anti-spam
     if (text.startsWith('/') || text.startsWith('.')) {
       const now = Date.now();
       const userSpam = spamTracker.get(userId) || [];
@@ -39,52 +44,44 @@ async function handleResponder(sock, msg) {
       spamTracker.set(userId, filtered);
       if (filtered.length > 5 && !adminList.includes(userId)) {
         mutedUsers.set(userId, now + muteDuration);
-        botReply = '🔇 Kamu terlalu banyak mengirim command! Bot diam 2 menit.';
-        await sock.sendMessage(sender, { text: botReply }, { quoted: msg });
-        await sendLog(sock, sender, body, botReply, isGroup, msg);
-        return;
+        return sock.sendMessage(sender, {
+          text: '🔇 Kamu terlalu banyak mengirim command! Bot diam 2 menit.'
+        }, { quoted: msg });
       }
     }
 
-    // 📦 Static Command
-    const staticReply = await handleStaticCommand(sock, msg, lowerText, userId, sender, body);
-    if (staticReply) {
-      botReply = staticReply;
-      await sock.sendMessage(sender, { text: botReply }, { quoted: msg });
-      await sendLog(sock, sender, body, botReply, isGroup, msg);
-      return;
+    const handledStatic = await handleStaticCommand(sock, msg, lowerText, userId, sender, body);
+    if (handledStatic) return;
+
+    const botJid = sock.user?.id?.split(':')[0] + '@s.whatsapp.net';
+    const mentionedJidList = content?.extendedTextMessage?.contextInfo?.mentionedJid || [];
+    const isMentioned = mentionedJidList.includes(botJid);
+
+    if (isMentioned && !greetedUsers.has(userId)) {
+      greetedUsers.add(userId);
+      await botFirstResponse({ sock, sender, msg }, { botBehavior });
     }
 
-    // 🎯 Custom Command Pattern
     for (const pattern of botResponsePatterns) {
       if (commandName !== pattern.command) continue;
-      let replyText = '';
-
-      if (['waifu', 'waifuhen'].includes(pattern.command)) {
-        replyText = await pattern.handler(sock, msg, body, args, commandName);
-      } else if (['na', 'una', 'admin'].includes(pattern.command)) {
-        replyText = await pattern.handler(sock, msg, text, actualUserId, sender);
-      } else {
-        replyText = await pattern.handler(sock, msg, body, args, commandName);
+       if (['waifu', 'waifuhen'].includes(pattern.command)) {
+        if (args.length === 0) {
+          return await pattern.handler(sock, msg, '', [], pattern.command);
+        } else {
+          return await pattern.handler(sock, msg, body, args, pattern.command);
+        }
       }
 
-      if (replyText) {
-        botReply = replyText;
-        await sock.sendMessage(sender, { text: botReply }, { quoted: msg });
-        await sendLog(sock, sender, body, botReply, isGroup, msg);
+      if (['na', 'una', 'admin'].includes(pattern.command)) {
+        return await pattern.handler(sock, msg, text, actualUserId, sender);
       }
-      return;
+
+      return await pattern.handler(sock, msg, body, args, commandName);
     }
 
-    // 🤖 AI Response
+
     if (!['menu', 'reset', 'clear'].includes(commandName)) {
-      const aiReply = await handleOpenAIResponder(sock, msg, userId);
-      if (aiReply) {
-        botReply = aiReply;
-        await sock.sendMessage(sender, { text: botReply }, { quoted: msg });
-        await sendLog(sock, sender, body, aiReply, isGroup, msg);
-      }
-      return;
+      await handleOpenAIResponder(sock, msg, userId);
     }
 
   } catch (err) {
@@ -92,37 +89,23 @@ async function handleResponder(sock, msg) {
   }
 }
 
-// 💌 Kirim Log ke Admin
-async function sendLog(sock, sender, userMsg, botReply, isGroup, msg) {
-  const groupName = isGroup && msg.pushName ? msg.pushName : '-';
-  const time = new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' });
 
-  const formatted = `📋 *Log Obrolan Bot*\n` +
-    `🕒 Waktu: ${time}\n` +
-    `📍 Dari: ${sender}${isGroup ? `\n👥 Grup: ${groupName}` : ''}\n` +
-    `📝 Pesan: ${userMsg}\n` +
-    `🤖 Balasan:\n${botReply || 'Tanpa balasan'}`;
-
-  for (const admin of logReceivers) {
-    await sock.sendMessage(admin, { text: formatted });
-  }
-}
-
-// 🎉 Listener Welcome
-const registeredSockets = new WeakSet();
+const registeredSockets = new WeakSet()
 
 function registerGroupUpdateListener(sock) {
-  if (registeredSockets.has(sock)) return;
-  registeredSockets.add(sock);
+  if (registeredSockets.has(sock)) return
+  registeredSockets.add(sock)
 
-  sock.ev.removeAllListeners('group-participants.update');
+  sock.ev.removeAllListeners('group-participants.update')
   sock.ev.on('group-participants.update', async (update) => {
-    const handleWelcome = require('../commands/welcome');
-    await handleWelcome(sock, update);
-  });
+    const handleWelcome = require('../commands/welcome')
+    await handleWelcome(sock, update)
+  })
 }
 
 module.exports = {
   handleResponder,
+  greetedUsers,
+  botFirstResponse,
   registerGroupUpdateListener
-};
+}
