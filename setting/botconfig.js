@@ -29,7 +29,7 @@ const botResponsePatterns = [
   { command: 'ets', handler: returnCommand["commands_ekstrakAudio"] },
   { command: 'pp', handler: returnCommand["commands_pp"] },
   { command: 'admin', handler: returnCommand["commands_admincontact"] },
-  { command: 'p', handler: returnCommand["commands_pin"] },
+  { command: 'p', handler: returnCommand["commands_pin"].handler },
 
   // Command Admin Only
   { command: 'kick', handler: returnCommand["commands_kick"], isAdmin: true },
