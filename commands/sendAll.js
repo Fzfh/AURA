@@ -1,15 +1,19 @@
-
 const { adminList } = require('../setting/setting');
-
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-async function sendAll(sock, msg, senderJid, text) {
+async function handler({ sock, msg, senderJid, text }) {
+  const from = msg.key.remoteJid;
+
   if (!adminList.includes(senderJid)) {
-    await sock.sendMessage(senderJid, { text: '❌ Kamu tidak punya izin untuk menjalankan perintah ini.' });
+    await sock.sendMessage(senderJid, {
+      text: '❌ Kamu tidak punya izin untuk menjalankan perintah ini.'
+    });
     return;
   }
 
-  await sock.sendMessage(from, { text: '🔄 Mengirim ke semua kontak yang 1 grup...' }, { quoted: msg });
+  await sock.sendMessage(from, {
+    text: '🔄 Mengirim ke semua kontak yang 1 grup...'
+  }, { quoted: msg });
 
   const botNumber = sock.user.id;
   const groups = await sock.groupFetchAllParticipating();
@@ -29,7 +33,7 @@ async function sendAll(sock, msg, senderJid, text) {
     }
   }
 
- for (const jid of uniqueContacts) {
+  for (const jid of uniqueContacts) {
     try {
       await sock.sendMessage(jid, {
         text: text,
@@ -46,12 +50,15 @@ async function sendAll(sock, msg, senderJid, text) {
         }
       });
 
-      await delay(1200); 
+      await delay(1200);
     } catch (err) {
-      console.error(❌ Gagal kirim ke ${jid}:, err.message);
+      console.error(`❌ Gagal kirim ke ${jid}:`, err.message);
     }
   }
-  await sock.sendMessage(from, { text: '✅ Pesan berhasil dikirim!' }, { quoted: msg });
+
+  await sock.sendMessage(from, {
+    text: '✅ Pesan berhasil dikirim!'
+  }, { quoted: msg });
 }
 
-module.exports = sendAll;
+module.exports = { handler };
