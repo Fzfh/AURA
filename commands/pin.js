@@ -2,33 +2,32 @@ module.exports = {
   name: 'p',
   category: 'group',
   async handler(sock, msg, args) {
-    const { remoteJid, key } = msg
+    const { remoteJid } = msg
 
-    // Cek apakah user reply pesan
-    const quoted = msg.message?.extendedTextMessage?.contextInfo?.stanzaId
-      ? {
-          remoteJid,
-          fromMe: false,
-          id: msg.message.extendedTextMessage.contextInfo.stanzaId,
-          participant: msg.message.extendedTextMessage.contextInfo.participant,
-        }
-      : key
-
-    if (!quoted?.id) {
+    // Ambil data reply pesan
+    const contextInfo = msg.message?.extendedTextMessage?.contextInfo
+    if (!contextInfo?.stanzaId || !contextInfo?.participant) {
       return sock.sendMessage(remoteJid, {
-        text: '❌ Balas pesan yang mau di-pin dulu yaa beb~',
+        text: '❌ Balas pesan yang mau di-pin dulu yaa',
       }, { quoted: msg })
+    }
+
+    const quoted = {
+      remoteJid,
+      fromMe: false,
+      id: contextInfo.stanzaId,
+      participant: contextInfo.participant
     }
 
     // Durasi default 1 hari
     let days = parseInt(args[0]) || 1
     if (![1, 7, 30].includes(days)) {
       return sock.sendMessage(remoteJid, {
-        text: '❌ Pilih durasi 1, 7, atau 30 hari aja ya cintaaa~ 💋',
+        text: '❌ Pilih durasi 1, 7, atau 30 hari aja ya',
       }, { quoted: msg })
     }
 
-    // Pin pesannya
+    // Pin pesan
     await sock.chatModify(
       { pin: true },
       remoteJid,
@@ -39,11 +38,11 @@ module.exports = {
       text: `📌 Pesan berhasil dipin selama ${days} hari!`,
     }, { quoted: msg })
 
-    // Timer untuk auto unpin
-    const timeout = days * 24 * 60 * 60 * 1000 // ms
+    // Timer auto-unpin
+    const timeout = days * 24 * 60 * 60 * 1000
     setTimeout(() => {
       sock.chatModify({ pin: false }, remoteJid, [quoted])
-        .then(() => console.log(`📍 Unpinned pesan otomatis setelah ${days} hari`))
+        .then(() => console.log(`📍 Unpinned otomatis setelah ${days} hari`))
         .catch(err => console.error('❌ Gagal unpin:', err))
     }, timeout)
   }
