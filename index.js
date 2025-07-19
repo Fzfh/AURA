@@ -1,4 +1,3 @@
-// === index.js ===
 require('dotenv').config();
 const {
   default: makeWASocket,
@@ -20,7 +19,7 @@ const { handleResponder, registerGroupUpdateListener } = require('./core/botresp
 const app = express();
 const PORT = 3000;
 
-// Nomor tujuan log (boleh lebih dari 1)
+// 💌 Nomor admin penerima log
 const LOG_TARGETS = ['62895326679840@s.whatsapp.net', '6289678096195@s.whatsapp.net'];
 
 const args = process.argv.slice(2);
@@ -76,7 +75,7 @@ async function startBot() {
             console.log(chalk.yellow('\n🔁 QR ulang karena belum discan:\n'));
             qrcode.generate(latestQR, { small: true });
           }
-        }, 60_000);
+        }, 60000);
       }
 
       if (qr && phoneNumber && !pairingRequested) {
@@ -90,7 +89,7 @@ async function startBot() {
             console.log(chalk.yellowBright(`\n🔑 Masukkan kode ini di WhatsApp:\n\n${chalk.bold(formatted)}\n`));
           } catch (err) {
             console.error(chalk.red('❌ Gagal generate pairing code. Ulang dalam 10 detik...'));
-            pairingRetryTimeout = setTimeout(requestPairing, 10_000);
+            pairingRetryTimeout = setTimeout(requestPairing, 10000);
           }
         };
 
@@ -99,7 +98,7 @@ async function startBot() {
 
       if (connection === 'open') {
         console.log(chalk.greenBright('\n✅ Bot berhasil terhubung ke WhatsApp!'));
-        console.log(chalk.cyanBright('✨ AURABOT SIAP MELAYANI TUAN AURAA 😎\n'));
+        console.log(chalk.cyanBright('✨ AURABOT SIAP MELAYANI TUAN AURA 😎\n'));
         if (qrRetryInterval) clearInterval(qrRetryInterval);
         if (pairingRetryTimeout) clearTimeout(pairingRetryTimeout);
         registerGroupUpdateListener(sock);
@@ -127,27 +126,30 @@ async function startBot() {
       msg.message = realMsg;
 
       try {
-
         const responseText = await handleResponder(sock, msg);
 
-        const log = `*Log Obrolan User:*\nDari: ${msg.key.remoteJid.replace('@s.whatsapp.net', '')}\nPesan: ${text}\nBalasan Bot: ${responseText || 'Tanpa balasan (mungkin async)'}`;
+        const logMessage = `📥 *Log Obrolan User:*\n👤 Dari: ${msg.key.remoteJid.replace('@s.whatsapp.net', '')}\n🗨️ Pesan: ${text}\n🤖 Balasan Bot: ${responseText || 'Tidak ada balasan (mungkin async)'}`;
+
         for (const adminNumber of LOG_TARGETS) {
-          await sock.sendMessage(adminNumber, { text: log });
+          await sock.sendMessage(adminNumber, { text: logMessage });
         }
 
       } catch (err) {
         console.error(chalk.red('❌ Error di handleResponder:'), err);
       }
     });
+
   } catch (err) {
     console.error(chalk.bgRed('🔥 Gagal memulai bot:'), err);
   }
 }
 
+// Untuk tampilan jika akses via browser
 app.get('/qr', (req, res) => {
   res.send('🛑 QR ditampilkan langsung di terminal.');
 });
 
+// Start express server
 app.listen(PORT, '0.0.0.0', () =>
   console.log(chalk.cyanBright(`🌐 Web server aktif di http://localhost:${PORT} (/qr optional)`))
 );
