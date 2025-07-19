@@ -113,7 +113,6 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
 ┃   ➤ Contoh: \`.bg Aura Squad\`
 ┃   ➤ Tambah member langsung:
 ┃     \`.bg Aura Squad add 62812,62813\`
-
 ╰━━━━━━━━━━━━━━━━━━━━━━━━━━╯  
 
 💡 *Tips:*  
@@ -189,6 +188,10 @@ Cocok untuk kirim pesan rahasia, menyampaikan unek-unek, atau kirim kode ke sese
    *.ds* = hanya ambil musik/audio-nya  
 ➤ *Instagram:*  
    *.dig* [link]
+   
+➤ *CONTOH:*
+➤ .d https://vt.tiktok/linkKamu
+➤ .dig https://instagram.com/linkKamu
 
 📌 Penjelasan:  
 Bot akan mendownload video/musik dari TikTok dan Instagram berdasarkan link yang kamu kirim. Cepat, praktis, dan tanpa watermark!
@@ -240,7 +243,7 @@ Digunakan untuk membatalkan proses atau keluar dari mode interaktif jika kamu be
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 💡 *Masih bingung?*
-Ketik *menu* untuk melihat semua fitur yang tersedia.  
+Ketik *admin* untuk menghubungi owner bot.  
 Bot ini terus berkembang, jadi pantau terus update-nya ya!
 
 ╰━━━━━━━━━━━━━━━━━━━━━━━━━━╯
