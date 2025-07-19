@@ -31,10 +31,16 @@ async function stickerFromMediaCommand(sock, msg, lowerText) {
 async function stickerTextCommand(sock, msg, lowerText, args) {
   if (!args[0]) {
     await sock.sendMessage(msg.key.remoteJid, {
-      text: `Mau Buat sticker dari teks? ketik \`stickertext\` <teks kamu>
-      contoh: \`stickertext halo dunia\`
-      *KALAU MAU LEBIH GAMPANG*
-      \`st\` halo dunia`
+      text: `Mau buat stiker dari teks?  
+Cukup ketik:  \`stickertext <teks kamu>\`
+
+Contoh:  \`stickertext halo dunia\`
+
+*Mau lebih cepat?*  
+Pakai saja perintah singkat:  \`st halo dunia\`
+
+Stiker akan langsung tercipta dari teks kamu!
+`
     }, { quoted: msg });
     return true;
   }
