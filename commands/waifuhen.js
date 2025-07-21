@@ -12,6 +12,7 @@ module.exports = async function waifuhen(sock, msg, text) {
     const isGroup = remoteJid.endsWith('@g.us');
     const userId = isGroup ? msg.key.participant : remoteJid;
 
+    // Ambil ADMIN_LIST dari .env dan convert ke JID
     const adminList = (process.env.ADMIN_LIST || '')
       .split(',')
       .map(n => n.trim().replace(/\D/g, '') + '@s.whatsapp.net');
@@ -19,15 +20,13 @@ module.exports = async function waifuhen(sock, msg, text) {
     const sender = userId.includes('@s.whatsapp.net') ? userId : userId.replace(/\D/g, '') + '@s.whatsapp.net';
     const isUserAdmin = adminList.includes(sender);
 
-    const replyTarget = isGroup ? remoteJid : sender; // 👈 Kirim ke grup kalau dari grup
-
     if (!isUserAdmin) {
-      return await sock.sendMessage(replyTarget, { text: '❌ Kamu bukan admin bot!' }, { quoted: msg });
+      return await sock.sendMessage(remoteJid, { text: '❌ Kamu bukan admin bot!' }, { quoted: msg });
     }
 
     const args = text?.trim().split(/\s+/).slice(1);
     if (!args.length) {
-      return sock.sendMessage(replyTarget, {
+      return sock.sendMessage(remoteJid, {
         text: `🔞 Gunakan: .waifuhen tag\nTag NSFW tersedia:\n• ${allowedNSFW.join('\n• ')}`
       }, { quoted: msg });
     }
@@ -35,11 +34,12 @@ module.exports = async function waifuhen(sock, msg, text) {
     const type = args[0]?.toLowerCase();
 
     if (!allowedNSFW.includes(type)) {
-      return sock.sendMessage(replyTarget, {
+      return sock.sendMessage(remoteJid, {
         text: `❌ Tag *${type}* gak tersedia!\n\nPilih salah satu:\n• ${allowedNSFW.join('\n• ')}`
       }, { quoted: msg });
     }
 
+    // API request
     const params = new URLSearchParams({
       included_tags: type,
       is_nsfw: 'true',
@@ -79,7 +79,7 @@ module.exports = async function waifuhen(sock, msg, text) {
         });
       });
 
-      await sock.sendMessage(replyTarget, {
+      await sock.sendMessage(remoteJid, {
         video: { url: mp4Path },
         caption,
         gifPlayback: true
@@ -88,7 +88,7 @@ module.exports = async function waifuhen(sock, msg, text) {
       fs.unlinkSync(gifPath);
       fs.unlinkSync(mp4Path);
     } else {
-      await sock.sendMessage(replyTarget, {
+      await sock.sendMessage(remoteJid, {
         image: { url: mediaUrl },
         caption
       }, { quoted: msg });
