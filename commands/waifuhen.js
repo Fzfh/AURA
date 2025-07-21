@@ -8,7 +8,11 @@ function getAdminList() {
   const setting = require(settingPath);
   return setting.adminList || [];
 }
-
+function isAdmin(userId) {
+  delete require.cache[require.resolve(settingPath)];
+  const setting = require(settingPath);
+  return setting.adminList.includes(userId);
+}
 
 const allowedNSFW = ['ass', 'hentai', 'milf', 'oral', 'paizuri', 'ecchi'];
 
@@ -16,7 +20,6 @@ module.exports = async function waifuhen(sock, msg, text) {
   try {
     const sender = msg.key.remoteJid;
     const userId = msg.key.participant || sender;
-    const adminList = getAdminList();
 
      if (!isAdmin(userId)) {
       return sock.sendMessage(sender, {
