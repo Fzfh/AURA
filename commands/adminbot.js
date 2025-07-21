@@ -2,41 +2,38 @@ const fs = require('fs');
 const path = require('path');
 const envPath = path.join(__dirname, '../../setting/.env');
 
-// Load .env dan parse
+// Load .env
 function loadEnv() {
   const raw = fs.readFileSync(envPath, 'utf-8');
   const env = {};
   raw.split('\n').forEach(line => {
     const [key, val] = line.split('=');
-    if (key && val) env[key.trim()] = val.trim();
+    if (key && val !== undefined) env[key.trim()] = val.trim();
   });
   return env;
 }
 
-// Simpan admin list ke .env
+// Simpan ke .env
 function updateAdminList(newList) {
   const env = loadEnv();
   env.ADMIN_LIST = newList.join(',');
-  const newEnv = Object.entries(env).map(([k, v]) => `${k}=${v}`).join('\n');
-  fs.writeFileSync(envPath, newEnv);
+  const updated = Object.entries(env).map(([k, v]) => `${k}=${v}`).join('\n');
+  fs.writeFileSync(envPath, updated);
 }
 
-// Ambil list admin dan owner
 function getAdminList() {
-  const env = loadEnv();
-  return env.ADMIN_LIST ? env.ADMIN_LIST.split(',') : [];
+  return loadEnv().ADMIN_LIST?.split(',') || [];
 }
 function getOwnerNumber() {
   return loadEnv().OWNER_NUMBER || '';
 }
 
-// Normalisasi nomor
 function normalizeNumber(input) {
-  const clean = input.replace(/[^0-9]/g, '');
-  if (clean.startsWith('0')) return '62' + clean.slice(1);
-  if (clean.startsWith('8')) return '62' + clean;
-  if (clean.startsWith('62')) return clean;
-  return clean;
+  let numbers = input.match(/[0-9]+/g)?.join('') || '';
+  if (numbers.startsWith('0')) return '62' + numbers.slice(1);
+  if (numbers.startsWith('8')) return '62' + numbers;
+  if (numbers.startsWith('62')) return numbers;
+  return numbers;
 }
 
 module.exports = async function adminBotHandler(sock, msg, command, args) {
@@ -46,7 +43,6 @@ module.exports = async function adminBotHandler(sock, msg, command, args) {
   const adminList = getAdminList();
   const ownerNumber = getOwnerNumber();
 
-  // TAMPILKAN LIST
   if (command === 'adminlist' && args.length === 0) {
     if (!adminList.includes(senderNumber)) {
       await sock.sendMessage(from, { text: '🚫 Kamu bukan admin bot.' });
@@ -58,15 +54,13 @@ module.exports = async function adminBotHandler(sock, msg, command, args) {
     return;
   }
 
-  // Hanya owner bisa nambah/hapus
   if (senderNumber !== ownerNumber) {
     await sock.sendMessage(from, { text: '❌ Hanya owner bot yang bisa ubah admin.' });
     return;
   }
 
-  // Gabungkan semua argumen jadi satu string, hapus keyword "add"/"del"/"hapus"
-  const targetRaw = args.join(' ').replace(/add|hapus|del/i, '').trim();
-  const target = normalizeNumber(targetRaw);
+  const fullArg = args.join(' ');
+  const target = normalizeNumber(fullArg);
 
   if (!target || target.length < 10) {
     await sock.sendMessage(from, { text: '⚠️ Nomor tidak valid.' });
