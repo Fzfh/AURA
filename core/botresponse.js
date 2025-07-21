@@ -1,13 +1,9 @@
+require('dotenv').config({ path: require('path').join(__dirname, '../../setting/.env') })
 const { botResponsePatterns } = require('../setting/botconfig')
 const { handleStaticCommand } = require('../core/handler/staticCommand')
 const { handleOpenAIResponder, memoryMap } = require('../core/utils/openai')
 const path = require('path');
 const importFresh = require('import-fresh');
-
-function isAdmin(jid) {
-  const { adminList } = importFresh(path.join(__dirname, '../../setting/setting.js'));
-  return adminList.includes(jid);
-}
 
 const spamTracker = new Map()
 const mutedUsers = new Map()
