@@ -1,15 +1,22 @@
-const { adminList } = require('../setting/setting');
 const axios = require('axios');
 const path = require('path');
 const fs = require('fs');
 const { exec } = require('child_process');
 
-const allowedNSFW = ['ass', 'hentai', 'milf', 'oral', 'paizuri', 'ecchi', 'ero'];
+const settingPath = path.join(__dirname, '../setting/setting.js');
+
+function getAdminList() {
+  delete require.cache[require.resolve(settingPath)];
+  return require(settingPath).adminList;
+}
+
+const allowedNSFW = ['ass', 'hentai', 'milf', 'oral', 'paizuri', 'ecchi'];
 
 module.exports = async function waifuhen(sock, msg, text) {
   try {
     const sender = msg.key.remoteJid;
     const userId = msg.key.participant || sender;
+    const adminList = getAdminList();
 
     if (!adminList.includes(userId)) {
       return sock.sendMessage(sender, {
@@ -19,7 +26,6 @@ module.exports = async function waifuhen(sock, msg, text) {
 
     const args = text?.trim().split(/\s+/).slice(1);
     const type = args[0]?.toLowerCase();
-
 
     if (!type) {
       return sock.sendMessage(sender, {
@@ -39,6 +45,7 @@ module.exports = async function waifuhen(sock, msg, text) {
       gif: 'true',
       limit: '1'
     });
+
     const res = await axios.get(`https://api.waifu.im/search?${params}`, {
       headers: { 'Accept-Version': 'v5' }
     });
