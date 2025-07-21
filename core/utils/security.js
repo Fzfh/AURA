@@ -6,14 +6,17 @@ function refreshSetting() {
   return require(settingPath);
 }
 
-module.exports = {
-  isAdmin(userId) {
-    const setting = refreshSetting();
-    return setting.adminList.includes(userId);
-  },
+function isAdmin(id) {
+  const setting = refreshSetting();
+  return setting.adminList.includes(id);
+}
 
-  isSuperAdmin(userId) {
-    const setting = refreshSetting();
-    return setting.superAdminList?.includes(userId); 
-  }
+function isSuperAdmin(userId) {
+  const setting = refreshSetting();
+  return setting.superAdminList?.includes(userId);
+}
+
+module.exports = {
+  isAdmin,
+  isSuperAdmin,
 };
