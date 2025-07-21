@@ -55,7 +55,7 @@ async function handleResponder(sock, msg) {
     const handledStatic = await handleStaticCommand(sock, msg, lowerText, userId, sender, body);
     if (handledStatic) return;
 
-    const botJid = sock.user?.id?.split(':')[0] + '@s.whatsapp.net';
+    const botJid = sock.user?.id;
     const mentionedJidList = content?.extendedTextMessage?.contextInfo?.mentionedJid || [];
     const isMentioned = mentionedJidList.includes(botJid);
 
