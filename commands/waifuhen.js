@@ -17,8 +17,8 @@ module.exports = async function waifuhen(sock, msg, text) {
       .split(',')
       .map(n => n.trim().replace(/\D/g, '') + '@s.whatsapp.net');
 
-    const sender = userId.includes('@s.whatsapp.net') ? userId : userId.replace(/\D/g, '') + '@s.whatsapp.net';
-    const isUserAdmin = adminList.includes(sender);
+    // Cek langsung userId, karena dia udah pasti dalam format JID
+    const isUserAdmin = adminList.includes(userId);
 
     if (!isUserAdmin) {
       return await sock.sendMessage(remoteJid, { text: '❌ Kamu bukan admin bot!' }, { quoted: msg });
