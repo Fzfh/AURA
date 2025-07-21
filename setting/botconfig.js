@@ -15,7 +15,7 @@ const botResponsePatterns = [
   { command: 'st', handler: returnCommand["core_stickerHelper"].stickerTextCommand },
   { command: 'stickertext', handler: returnCommand["core_stickerHelper"].stickerTextCommand },
   { command: 'waifu', handler: returnCommand["commands_waifu"] },
-  { command: 'waifuhen', handler: returnCommand["commands_waifuhen"] },
+  { command: 'waifuhen', handler: returnCommand["commands_waifuhen"], isAdmin: true },
   { command: 'sqr', handler: returnCommand["commands_qris"] },
   { command: 'cqr', handler: returnCommand["commands_createQr"] },
   { command: 'mapqr', handler: returnCommand["commands_mapqr"] },
