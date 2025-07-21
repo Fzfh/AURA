@@ -1,110 +1,99 @@
 const fs = require('fs');
 const path = require('path');
-
-// Path ke file .env
 const envPath = path.join(__dirname, '../../setting/.env');
 
-// Load dan parsing isi .env
+// Load .env dan parse
 function loadEnv() {
-  const envRaw = fs.readFileSync(envPath, 'utf-8');
-  const lines = envRaw.split('\n');
+  const raw = fs.readFileSync(envPath, 'utf-8');
   const env = {};
-  for (const line of lines) {
-    const [key, value] = line.split('=');
-    if (key && value) env[key.trim()] = value.trim();
-  }
+  raw.split('\n').forEach(line => {
+    const [key, val] = line.split('=');
+    if (key && val) env[key.trim()] = val.trim();
+  });
   return env;
 }
 
-// Simpan admin list baru ke .env
+// Simpan admin list ke .env
 function updateAdminList(newList) {
   const env = loadEnv();
   env.ADMIN_LIST = newList.join(',');
-  const newEnv = Object.entries(env)
-    .map(([key, val]) => `${key}=${val}`)
-    .join('\n');
+  const newEnv = Object.entries(env).map(([k, v]) => `${k}=${v}`).join('\n');
   fs.writeFileSync(envPath, newEnv);
 }
 
-// Cek adminlist dari .env
+// Ambil list admin dan owner
 function getAdminList() {
   const env = loadEnv();
   return env.ADMIN_LIST ? env.ADMIN_LIST.split(',') : [];
 }
-
 function getOwnerNumber() {
-  const env = loadEnv();
-  return env.OWNER_NUMBER || '';
+  return loadEnv().OWNER_NUMBER || '';
 }
 
-function normalizeNumber(number) {
-  // Hilangkan semua non-digit, lalu ubah ke format 628xxx
-  let cleaned = number.replace(/[^0-9]/g, '');
-  if (cleaned.startsWith('0')) return '62' + cleaned.slice(1);
-  if (cleaned.startsWith('8')) return '62' + cleaned;
-  if (cleaned.startsWith('62')) return cleaned;
-  return cleaned; // fallback
+// Normalisasi nomor
+function normalizeNumber(input) {
+  const clean = input.replace(/[^0-9]/g, '');
+  if (clean.startsWith('0')) return '62' + clean.slice(1);
+  if (clean.startsWith('8')) return '62' + clean;
+  if (clean.startsWith('62')) return clean;
+  return clean;
 }
 
 module.exports = async function adminBotHandler(sock, msg, command, args) {
   const from = msg.key.remoteJid;
-  const actualUserId = msg.key.participant || msg.key.remoteJid;
-  const senderNumber = actualUserId.split('@')[0];
+  const sender = msg.key.participant || msg.key.remoteJid;
+  const senderNumber = sender.split('@')[0];
   const adminList = getAdminList();
   const ownerNumber = getOwnerNumber();
 
-  // Perintah: .adminlist
-  if (command === 'adminlist') {
+  // TAMPILKAN LIST
+  if (command === 'adminlist' && args.length === 0) {
     if (!adminList.includes(senderNumber)) {
       await sock.sendMessage(from, { text: '🚫 Kamu bukan admin bot.' });
       return;
     }
 
-    const text = adminList.map((num, i) => `*${i + 1}.* wa.me/${num}`).join('\n') || '📭 Admin bot kosong.';
-    await sock.sendMessage(from, { text: `📋 Daftar Admin Bot:\n${text}` });
+    const daftar = adminList.map((n, i) => `*${i + 1}.* wa.me/${n}`).join('\n') || '📭 Admin kosong.';
+    await sock.sendMessage(from, { text: `📋 Daftar Admin Bot:\n${daftar}` });
     return;
   }
 
-  // Format salah
-  if (args.length < 2) {
-    await sock.sendMessage(from, {
-      text: '📌 Format:\n.adminbot add 628xxxxxx\n.adminbot del 628xxxxxx'
-    });
-    return;
-  }
-
-  const action = args[0].toLowerCase();
-  const targetNumber = normalizeNumber(args[1]);
-
+  // Hanya owner bisa nambah/hapus
   if (senderNumber !== ownerNumber) {
-    await sock.sendMessage(from, { text: '❌ Hanya owner yang bisa ubah admin bot.' });
+    await sock.sendMessage(from, { text: '❌ Hanya owner bot yang bisa ubah admin.' });
     return;
   }
 
-  if (action === 'add') {
-    if (adminList.includes(targetNumber)) {
-      await sock.sendMessage(from, { text: '⚠️ Nomor sudah terdaftar sebagai admin bot.' });
+  const target = normalizeNumber(args[0]);
+  if (!target || target.length < 10) {
+    await sock.sendMessage(from, { text: '⚠️ Nomor tidak valid.' });
+    return;
+  }
+
+  if (target === ownerNumber) {
+    await sock.sendMessage(from, { text: '👑 Itu nomor owner, tidak bisa dihapus!' });
+    return;
+  }
+
+  // TAMBAH ADMIN
+  if (command === 'adminbot') {
+    if (adminList.includes(target)) {
+      await sock.sendMessage(from, { text: `⚠️ Nomor ${target} sudah jadi admin.` });
       return;
     }
-
-    adminList.push(targetNumber);
+    adminList.push(target);
     updateAdminList(adminList);
-    await sock.sendMessage(from, { text: `✅ ${targetNumber} berhasil jadi admin bot.` });
-  } else if (action === 'del') {
-    if (targetNumber === ownerNumber) {
-      await sock.sendMessage(from, { text: '🚫 Nomor ini adalah OWNER dan tidak bisa dihapus.' });
+    await sock.sendMessage(from, { text: `✅ ${target} ditambahkan sebagai admin bot.` });
+  }
+
+  // HAPUS ADMIN
+  if (command === 'delbot') {
+    if (!adminList.includes(target)) {
+      await sock.sendMessage(from, { text: `❌ Nomor ${target} bukan admin.` });
       return;
     }
-
-    if (!adminList.includes(targetNumber)) {
-      await sock.sendMessage(from, { text: '⚠️ Nomor tidak ditemukan dalam admin list.' });
-      return;
-    }
-
-    const newList = adminList.filter(num => num !== targetNumber);
+    const newList = adminList.filter(n => n !== target);
     updateAdminList(newList);
-    await sock.sendMessage(from, { text: `✅ ${targetNumber} berhasil dihapus dari admin bot.` });
-  } else {
-    await sock.sendMessage(from, { text: '📌 Gunakan perintah `add` atau `del` ya sayang~' });
+    await sock.sendMessage(from, { text: `🗑️ ${target} telah dihapus dari admin bot.` });
   }
 };
