@@ -2,11 +2,7 @@ const { botResponsePatterns } = require('../setting/botconfig')
 const { handleStaticCommand } = require('../core/handler/staticCommand')
 const { handleOpenAIResponder, memoryMap } = require('../core/utils/openai')
 const path = require('path');
-const settingPath = path.join(__dirname, '../setting/setting.js');
-function getAdminList() {
-  delete require.cache[require.resolve(settingPath)];
-  return require(settingPath).adminList || [];
-}
+const { isAdmin } = require('../core/security');
 
 
 const spamTracker = new Map()
@@ -48,7 +44,7 @@ async function handleResponder(sock, msg) {
       const filtered = userSpam.filter(t => now - t < 10000);
       filtered.push(now);
       spamTracker.set(userId, filtered);
-      if (filtered.length > 5 && !adminList.includes(userId)) {
+      if (filtered.length > 5 && !isAdmin(userId)) {
         mutedUsers.set(userId, now + muteDuration);
         return sock.sendMessage(sender, {
           text: '🔇 Kamu terlalu banyak mengirim command! Bot diam 2 menit.'
