@@ -1,19 +1,23 @@
-const { adminList } = require('../setting/setting')
+const { adminList } = require('../setting/setting');
 const axios = require('axios');
 const path = require('path');
 const fs = require('fs');
 const { exec } = require('child_process');
 
-
 const allowedNSFW = ['ass', 'hentai', 'milf', 'oral', 'paizuri', 'ecchi'];
 
 module.exports = async function waifuhen(sock, msg, text) {
   try {
-    const sender = msg.key.remoteJid;
-    const userId = msg.key.participant || sender;
-    
+    const remoteJid = msg.key.remoteJid;
+    const userId = msg.key.participant || remoteJid;
+    const isGroup = remoteJid.endsWith('@g.us');
+
+    // ✅ Gunakan remoteJid sebagai target pengiriman
+    const targetJid = remoteJid;
+
+    // ❌ Admin check harus berdasarkan userId (participant kalau grup)
     if (!adminList.includes(userId)) {
-      return sock.sendMessage(sender, {
+      return sock.sendMessage(targetJid, {
         text: '❌ Fitur ini hanya bisa dipakai oleh admin bot saja.',
       }, { quoted: msg });
     }
@@ -22,13 +26,13 @@ module.exports = async function waifuhen(sock, msg, text) {
     const type = args[0]?.toLowerCase();
 
     if (!type) {
-      return sock.sendMessage(sender, {
+      return sock.sendMessage(targetJid, {
         text: `🔞 Gunakan: .waifuhen tag\nTag NSFW tersedia:\n• ${allowedNSFW.join('\n• ')}`
       }, { quoted: msg });
     }
 
     if (!allowedNSFW.includes(type)) {
-      return sock.sendMessage(sender, {
+      return sock.sendMessage(targetJid, {
         text: `❌ Tag *${type}* gak tersedia!\n\nPilih salah satu:\n• ${allowedNSFW.join('\n• ')}`
       }, { quoted: msg });
     }
@@ -72,7 +76,7 @@ module.exports = async function waifuhen(sock, msg, text) {
         });
       });
 
-      await sock.sendMessage(sender, {
+      await sock.sendMessage(targetJid, {
         video: { url: mp4Path },
         caption,
         gifPlayback: true
@@ -81,7 +85,7 @@ module.exports = async function waifuhen(sock, msg, text) {
       fs.unlinkSync(gifPath);
       fs.unlinkSync(mp4Path);
     } else {
-      await sock.sendMessage(sender, {
+      await sock.sendMessage(targetJid, {
         image: { url: mediaUrl },
         caption
       }, { quoted: msg });
