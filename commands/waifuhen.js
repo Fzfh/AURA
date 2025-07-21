@@ -2,17 +2,8 @@ const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
 const { exec } = require('child_process'); 
-const settingPath = path.join(__dirname, '../setting/setting.js');
-function getAdminList() {
-  delete require.cache[require.resolve(settingPath)];
-  const setting = require(settingPath);
-  return setting.adminList || [];
-}
-function isAdmin(userId) {
-  delete require.cache[require.resolve(settingPath)];
-  const setting = require(settingPath);
-  return setting.adminList.includes(userId);
-}
+const { isAdmin } = require('../core/utils/security');
+
 
 const allowedNSFW = ['ass', 'hentai', 'milf', 'oral', 'paizuri', 'ecchi'];
 
@@ -20,10 +11,10 @@ module.exports = async function waifuhen(sock, msg, text) {
   try {
     const sender = msg.key.remoteJid;
     const userId = msg.key.participant || sender;
-
-     if (!isAdmin(userId)) {
+    
+    if (!isAdmin(userId)) {
       return sock.sendMessage(sender, {
-        text: '❌ Fitur ini hanya bisa dipakai oleh admin bot saja.',
+        text: '❌ Fitur ini hanya untuk admin AuraBot yaa 😘',
       }, { quoted: msg });
     }
 
