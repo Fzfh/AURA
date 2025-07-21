@@ -1,7 +1,7 @@
 const path = require('path');
 const settingPath = path.join(__dirname, '../../setting/setting.js');
 
-// Pemilik utama bot (hardcoded)
+// Pakai full JID karena adminList kamu full JID
 const OWNER_JID = '62895326679840@s.whatsapp.net';
 
 function refreshSetting() {
@@ -9,14 +9,21 @@ function refreshSetting() {
   return require(settingPath);
 }
 
+function normalizeJid(jid) {
+  // Pastikan jid selalu pakai @s.whatsapp.net
+  return jid.includes('@s.whatsapp.net') ? jid : jid.replace(/[^0-9]/g, '') + '@s.whatsapp.net';
+}
+
 function isAdmin(userId) {
   const setting = refreshSetting();
-  return userId === OWNER_JID || setting.adminList.includes(userId);
+  const jid = normalizeJid(userId);
+  return jid === OWNER_JID || setting.adminList.includes(jid);
 }
 
 function isSuperAdmin(userId) {
   const setting = refreshSetting();
-  return userId === OWNER_JID || setting.superAdminList?.includes(userId);
+  const jid = normalizeJid(userId);
+  return jid === OWNER_JID || setting.superAdminList?.includes(jid);
 }
 
 module.exports = {
