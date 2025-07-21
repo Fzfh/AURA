@@ -1,4 +1,4 @@
-const { adminList } = require('../setting/setting');
+const { adminList } = require('../../setting/setting');
 async function handleStaticCommand(sock, msg, lowerText, userId, body) {
   const from = msg.key.remoteJid
   const sender = from
