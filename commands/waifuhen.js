@@ -1,14 +1,26 @@
 const axios = require('axios');
-const path = require('path');
 const fs = require('fs');
-const { exec } = require('child_process');
+const path = require('path');
 
 const settingPath = path.join(__dirname, '../setting/setting.js');
 
 function getAdminList() {
-  delete require.cache[require.resolve(settingPath)];
-  return require(settingPath).adminList;
+  try {
+    const fileContent = fs.readFileSync(settingPath, 'utf-8');
+
+    const match = fileContent.match(/adminList\s*=\s*(\[[^\]]+\])/);
+    if (!match) throw new Error('Gagal parsing adminList');
+
+    const list = eval(match[1]);
+    if (!Array.isArray(list)) throw new Error('adminList bukan array');
+
+    return list;
+  } catch (err) {
+    console.error('⚠️ Gagal ambil adminList:', err);
+    return [];
+  }
 }
+
 
 const allowedNSFW = ['ass', 'hentai', 'milf', 'oral', 'paizuri', 'ecchi'];
 
