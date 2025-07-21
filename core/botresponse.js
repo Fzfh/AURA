@@ -44,7 +44,7 @@ async function handleResponder(sock, msg) {
       const filtered = userSpam.filter(t => now - t < 10000);
       filtered.push(now);
       spamTracker.set(userId, filtered);
-      if (filtered.length > 5 && !isAdmin(userId)) {
+      if (filtered.length > 5 && !isAdmin(actualUserId)) {
         mutedUsers.set(userId, now + muteDuration);
         return sock.sendMessage(sender, {
           text: '🔇 Kamu terlalu banyak mengirim command! Bot diam 2 menit.'
