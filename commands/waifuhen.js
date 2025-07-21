@@ -11,15 +11,15 @@ module.exports = async function waifuhen(sock, msg, text) {
   try {
     const sender = msg.key.remoteJid;
     const userId = msg.key.participant || sender;
-    console.log('🔍 sender:', sender);
-console.log('🔍 participant/userId:', userId);
+    const isUserAdmin = isAdmin(userId);
+    console.log('🛡️ isAdmin:', isUserAdmin);
     
-      // ...
-    if (!isAdmin(userId)) {
+    if (!isUserAdmin) {
       return sock.sendMessage(sender, {
         text: '❌ Fitur ini hanya untuk admin AuraBot yaa 😘',
       }, { quoted: msg });
     }
+
 
    const args = text?.trim().split(/\s+/).slice(1);
     if (!args.length) {
