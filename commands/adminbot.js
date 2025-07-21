@@ -2,14 +2,15 @@ const fs = require('fs');
 const path = require('path');
 const settingPath = path.join(__dirname, '../setting/setting.js');
 
-// Reload setting.js setiap dipanggil
-function loadSetting() {
+const OWNER_JID = '62895326679840@s.whatsapp.net'; // 👑 Nomor Aura
+
+// ⏪ Reload setting.js setiap dipanggil
+function getSetting() {
   delete require.cache[require.resolve(settingPath)];
   return require(settingPath);
 }
 
-const OWNER_JID = '62895326679840@s.whatsapp.net'; // 👑 Nomor Aura
-
+// 📞 Ubah nomor jadi format JID WhatsApp
 function normalizeNumber(input) {
   let cleaned = input.replace(/[-\s+]/g, '');
   if (cleaned.startsWith('08') || cleaned.startsWith('0')) {
@@ -18,8 +19,9 @@ function normalizeNumber(input) {
   return cleaned + '@s.whatsapp.net';
 }
 
+// 💾 Simpan daftar admin ke setting.js
 function saveSettingFile(newAdminList) {
-  const setting = loadSetting();
+  const setting = getSetting();
   const updated = {
     ...setting,
     adminList: newAdminList
@@ -28,8 +30,9 @@ function saveSettingFile(newAdminList) {
   fs.writeFileSync(settingPath, fileContent);
 }
 
+// 🚀 Handler utama
 module.exports = async function adminManagerHandler(sock, msg, text) {
-  const setting = loadSetting(); // 🔁 load fresh
+  const setting = getSetting(); // 🆕 selalu fresh
   const from = msg.key.remoteJid;
   const sender = msg.key.participant || msg.key.remoteJid;
   const body = text.trim();
