@@ -1,8 +1,8 @@
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
-const { exec } = require('child_process'); 
-const importFresh = require('import-fresh');
+const { exec } = require('child_process');
+require('dotenv').config({ path: path.join(__dirname, '../setting/.env') });
 
 const allowedNSFW = ['ass', 'hentai', 'milf', 'oral', 'paizuri', 'ecchi'];
 
@@ -12,11 +12,13 @@ module.exports = async function waifuhen(sock, msg, text) {
     const isGroup = remoteJid.endsWith('@g.us');
     const userId = isGroup ? msg.key.participant : remoteJid;
 
-    const setting = importFresh(path.join(__dirname, '../setting/setting.js'));
-    const { adminList } = setting;
+    // Ambil ADMIN_LIST dari .env dan convert ke JID
+    const adminList = (process.env.ADMIN_LIST || '')
+      .split(',')
+      .map(n => n.trim().replace(/\D/g, '') + '@s.whatsapp.net');
 
     const sender = userId.includes('@s.whatsapp.net') ? userId : userId.replace(/\D/g, '') + '@s.whatsapp.net';
-    const isUserAdmin = adminList.includes(sender); // bisa dipakai buat log juga
+    const isUserAdmin = adminList.includes(sender);
 
     if (!isUserAdmin) {
       return await sock.sendMessage(sender, { text: '❌ Kamu bukan admin bot!' });
