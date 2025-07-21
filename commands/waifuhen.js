@@ -12,20 +12,21 @@ module.exports = async function waifuhen(sock, msg, text) {
     const sender = msg.key.remoteJid;
     const userId = msg.key.participant || sender;
     
+      // ...
     if (!isAdmin(userId)) {
       return sock.sendMessage(sender, {
         text: '❌ Fitur ini hanya untuk admin AuraBot yaa 😘',
       }, { quoted: msg });
     }
 
-    const args = text?.trim().split(/\s+/).slice(1);
-    const type = args[0]?.toLowerCase();
-
-    if (!type) {
+   const args = text?.trim().split(/\s+/).slice(1);
+    if (!args.length) {
       return sock.sendMessage(sender, {
         text: `🔞 Gunakan: .waifuhen tag\nTag NSFW tersedia:\n• ${allowedNSFW.join('\n• ')}`
       }, { quoted: msg });
     }
+    const type = args[0]?.toLowerCase();
+
 
     if (!allowedNSFW.includes(type)) {
       return sock.sendMessage(sender, {
