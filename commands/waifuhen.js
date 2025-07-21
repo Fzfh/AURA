@@ -3,11 +3,12 @@ const fs = require('fs');
 const path = require('path');
 const { exec } = require('child_process'); 
 const settingPath = path.join(__dirname, '../setting/setting.js');
-const setting = require(settingPath);
-
 function getAdminList() {
+  delete require.cache[require.resolve(settingPath)];
+  const setting = require(settingPath);
   return setting.adminList || [];
 }
+
 
 const allowedNSFW = ['ass', 'hentai', 'milf', 'oral', 'paizuri', 'ecchi'];
 
