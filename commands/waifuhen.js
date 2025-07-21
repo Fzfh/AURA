@@ -9,21 +9,18 @@ const allowedNSFW = ['ass', 'hentai', 'milf', 'oral', 'paizuri', 'ecchi'];
 module.exports = async function waifuhen(sock, msg, text) {
   const remoteJid = msg.key.remoteJid;
   const isGroup = remoteJid.endsWith('@g.us');
-  const userId = isGroup ? msg.key.participant : remoteJid;
-  const replyJid = remoteJid; // <- ganti ini untuk jadi target pengiriman yang tepat (grup atau private)
+  const userId = (isGroup ? msg.key.participant : remoteJid) || '';
+  const replyJid = remoteJid;
 
   try {
-    console.log('\n[WAIFUHEN DEBUG]');
-    console.log('remoteJid:', remoteJid);
-    console.log('participant:', msg.key.participant);
-    console.log('isGroup:', isGroup);
-    console.log('userId:', userId);
+    // ✅ Convert userId ke format angka polos biar cocok sama ENV
+    const senderNumber = userId.replace(/[^0-9]/g, '');
 
     const adminList = (process.env.ADMIN_LIST || '')
       .split(',')
-      .map(n => n.trim().replace(/\D/g, '') + '@s.whatsapp.net');
+      .map(n => n.trim());
 
-    const isUserAdmin = adminList.includes(userId);
+    const isUserAdmin = adminList.includes(senderNumber);
 
     if (!isUserAdmin) {
       return await sock.sendMessage(replyJid, {
