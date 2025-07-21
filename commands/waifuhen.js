@@ -8,11 +8,11 @@ const allowedNSFW = ['ass', 'hentai', 'milf', 'oral', 'paizuri', 'ecchi'];
 
 module.exports = async function waifuhen(sock, msg, text) {
   try {
-    const chatId = msg.key.remoteJid;
-    const sender = msg.key.participant || msg.key.remoteJid; // ini yang dipakai buat validasi & kirim
+    const chatId = msg.key.remoteJid; // untuk kirim pesan
+    const sender = msg.key.participant || msg.key.remoteJid; // untuk validasi admin
 
     if (!adminList.includes(sender)) {
-      return sock.sendMessage(sender, {
+      return sock.sendMessage(chatId, { // kirim ke tempat asal pesan!
         text: '❌ Fitur ini hanya bisa dipakai oleh admin bot saja.',
       }, { quoted: msg });
     }
@@ -51,7 +51,8 @@ module.exports = async function waifuhen(sock, msg, text) {
     const caption = `🔞 ${type.charAt(0).toUpperCase() + type.slice(1)} by AuraBot`;
 
     if (ext === '.gif') {
-      const gifPath = path.join(__dirname, `../temp/${Date.now()}.gif`);
+      const timestamp = Date.now();
+      const gifPath = path.join(__dirname, `../temp/${timestamp}.gif`);
       const mp4Path = gifPath.replace('.gif', '.mp4');
 
       const writer = fs.createWriteStream(gifPath);
@@ -92,4 +93,4 @@ module.exports = async function waifuhen(sock, msg, text) {
       text: '⚠️ Gagal kirim waifuhen. Cek tag atau coba lagi nanti ya.',
     }, { quoted: msg });
   }
-}
+};
