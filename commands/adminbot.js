@@ -54,7 +54,7 @@ module.exports = async function adminManagerHandler(sock, msg, text) {
     const listText = sortedList.map((a, i) => {
       const num = a.replace('@s.whatsapp.net', '');
       if (a === OWNER_JID) {
-        return `\`*Pemilik Utama:* wa.me/\`${num}`;
+        return `\`Pemilik Utama:/` wa.me/${num}`;
       }
       return `*${i}.* wa.me/${num}`;
     }).join('\n') || 'Belum ada admin bot';
