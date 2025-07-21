@@ -6,19 +6,18 @@ const { exec } = require('child_process');
 
 const allowedNSFW = ['ass', 'hentai', 'milf', 'oral', 'paizuri', 'ecchi'];
 
-module.exports = async function waifuhen(sock, msg, text) {
+module.exports = async function waifuhen(sock, msg, text, args, command, actualUserId) {
   try {
-    const chatId = msg.key.remoteJid; // untuk kirim pesan
-    const sender = msg.key.participant || msg.key.remoteJid; // untuk validasi admin
+    const chatId = msg.key.remoteJid;
+    const sender = msg.key.remoteJid;
 
-    if (!adminList.includes(sender)) {
-      return sock.sendMessage(chatId, { // kirim ke tempat asal pesan!
+    if (!adminList.includes(actualUserId)) {
+      return sock.sendMessage(sender, {
         text: '❌ Fitur ini hanya bisa dipakai oleh admin bot saja.',
       }, { quoted: msg });
     }
 
-    const args = text?.trim().split(/\s+/).slice(1);
-    const type = args[0]?.toLowerCase();
+    const type = args[1]?.toLowerCase();
 
     if (!type) {
       return sock.sendMessage(chatId, {
@@ -51,8 +50,7 @@ module.exports = async function waifuhen(sock, msg, text) {
     const caption = `🔞 ${type.charAt(0).toUpperCase() + type.slice(1)} by AuraBot`;
 
     if (ext === '.gif') {
-      const timestamp = Date.now();
-      const gifPath = path.join(__dirname, `../temp/${timestamp}.gif`);
+      const gifPath = path.join(__dirname, `../temp/${Date.now()}.gif`);
       const mp4Path = gifPath.replace('.gif', '.mp4');
 
       const writer = fs.createWriteStream(gifPath);
@@ -93,4 +91,4 @@ module.exports = async function waifuhen(sock, msg, text) {
       text: '⚠️ Gagal kirim waifuhen. Cek tag atau coba lagi nanti ya.',
     }, { quoted: msg });
   }
-};
+}
