@@ -11,49 +11,52 @@ module.exports = async function waifuhen(sock, msg, text) {
     const remoteJid = msg.key.remoteJid;
     const isGroup = remoteJid.endsWith('@g.us');
     const userId = isGroup ? msg.key.participant : remoteJid;
+    const replyJid = msg.key.remoteJid; // Kirim pesan ke tempat asal command
+
     console.log('[WAIFUHEN DEBUG]');
-console.log('remoteJid:', msg.key.remoteJid);
-console.log('participant:', msg.key.participant);
-console.log('isGroup:', msg.key.remoteJid.endsWith('@g.us'));
+    console.log('remoteJid:', remoteJid);
+    console.log('participant:', msg.key.participant);
+    console.log('isGroup:', isGroup);
+    console.log('userId:', userId);
 
-
-    // Ambil ADMIN_LIST dari .env dan convert ke JID
+    // Ambil ADMIN_LIST dari .env dan ubah ke JID format
     const adminList = (process.env.ADMIN_LIST || '')
       .split(',')
       .map(n => n.trim().replace(/\D/g, '') + '@s.whatsapp.net');
 
-    // Cek langsung userId, karena dia udah pasti dalam format JID
+    // Cek apakah user termasuk admin
     const isUserAdmin = adminList.includes(userId);
 
     if (!isUserAdmin) {
-      return await sock.sendMessage(remoteJid, { text: '❌ Kamu bukan admin bot!' }, { quoted: msg });
+      return await sock.sendMessage(replyJid, {
+        text: '❌ Kamu bukan admin bot!',
+      }, { quoted: msg });
     }
 
     const args = text?.trim().split(/\s+/).slice(1);
     if (!args.length) {
-      return sock.sendMessage(remoteJid, {
-        text: `🔞 Gunakan: .waifuhen tag\nTag NSFW tersedia:\n• ${allowedNSFW.join('\n• ')}`
+      return sock.sendMessage(replyJid, {
+        text: `🔞 Gunakan: .waifuhen tag\nTag NSFW tersedia:\n• ${allowedNSFW.join('\n• ')}`,
       }, { quoted: msg });
     }
 
     const type = args[0]?.toLowerCase();
-
     if (!allowedNSFW.includes(type)) {
-      return sock.sendMessage(remoteJid, {
-        text: `❌ Tag *${type}* gak tersedia!\n\nPilih salah satu:\n• ${allowedNSFW.join('\n• ')}`
+      return sock.sendMessage(replyJid, {
+        text: `❌ Tag *${type}* gak tersedia!\n\nPilih salah satu:\n• ${allowedNSFW.join('\n• ')}`,
       }, { quoted: msg });
     }
 
-    // API request
+    // Request ke API
     const params = new URLSearchParams({
       included_tags: type,
       is_nsfw: 'true',
       gif: 'true',
-      limit: '1'
+      limit: '1',
     });
 
     const res = await axios.get(`https://api.waifu.im/search?${params}`, {
-      headers: { 'Accept-Version': 'v5' }
+      headers: { 'Accept-Version': 'v5' },
     });
 
     const img = res.data.images?.[0];
@@ -84,18 +87,18 @@ console.log('isGroup:', msg.key.remoteJid.endsWith('@g.us'));
         });
       });
 
-      await sock.sendMessage(remoteJid, {
+      await sock.sendMessage(replyJid, {
         video: { url: mp4Path },
         caption,
-        gifPlayback: true
+        gifPlayback: true,
       }, { quoted: msg });
 
       fs.unlinkSync(gifPath);
       fs.unlinkSync(mp4Path);
     } else {
-      await sock.sendMessage(remoteJid, {
+      await sock.sendMessage(replyJid, {
         image: { url: mediaUrl },
-        caption
+        caption,
       }, { quoted: msg });
     }
 
