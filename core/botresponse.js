@@ -1,7 +1,13 @@
 const { botResponsePatterns } = require('../setting/botconfig')
 const { handleStaticCommand } = require('../core/handler/staticCommand')
 const { handleOpenAIResponder, memoryMap } = require('../core/utils/openai')
-const { adminList } = require('../setting/setting')
+const path = require('path');
+const settingPath = path.join(__dirname, '../setting/setting.js');
+function getAdminList() {
+  delete require.cache[require.resolve(settingPath)];
+  return require(settingPath).adminList || [];
+}
+
 
 const spamTracker = new Map()
 const mutedUsers = new Map()
