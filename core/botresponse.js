@@ -1,8 +1,8 @@
+const { adminList } = require('../setting/setting')
 const { botResponsePatterns } = require('../setting/botconfig')
 const { handleStaticCommand } = require('../core/handler/staticCommand')
 const { handleOpenAIResponder, memoryMap } = require('../core/utils/openai')
 const path = require('path');
-const { adminList } = require('../setting/setting');
 
 
 const spamTracker = new Map()
@@ -13,7 +13,7 @@ const greetedUsers = new Set()
 async function botFirstResponse({ sock, sender, msg }, options = {}) {
   const botName = options.botBehavior?.botName || 'Bot'
   const botMenu = options.botBehavior?.botMenu || '/menu'
-  const greetingText = `Halo! Saya *${botName}* 🤖.\nKetik *${botMenu}* untuk melihat menu yang tersedia yaa~`
+  const greetingText = Halo! Saya *${botName}* 🤖.\nKetik *${botMenu}* untuk melihat menu yang tersedia yaa~
   await sock.sendMessage(sender, { text: greetingText }, { quoted: msg })
 }
 
@@ -44,7 +44,7 @@ async function handleResponder(sock, msg) {
       const filtered = userSpam.filter(t => now - t < 10000);
       filtered.push(now);
       spamTracker.set(userId, filtered);
-      if (filtered.length > 5 && !isAdmin(actualUserId)) {
+      if (filtered.length > 5 && !adminList.includes(userId)) {
         mutedUsers.set(userId, now + muteDuration);
         return sock.sendMessage(sender, {
           text: '🔇 Kamu terlalu banyak mengirim command! Bot diam 2 menit.'
