@@ -13,20 +13,20 @@ module.exports = async function waifuhen(sock, msg, text) {
     const userId = msg.key.participant || sender;
 
     if (!adminList.includes(userId)) {
-      return sock.sendMessage(userId, {
+      return sock.sendMessage(sender, {
         text: '❌ Fitur ini hanya bisa dipakai oleh admin bot saja.',
       }, { quoted: msg });
     }
 
     const type = text?.toLowerCase()?.trim();
     if (!type) {
-      return sock.sendMessage(userId, {
+      return sock.sendMessage(sender, {
         text: `🔞 Gunakan: .waifuhen tag\nTag NSFW tersedia:\n• ${allowedNSFW.join('\n• ')}`
       }, { quoted: msg });
     }
 
     if (!allowedNSFW.includes(type)) {
-      return sock.sendMessage(userId, {
+      return sock.sendMessage(sender, {
         text: `❌ Tag *${type}* gak tersedia!\n\nPilih salah satu:\n• ${allowedNSFW.join('\n• ')}`
       }, { quoted: msg });
     }
@@ -49,13 +49,13 @@ module.exports = async function waifuhen(sock, msg, text) {
     const caption = `🔞 ${type.charAt(0).toUpperCase() + type.slice(1)} by AuraBot`;
 
     if (['.gif', '.mp4', '.webm'].includes(ext)) {
-      await sock.sendMessage(userId, {
+      await sock.sendMessage(sender, {
         video: { url: mediaUrl },
         caption,
         gifPlayback: true
       }, { quoted: msg });
     } else {
-      await sock.sendMessage(userId, {
+      await sock.sendMessage(sender, {
         image: { url: mediaUrl },
         caption
       }, { quoted: msg });
