@@ -7,24 +7,22 @@ require('dotenv').config({ path: path.join(__dirname, '../setting/.env') });
 const allowedNSFW = ['ass', 'hentai', 'milf', 'oral', 'paizuri', 'ecchi'];
 
 module.exports = async function waifuhen(sock, msg, text) {
-  try {
-    const remoteJid = msg.key.remoteJid;
-    const isGroup = remoteJid.endsWith('@g.us');
-    const userId = isGroup ? msg.key.participant : remoteJid;
-    const replyJid = msg.key.remoteJid; // Kirim pesan ke tempat asal command
+  const remoteJid = msg.key.remoteJid;
+  const isGroup = remoteJid.endsWith('@g.us');
+  const userId = isGroup ? msg.key.participant : remoteJid;
+  const replyJid = remoteJid; // <- ganti ini untuk jadi target pengiriman yang tepat (grup atau private)
 
-    console.log('[WAIFUHEN DEBUG]');
+  try {
+    console.log('\n[WAIFUHEN DEBUG]');
     console.log('remoteJid:', remoteJid);
     console.log('participant:', msg.key.participant);
     console.log('isGroup:', isGroup);
     console.log('userId:', userId);
 
-    // Ambil ADMIN_LIST dari .env dan ubah ke JID format
     const adminList = (process.env.ADMIN_LIST || '')
       .split(',')
       .map(n => n.trim().replace(/\D/g, '') + '@s.whatsapp.net');
 
-    // Cek apakah user termasuk admin
     const isUserAdmin = adminList.includes(userId);
 
     if (!isUserAdmin) {
@@ -47,7 +45,6 @@ module.exports = async function waifuhen(sock, msg, text) {
       }, { quoted: msg });
     }
 
-    // Request ke API
     const params = new URLSearchParams({
       included_tags: type,
       is_nsfw: 'true',
@@ -104,7 +101,7 @@ module.exports = async function waifuhen(sock, msg, text) {
 
   } catch (err) {
     console.error('[WAIFUHEN ERROR]', err);
-    await sock.sendMessage(msg.key.remoteJid, {
+    await sock.sendMessage(remoteJid, {
       text: '⚠️ Gagal kirim waifuhen. Cek tag atau coba lagi nanti ya.',
     }, { quoted: msg });
   }
