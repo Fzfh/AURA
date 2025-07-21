@@ -1,33 +1,31 @@
-const { adminList } = require('../setting/setting');
 const axios = require('axios');
 const path = require('path');
-const fs = require('fs');
-const { exec } = require('child_process');
+const { adminList } = require('../setting/setting');
 
-const allowedNSFW = ['ass', 'hentai', 'milf', 'oral', 'paizuri', 'ecchi'];
+const allowedNSFW = ['ass', 'hentai', 'milf', 'oral', 'paizuri', 'ecchi', 'ero'];
 
-module.exports = async function waifuhen(sock, msg, text, args, command, actualUserId) {
+module.exports = async function waifuhen(sock, msg, text) {
   try {
-    const chatId = msg.key.remoteJid;
-    const sender = msg.key.remoteJid;
+    const remoteJid = msg.key.remoteJid;
+    const userId = msg.key.participant || remoteJid;
+    const sendTo = remoteJid;
 
-    if (!adminList.includes(actualUserId)) {
-      return sock.sendMessage(sender, {
+    if (!adminList.includes(userId)) {
+      return sock.sendMessage(sendTo, {
         text: '❌ Fitur ini hanya bisa dipakai oleh admin bot saja.',
       }, { quoted: msg });
     }
 
-    const type = args[1]?.toLowerCase();
-
+    const type = text?.toLowerCase()?.trim();
     if (!type) {
-      return sock.sendMessage(chatId, {
-        text: `🔞 Gunakan: .waifuhen tag\nTag NSFW tersedia:\n• ${allowedNSFW.join('\n• ')}`
+      return sock.sendMessage(sendTo, {
+        text: `🔞 Gunakan: .waifuhen tag\nTag NSFW tersedia:\n• ${allowedNSFW.join('\n• ')}`,
       }, { quoted: msg });
     }
 
     if (!allowedNSFW.includes(type)) {
-      return sock.sendMessage(chatId, {
-        text: `❌ Tag *${type}* gak tersedia!\n\nPilih salah satu:\n• ${allowedNSFW.join('\n• ')}`
+      return sock.sendMessage(sendTo, {
+        text: `❌ Tag *${type}* gak tersedia!\n\nPilih salah satu:\n• ${allowedNSFW.join('\n• ')}`,
       }, { quoted: msg });
     }
 
@@ -49,37 +47,14 @@ module.exports = async function waifuhen(sock, msg, text, args, command, actualU
     const ext = path.extname(mediaUrl).toLowerCase();
     const caption = `🔞 ${type.charAt(0).toUpperCase() + type.slice(1)} by AuraBot`;
 
-    if (ext === '.gif') {
-      const gifPath = path.join(__dirname, `../temp/${Date.now()}.gif`);
-      const mp4Path = gifPath.replace('.gif', '.mp4');
-
-      const writer = fs.createWriteStream(gifPath);
-      const response = await axios.get(mediaUrl, { responseType: 'stream' });
-      response.data.pipe(writer);
-
-      await new Promise((resolve, reject) => {
-        writer.on('finish', resolve);
-        writer.on('error', reject);
-      });
-
-      await new Promise((resolve, reject) => {
-        const cmd = `ffmpeg -y -i "${gifPath}" -movflags faststart -pix_fmt yuv420p -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" "${mp4Path}"`;
-        exec(cmd, (err) => {
-          if (err) return reject(err);
-          resolve();
-        });
-      });
-
-      await sock.sendMessage(chatId, {
-        video: { url: mp4Path },
+    if (['.gif', '.mp4', '.webm'].includes(ext)) {
+      await sock.sendMessage(sendTo, {
+        video: { url: mediaUrl },
         caption,
         gifPlayback: true
       }, { quoted: msg });
-
-      fs.unlinkSync(gifPath);
-      fs.unlinkSync(mp4Path);
     } else {
-      await sock.sendMessage(chatId, {
+      await sock.sendMessage(sendTo, {
         image: { url: mediaUrl },
         caption
       }, { quoted: msg });
@@ -91,4 +66,4 @@ module.exports = async function waifuhen(sock, msg, text, args, command, actualU
       text: '⚠️ Gagal kirim waifuhen. Cek tag atau coba lagi nanti ya.',
     }, { quoted: msg });
   }
-}
+};
