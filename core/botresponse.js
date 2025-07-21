@@ -2,7 +2,6 @@ const { botResponsePatterns } = require('../setting/botconfig')
 const { handleStaticCommand } = require('../core/handler/staticCommand')
 const { handleOpenAIResponder, memoryMap } = require('../core/utils/openai')
 const path = require('path');
-const path = require('path');
 const importFresh = require('import-fresh');
 
 function isAdmin(jid) {
