@@ -42,6 +42,9 @@ const botResponsePatterns = [
   { command: 'una', handler: returnCommand["commands_admin"], isAdmin: true },
   { command: 'del', handler: returnCommand["commands_delete"], isAdmin: true},
   { command: 'show', handler: returnCommand["commands_show"], isAdmin: true },
+  { command: 'adminbot', handler: returnCommand["commands_adminBotManager"] },
+  { command: 'delbot', handler: returnCommand["commands_adminBotManager"] },
+  { command: 'adminlist', handler: returnCommand["commands_adminBotManager"] }
 
 ];
 
