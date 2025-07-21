@@ -8,16 +8,16 @@ const allowedNSFW = ['ass', 'hentai', 'milf', 'oral', 'paizuri', 'ecchi', 'ero']
 
 module.exports = async function waifuhen(sock, msg, text) {
   try {
-    const isGroup = msg.key.remoteJid.endsWith('@g.us');
-    const from = msg.key.remoteJid; // tempat command diketik
-    const sender = isGroup ? msg.key.participant : msg.key.remoteJid; // siapa yang ngirim
+    const sender = msg.key.participant || msg.key.remoteJid; // siapa yang kirim command
+    const chatId = msg.key.remoteJid; // tempat command diketik / tempat balasan dikirim
+    const isGroup = chatId.endsWith('@g.us');
 
-    const reply = (content) => sock.sendMessage(from, content, { quoted: msg });
+    // fungsi balas ke chatId dengan quoted message
+    const reply = (content) => sock.sendMessage(chatId, content, { quoted: msg });
 
+    // cek admin bot berdasar sender
     if (!adminList.includes(sender)) {
-      return reply({
-        text: '❌ Fitur ini hanya bisa dipakai oleh admin bot saja.',
-      });
+      return reply({ text: '❌ Fitur ini hanya bisa dipakai oleh admin bot saja.' });
     }
 
     const args = text?.trim().split(/\s+/).slice(1);
@@ -53,40 +53,45 @@ module.exports = async function waifuhen(sock, msg, text) {
     const ext = path.extname(mediaUrl).toLowerCase();
     const caption = `🔞 ${type.charAt(0).toUpperCase() + type.slice(1)} by AuraBot`;
 
+    // Download media ke temp file dulu
+    const tempPath = path.join(__dirname, `../temp/${Date.now()}${ext}`);
+    const writer = fs.createWriteStream(tempPath);
+    const response = await axios.get(mediaUrl, { responseType: 'stream' });
+    response.data.pipe(writer);
+
+    await new Promise((resolve, reject) => {
+      writer.on('finish', resolve);
+      writer.on('error', reject);
+    });
+
+    // Kalau GIF, convert ke MP4
     if (ext === '.gif') {
-      const gifPath = path.join(__dirname, `../temp/${Date.now()}.gif`);
-      const mp4Path = gifPath.replace('.gif', '.mp4');
-
-      const writer = fs.createWriteStream(gifPath);
-      const response = await axios.get(mediaUrl, { responseType: 'stream' });
-      response.data.pipe(writer);
-
+      const mp4Path = tempPath.replace('.gif', '.mp4');
       await new Promise((resolve, reject) => {
-        writer.on('finish', resolve);
-        writer.on('error', reject);
-      });
-
-      await new Promise((resolve, reject) => {
-        const cmd = `ffmpeg -y -i "${gifPath}" -movflags faststart -pix_fmt yuv420p -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" "${mp4Path}"`;
+        const cmd = `ffmpeg -y -i "${tempPath}" -movflags faststart -pix_fmt yuv420p -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" "${mp4Path}"`;
         exec(cmd, (err) => {
           if (err) return reject(err);
           resolve();
         });
       });
 
-      await sock.sendMessage(from, {
-        video: { url: mp4Path },
+      const videoBuffer = fs.readFileSync(mp4Path);
+      await sock.sendMessage(chatId, {
+        video: videoBuffer,
         caption,
         gifPlayback: true
       }, { quoted: msg });
 
-      fs.unlinkSync(gifPath);
+      fs.unlinkSync(tempPath);
       fs.unlinkSync(mp4Path);
     } else {
-      await sock.sendMessage(from, {
-        image: { url: mediaUrl },
+      const imageBuffer = fs.readFileSync(tempPath);
+      await sock.sendMessage(chatId, {
+        image: imageBuffer,
         caption
       }, { quoted: msg });
+
+      fs.unlinkSync(tempPath);
     }
 
   } catch (err) {
