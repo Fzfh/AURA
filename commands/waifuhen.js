@@ -11,6 +11,11 @@ module.exports = async function waifuhen(sock, msg, text) {
     const remoteJid = msg.key.remoteJid;
     const isGroup = remoteJid.endsWith('@g.us');
     const userId = isGroup ? msg.key.participant : remoteJid;
+    console.log('[WAIFUHEN DEBUG]');
+console.log('remoteJid:', msg.key.remoteJid);
+console.log('participant:', msg.key.participant);
+console.log('isGroup:', msg.key.remoteJid.endsWith('@g.us'));
+
 
     // Ambil ADMIN_LIST dari .env dan convert ke JID
     const adminList = (process.env.ADMIN_LIST || '')
