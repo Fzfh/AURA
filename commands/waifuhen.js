@@ -1,45 +1,42 @@
+const { adminList } = require('../setting/setting');
 const axios = require('axios');
-const fs = require('fs');
 const path = require('path');
+const fs = require('fs');
 const { exec } = require('child_process');
-require('dotenv').config({ path: path.join(__dirname, '../setting/.env') });
 
 const allowedNSFW = ['ass', 'hentai', 'milf', 'oral', 'paizuri', 'ecchi'];
 
 module.exports = async function waifuhen(sock, msg, text) {
   try {
     const remoteJid = msg.key.remoteJid;
+    const userId = msg.key.participant || remoteJid;
     const isGroup = remoteJid.endsWith('@g.us');
-    const userId = isGroup ? msg.key.participant : remoteJid;
 
-    // Ambil ADMIN_LIST dari .env dan convert ke JID
-    const adminList = (process.env.ADMIN_LIST || '')
-      .split(',')
-      .map(n => n.trim().replace(/\D/g, '') + '@s.whatsapp.net');
+    // ✅ Gunakan remoteJid sebagai target pengiriman
+    const targetJid = remoteJid;
 
-    const sender = userId.includes('@s.whatsapp.net') ? userId : userId.replace(/\D/g, '') + '@s.whatsapp.net';
-    const isUserAdmin = adminList.includes(sender);
-
-    if (!isUserAdmin) {
-      return await sock.sendMessage(sender, { text: '❌ Kamu bukan admin bot!' });
+    // ❌ Admin check harus berdasarkan userId (participant kalau grup)
+    if (!adminList.includes(userId)) {
+      return sock.sendMessage(targetJid, {
+        text: '❌ Fitur ini hanya bisa dipakai oleh admin bot saja.',
+      }, { quoted: msg });
     }
 
     const args = text?.trim().split(/\s+/).slice(1);
-    if (!args.length) {
-      return sock.sendMessage(sender, {
+    const type = args[0]?.toLowerCase();
+
+    if (!type) {
+      return sock.sendMessage(targetJid, {
         text: `🔞 Gunakan: .waifuhen tag\nTag NSFW tersedia:\n• ${allowedNSFW.join('\n• ')}`
       }, { quoted: msg });
     }
 
-    const type = args[0]?.toLowerCase();
-
     if (!allowedNSFW.includes(type)) {
-      return sock.sendMessage(sender, {
+      return sock.sendMessage(targetJid, {
         text: `❌ Tag *${type}* gak tersedia!\n\nPilih salah satu:\n• ${allowedNSFW.join('\n• ')}`
       }, { quoted: msg });
     }
 
-    // API request
     const params = new URLSearchParams({
       included_tags: type,
       is_nsfw: 'true',
@@ -79,7 +76,7 @@ module.exports = async function waifuhen(sock, msg, text) {
         });
       });
 
-      await sock.sendMessage(sender, {
+      await sock.sendMessage(targetJid, {
         video: { url: mp4Path },
         caption,
         gifPlayback: true
@@ -88,7 +85,7 @@ module.exports = async function waifuhen(sock, msg, text) {
       fs.unlinkSync(gifPath);
       fs.unlinkSync(mp4Path);
     } else {
-      await sock.sendMessage(sender, {
+      await sock.sendMessage(targetJid, {
         image: { url: mediaUrl },
         caption
       }, { quoted: msg });
