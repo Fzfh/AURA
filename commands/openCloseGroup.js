@@ -33,24 +33,18 @@ module.exports = async function openCloseGroup(sock, msg, text, args, commandNam
   const statusText = isOpen
     ? '🔓 Grup telah *dibuka*!\nSekarang semua anggota bisa mengirim pesan.'
     : '🔒 Grup telah *ditutup*!\nSekarang hanya admin yang bisa mengirim pesan.';
+
+  const alreadyStatusText = isOpen
+    ? '🔓 Grup sudah *dibuka*!'
+    : '🔒 Grup sudah *ditutup*!';
+
   try {
     await sock.groupSettingUpdate(from, action);
-    await sock.sendMessage(from, {
-      text: statusText,
-    }, { quoted: msg });
-  const SudahText = !isOpen
-    ? '🔓 Grup Sudah *dibuka*!'
-    : '🔒 Grup Sudah *ditutup*!';
-  try {
-    await sock.groupSettingUpdate(from, action);
-    await sock.sendMessage(from, {
-      text: SudahText,
-    }, { quoted: msg });
-    
+    await sock.sendMessage(from, { text: statusText }, { quoted: msg });
   } catch (err) {
     console.error('❌ Gagal mengubah pengaturan grup:', err);
     await sock.sendMessage(from, {
-      text: '❌ Gagal mengubah pengaturan grup. Coba lagi nanti yaa~',
+      text: alreadyStatusText + '\n(Tapi sepertinya sudah dalam status tersebut yaa~)',
     }, { quoted: msg });
   }
 };
