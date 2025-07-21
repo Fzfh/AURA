@@ -2,8 +2,9 @@ const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
 const { exec } = require('child_process'); 
-const { isAdmin } = require('../core/utils/security');
 
+const setting = require('../setting/setting'); // langsung dari setting.js
+const { adminList } = setting; // ambil adminList langsung
 
 const allowedNSFW = ['ass', 'hentai', 'milf', 'oral', 'paizuri', 'ecchi'];
 
@@ -12,16 +13,15 @@ module.exports = async function waifuhen(sock, msg, text) {
     const remoteJid = msg.key.remoteJid;
     const isGroup = remoteJid.endsWith('@g.us');
     const userId = isGroup ? msg.key.participant : remoteJid;
-    const sender = userId;
-    const isUserAdmin = isAdmin(userId);
-    
+
+    const userJid = userId.includes('@s.whatsapp.net') ? userId : userId.replace(/\D/g, '') + '@s.whatsapp.net';
+    const isUserAdmin = adminList.includes(userJid); // cek langsung dari setting
+
     if (!isUserAdmin) {
-      return sock.sendMessage(sender, {
+      return sock.sendMessage(userId, {
         text: '❌ Fitur ini hanya untuk admin AuraBot yaa 😘',
       }, { quoted: msg });
     }
-
-
 
    const args = text?.trim().split(/\s+/).slice(1);
     if (!args.length) {
