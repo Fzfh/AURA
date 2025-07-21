@@ -33,6 +33,9 @@ module.exports = async function openCloseGroup(sock, msg, text, args, commandNam
   const statusText = isOpen
     ? '🔓 Grup telah *dibuka*!\nSekarang semua anggota bisa mengirim pesan.'
     : '🔒 Grup telah *ditutup*!\nSekarang hanya admin yang bisa mengirim pesan.';
+  const statusText = !isOpen
+    ? '🔓 Grup Sudah *dibuka*!'
+    : '🔒 Grup Sudah *ditutup*!';
 
   try {
     await sock.groupSettingUpdate(from, action);
