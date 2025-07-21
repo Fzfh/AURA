@@ -8,29 +8,30 @@ const allowedNSFW = ['ass', 'hentai', 'milf', 'oral', 'paizuri', 'ecchi', 'ero']
 
 module.exports = async function waifuhen(sock, msg, text) {
   try {
-    const sender = msg.key.remoteJid;
-    const userId = msg.key.participant || sender;
+    const chatId = msg.key.remoteJid; // ID tempat balasan dikirim
+    const senderId = msg.key.participant || chatId; // ID pengirim command
 
-    if (!adminList.includes(userId)) {
-      return sock.sendMessage(sender, {
+    const reply = (content) => sock.sendMessage(chatId, content, { quoted: msg });
+
+    if (!adminList.includes(senderId)) {
+      return reply({
         text: '❌ Fitur ini hanya bisa dipakai oleh admin bot saja.',
-      }, { quoted: msg });
+      });
     }
 
     const args = text?.trim().split(/\s+/).slice(1);
     const type = args[0]?.toLowerCase();
 
-
     if (!type) {
-      return sock.sendMessage(sender, {
+      return reply({
         text: `🔞 Gunakan: .waifuhen tag\nTag NSFW tersedia:\n• ${allowedNSFW.join('\n• ')}`
-      }, { quoted: msg });
+      });
     }
 
     if (!allowedNSFW.includes(type)) {
-      return sock.sendMessage(sender, {
+      return reply({
         text: `❌ Tag *${type}* gak tersedia!\n\nPilih salah satu:\n• ${allowedNSFW.join('\n• ')}`
-      }, { quoted: msg });
+      });
     }
 
     const params = new URLSearchParams({
@@ -39,6 +40,7 @@ module.exports = async function waifuhen(sock, msg, text) {
       gif: 'true',
       limit: '1'
     });
+
     const res = await axios.get(`https://api.waifu.im/search?${params}`, {
       headers: { 'Accept-Version': 'v5' }
     });
@@ -71,7 +73,7 @@ module.exports = async function waifuhen(sock, msg, text) {
         });
       });
 
-      await sock.sendMessage(sender, {
+      await sock.sendMessage(chatId, {
         video: { url: mp4Path },
         caption,
         gifPlayback: true
@@ -80,7 +82,7 @@ module.exports = async function waifuhen(sock, msg, text) {
       fs.unlinkSync(gifPath);
       fs.unlinkSync(mp4Path);
     } else {
-      await sock.sendMessage(sender, {
+      await sock.sendMessage(chatId, {
         image: { url: mediaUrl },
         caption
       }, { quoted: msg });
