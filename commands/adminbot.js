@@ -64,7 +64,10 @@ module.exports = async function adminBotHandler(sock, msg, command, args) {
     return;
   }
 
-  const target = normalizeNumber(args[0]);
+  // Gabungkan semua argumen jadi satu string, hapus keyword "add"/"del"/"hapus"
+  const targetRaw = args.join(' ').replace(/add|hapus|del/i, '').trim();
+  const target = normalizeNumber(targetRaw);
+
   if (!target || target.length < 10) {
     await sock.sendMessage(from, { text: '⚠️ Nomor tidak valid.' });
     return;
@@ -78,22 +81,22 @@ module.exports = async function adminBotHandler(sock, msg, command, args) {
   // TAMBAH ADMIN
   if (command === 'adminbot') {
     if (adminList.includes(target)) {
-      await sock.sendMessage(from, { text: `⚠️ Nomor ${target} sudah jadi admin.` });
+      await sock.sendMessage(from, { text: `⚠️ Nomor *${target}* sudah jadi admin.` });
       return;
     }
     adminList.push(target);
     updateAdminList(adminList);
-    await sock.sendMessage(from, { text: `✅ ${target} ditambahkan sebagai admin bot.` });
+    await sock.sendMessage(from, { text: `✅ *${target}* berhasil ditambahkan sebagai admin bot.` });
   }
 
   // HAPUS ADMIN
   if (command === 'delbot') {
     if (!adminList.includes(target)) {
-      await sock.sendMessage(from, { text: `❌ Nomor ${target} bukan admin.` });
+      await sock.sendMessage(from, { text: `❌ Nomor *${target}* bukan admin.` });
       return;
     }
     const newList = adminList.filter(n => n !== target);
     updateAdminList(newList);
-    await sock.sendMessage(from, { text: `🗑️ ${target} telah dihapus dari admin bot.` });
+    await sock.sendMessage(from, { text: `🗑️ *${target}* telah dihapus dari admin bot.` });
   }
 };
