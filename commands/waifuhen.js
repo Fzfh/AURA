@@ -9,10 +9,17 @@ const allowedNSFW = ['ass', 'hentai', 'milf', 'oral', 'paizuri', 'ecchi'];
 
 module.exports = async function waifuhen(sock, msg, text) {
   try {
-    const sender = msg.key.remoteJid;
-    const userId = msg.key.participant || sender;
+    const remoteJid = msg.key.remoteJid;
+    const isGroup = remoteJid.endsWith('@g.us');
+    const userId = isGroup ? msg.key.participant : remoteJid;
+    
+    console.log('🧠 userId:', userId);
+    console.log('📣 remoteJid:', remoteJid);
+    console.log('🏘️ isGroup:', isGroup);
+    
     const isUserAdmin = isAdmin(userId);
     console.log('🛡️ isAdmin:', isUserAdmin);
+
     
     if (!isUserAdmin) {
       return sock.sendMessage(sender, {
