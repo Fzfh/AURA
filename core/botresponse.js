@@ -13,7 +13,7 @@ const greetedUsers = new Set()
 async function botFirstResponse({ sock, sender, msg }, options = {}) {
   const botName = options.botBehavior?.botName || 'Bot'
   const botMenu = options.botBehavior?.botMenu || '/menu'
-  const greetingText = Halo! Saya *${botName}* 🤖.\nKetik *${botMenu}* untuk melihat menu yang tersedia yaa~
+  const greetingText = `Halo! Saya *${botName}* 🤖.\nKetik *${botMenu}* untuk melihat menu yang tersedia yaa~`
   await sock.sendMessage(sender, { text: greetingText }, { quoted: msg })
 }
 
