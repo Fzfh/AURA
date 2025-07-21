@@ -12,6 +12,14 @@ module.exports = async function waifuhen(sock, msg, text) {
     const chatId = msg.key.remoteJid; // tempat command diketik / tempat balasan dikirim
     const isGroup = chatId.endsWith('@g.us');
 
+    console.log('--- Debug waifuhen ---');
+    console.log(`Fungsi waifuhen dipanggil.`);
+    console.log(`Sender (dari waifuhen): ${sender}`);
+    console.log(`Chat ID (dari waifuhen): ${chatId}`);
+    console.log(`Apakah Grup (dari waifuhen): ${isGroup}`);
+    console.log(`Kunci pesan penuh (msg.key):`, msg.key);
+    console.log('--------------------');
+    
     // fungsi balas ke chatId dengan quoted message
     const reply = (content) => sock.sendMessage(chatId, content, { quoted: msg });
 
