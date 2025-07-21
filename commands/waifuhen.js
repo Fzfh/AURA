@@ -12,7 +12,7 @@ module.exports = async function waifuhen(sock, msg, text) {
     const isGroup = remoteJid.endsWith('@g.us');
     const userId = isGroup ? msg.key.participant : remoteJid;
 
-    const setting = importFresh('../setting/setting'); // 🧼 Always Fresh!
+    const setting = importFresh(path.join(__dirname, '../setting/setting.js'));
     const { adminList } = setting;
 
     const sender = userId.includes('@s.whatsapp.net') ? userId : userId.replace(/\D/g, '') + '@s.whatsapp.net';
