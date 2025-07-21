@@ -29,7 +29,9 @@ function getOwnerNumber() {
 }
 
 function normalizeNumber(input) {
-  let numbers = input.match(/[0-9]+/g)?.join('') || '';
+  if (!input) return '';
+  let numbers = input.replace(/\D/g, ''); // Hanya ambil digit angka
+
   if (numbers.startsWith('0')) return '62' + numbers.slice(1);
   if (numbers.startsWith('8')) return '62' + numbers;
   if (numbers.startsWith('62')) return numbers;
@@ -43,54 +45,70 @@ module.exports = async function adminBotHandler(sock, msg, command, args) {
   const adminList = getAdminList();
   const ownerNumber = getOwnerNumber();
 
-  if (command === 'adminlist' && args.length === 0) {
-    if (!adminList.includes(senderNumber)) {
-      await sock.sendMessage(from, { text: '🚫 Kamu bukan admin bot.' });
+  // ❗ Cek jika bukan owner, langsung tolak
+  if (!adminList.includes(senderNumber) && command !== 'adminlist') {
+    if (senderNumber !== ownerNumber) {
+      await sock.sendMessage(from, { text: '❌ Hanya owner bot yang bisa ubah admin.' });
       return;
     }
+  }
 
+  // ✅ TAMPILKAN LIST ADMIN
+  if (command === 'adminlist') {
     const daftar = adminList.map((n, i) => `*${i + 1}.* wa.me/${n}`).join('\n') || '📭 Admin kosong.';
     await sock.sendMessage(from, { text: `📋 Daftar Admin Bot:\n${daftar}` });
     return;
   }
 
-  if (senderNumber !== ownerNumber) {
-    await sock.sendMessage(from, { text: '❌ Hanya owner bot yang bisa ubah admin.' });
-    return;
-  }
+  // ✅ TAMBAH ADMIN
+  if (command === 'adminbot' && args[0]?.toLowerCase() === 'add') {
+    const rawNumber = args.slice(1).join(' ');
+    const target = normalizeNumber(rawNumber);
 
-  const fullArg = args.join(' ');
-  const target = normalizeNumber(fullArg);
+    if (!target || target.length < 10) {
+      await sock.sendMessage(from, { text: '⚠️ Nomor tidak valid.' });
+      return;
+    }
 
-  if (!target || target.length < 10) {
-    await sock.sendMessage(from, { text: '⚠️ Nomor tidak valid.' });
-    return;
-  }
+    if (target === ownerNumber) {
+      await sock.sendMessage(from, { text: '👑 Itu nomor owner, tidak bisa diubah!' });
+      return;
+    }
 
-  if (target === ownerNumber) {
-    await sock.sendMessage(from, { text: '👑 Itu nomor owner, tidak bisa dihapus!' });
-    return;
-  }
-
-  // TAMBAH ADMIN
-  if (command === 'adminbot') {
     if (adminList.includes(target)) {
       await sock.sendMessage(from, { text: `⚠️ Nomor *${target}* sudah jadi admin.` });
       return;
     }
+
     adminList.push(target);
     updateAdminList(adminList);
     await sock.sendMessage(from, { text: `✅ *${target}* berhasil ditambahkan sebagai admin bot.` });
+    return;
   }
 
-  // HAPUS ADMIN
-  if (command === 'delbot') {
+  // ✅ HAPUS ADMIN
+  if (command === 'delbot' && args[0]?.toLowerCase() === 'del') {
+    const rawNumber = args.slice(1).join(' ');
+    const target = normalizeNumber(rawNumber);
+
+    if (!target || target.length < 10) {
+      await sock.sendMessage(from, { text: '⚠️ Nomor tidak valid.' });
+      return;
+    }
+
     if (!adminList.includes(target)) {
       await sock.sendMessage(from, { text: `❌ Nomor *${target}* bukan admin.` });
       return;
     }
+
     const newList = adminList.filter(n => n !== target);
     updateAdminList(newList);
     await sock.sendMessage(from, { text: `🗑️ *${target}* telah dihapus dari admin bot.` });
+    return;
   }
+
+  // ❓ Kalau command salah
+  await sock.sendMessage(from, {
+    text: `⚙️ Format salah! Gunakan salah satu dari:\n\n• *adminbot add 628xxx*\n• *delbot del 628xxx*\n• *adminlist*`
+  });
 };
