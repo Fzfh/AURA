@@ -106,7 +106,9 @@ module.exports = async function adminManagerHandler(sock, msg, text) {
     }
 
     const newList = setting.adminList.filter(x => x !== jid);
+    setting.adminList = newList; // ✅ Sinkronisasi ke memori aktif
     saveSettingFile(newList);
+
     return await sock.sendMessage(from, {
       text: `🗑️ Admin bot dihapus:\nwa.me/${jid.replace('@s.whatsapp.net', '')}`
     }, { quoted: msg });
