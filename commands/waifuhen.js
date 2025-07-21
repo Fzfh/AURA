@@ -18,7 +18,7 @@ module.exports = async function waifuhen(sock, msg, text) {
     const userId = msg.key.participant || sender;
     const adminList = getAdminList();
 
-    if (!adminList.includes(userId)) {
+     if (!isAdmin(userId)) {
       return sock.sendMessage(sender, {
         text: '❌ Fitur ini hanya bisa dipakai oleh admin bot saja.',
       }, { quoted: msg });
