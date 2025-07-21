@@ -2,109 +2,74 @@ const fs = require('fs');
 const path = require('path');
 const settingPath = path.join(__dirname, '../setting/setting.js');
 
-const OWNER_JID = '62895326679840@s.whatsapp.net'; // 👑 Nomor Aura
-
-// ⏪ Reload setting.js setiap dipanggil
 function getSetting() {
   delete require.cache[require.resolve(settingPath)];
   return require(settingPath);
 }
 
-// 📞 Ubah nomor jadi format JID WhatsApp
-function normalizeNumber(input) {
-  let cleaned = input.replace(/[-\s+]/g, '');
-  if (cleaned.startsWith('08') || cleaned.startsWith('0')) {
-    cleaned = '62' + cleaned.slice(1);
-  }
-  return cleaned + '@s.whatsapp.net';
+function saveSetting(newSetting) {
+  fs.writeFileSync(settingPath, 'module.exports = ' + JSON.stringify(newSetting, null, 2));
 }
 
-// 💾 Simpan daftar admin ke setting.js
-function saveSettingFile(newAdminList) {
+module.exports = async function adminBotHandler(sock, msg, command, args) {
   const setting = getSetting();
-  const updated = {
-    ...setting,
-    adminList: newAdminList
-  };
-  const fileContent = `module.exports = ${JSON.stringify(updated, null, 2)}\n`;
-  fs.writeFileSync(settingPath, fileContent);
-}
-
-// 🚀 Handler utama
-module.exports = async function adminManagerHandler(sock, msg, text) {
-  const setting = getSetting(); // 🆕 selalu fresh
-  const from = msg.key.remoteJid;
   const sender = msg.key.participant || msg.key.remoteJid;
-  const body = text.trim();
-  const [command, ...args] = body.split(/\s+/);
-  const fullArgs = args.join(' ').trim();
+  const isGroup = msg.key.remoteJid.endsWith('@g.us');
 
-  if (!setting.adminList.includes(sender)) {
-    return sock.sendMessage(from, {
-      text: '🚫 Kamu tidak memiliki izin untuk menggunakan perintah ini!',
-    }, { quoted: msg });
+  const senderNumber = sender.split('@')[0];
+  const ownerNumber = sock.user.id.split(':')[0]; // Nomor utama bot
+  const adminList = setting.adminList || [];
+
+  const isOwner = senderNumber === ownerNumber;
+
+  // Cek kalau yang manggil bukan owner
+  if (!isOwner) {
+    await sock.sendMessage(sender, { text: '❌ Hanya owner bot yang bisa mengatur admin bot.' });
+    return;
   }
 
-  if (command.toLowerCase() === 'adminlist') {
-    const sortedList = [
-      OWNER_JID,
-      ...setting.adminList.filter(a => a !== OWNER_JID)
-    ];
-
-    const listText = sortedList.map((a, i) => {
-      const num = a.replace('@s.whatsapp.net', '');
-      if (a === OWNER_JID) return `*Pemilik Utama:* wa.me/${num}`;
-      return `*${i}.* wa.me/${num}`;
-    }).join('\n') || 'Belum ada admin bot';
-
-    return await sock.sendMessage(from, {
-      text: `*Daftar Admin Bot:*\n${listText}`
-    }, { quoted: msg });
+  if (command === 'adminlist') {
+    if (adminList.length === 0) {
+      await sock.sendMessage(sender, { text: '📭 Daftar admin masih kosong.' });
+    } else {
+      const listText = adminList.map((num, i) => `*${i + 1}.* wa.me/${num}`).join('\n');
+      await sock.sendMessage(sender, { text: `📋 Daftar Admin Bot:\n${listText}` });
+    }
+    return;
   }
 
-  if (command.toLowerCase() === 'adminbot') {
-    if (!fullArgs) {
-      return await sock.sendMessage(from, { text: '⚠️ Format: *adminbot <nomor>*' }, { quoted: msg });
-    }
-
-    const jid = normalizeNumber(fullArgs);
-    if (jid === OWNER_JID) {
-      return await sock.sendMessage(from, { text: '👑 Pemilik Utama tidak perlu ditambahkan~' }, { quoted: msg });
-    }
-
-    if (setting.adminList.includes(jid)) {
-      return await sock.sendMessage(from, { text: '⚠️ Nomor sudah terdaftar sebagai admin bot!' }, { quoted: msg });
-    }
-
-    const newList = [...setting.adminList, jid];
-    saveSettingFile(newList);
-    return await sock.sendMessage(from, {
-      text: `✅ Admin bot ditambahkan:\nwa.me/${jid.replace('@s.whatsapp.net', '')}`
-    }, { quoted: msg });
+  if (args.length < 2) {
+    await sock.sendMessage(sender, { text: '📌 Format:\n.adminbot add 628xxxx\n.adminbot del 628xxxx' });
+    return;
   }
 
-  if (command.toLowerCase() === 'delbot') {
-    if (!fullArgs) {
-      return await sock.sendMessage(from, { text: '⚠️ Format: *delbot <nomor>*' }, { quoted: msg });
-    }
+  const action = args[0];
+  const targetNumber = args[1].replace(/[^0-9]/g, ''); // Bersihin karakter aneh
 
-    const jid = normalizeNumber(fullArgs);
-    if (jid === OWNER_JID) {
-      return await sock.sendMessage(from, {
-        text: '⛔ Tidak bisa menghapus Pemilik Utama. Dia kekal dan abadi~ 💫'
-      }, { quoted: msg });
-    }
+  if (!targetNumber) {
+    await sock.sendMessage(sender, { text: '❌ Nomor tidak valid!' });
+    return;
+  }
 
-    if (!setting.adminList.includes(jid)) {
-      return await sock.sendMessage(from, {
-        text: '❌ Nomor tidak ditemukan di daftar admin bot.'
-      }, { quoted: msg });
+  if (action === 'adminbot') {
+    if (adminList.includes(targetNumber)) {
+      await sock.sendMessage(sender, { text: '⚠️ Nomor ini sudah ada di admin list.' });
+    } else {
+      adminList.push(targetNumber);
+      setting.adminList = adminList;
+      saveSetting(setting);
+      await sock.sendMessage(sender, { text: `✅ Nomor ${targetNumber} berhasil ditambahkan ke admin bot.` });
     }
-
-    const newList = setting.adminList.filter(x => x !== jid);
-    saveSettingFile(newList);
-    return await sock.sendMessage(from, {
-      text: `🗑️ Admin bot dihapus:\nwa.me/${jid.replace('@s.whatsapp.net', '')}`
-    }, { quoted: msg });
+  } else if (action === 'del') {
+    if (!adminList.includes(targetNumber)) {
+      await sock.sendMessage(sender, { text: '⚠️ Nomor ini tidak ditemukan di admin list.' });
+    } else {
+      const filtered = adminList.filter(num => num !== targetNumber);
+      setting.adminList = filtered;
+      saveSetting(setting);
+      await sock.sendMessage(sender, { text: `✅ Nomor ${targetNumber} berhasil dihapus dari admin bot.` });
+    }
+  } else {
+    await sock.sendMessage(sender, { text: '📌 Gunakan `add` atau `del` untuk perintah ini.' });
   }
 };
