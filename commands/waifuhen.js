@@ -8,12 +8,13 @@ const allowedNSFW = ['ass', 'hentai', 'milf', 'oral', 'paizuri', 'ecchi', 'ero']
 
 module.exports = async function waifuhen(sock, msg, text) {
   try {
-    const chatId = msg.key.remoteJid; // ID tempat balasan dikirim
-    const senderId = msg.key.participant || chatId; // ID pengirim command
+    const isGroup = msg.key.remoteJid.endsWith('@g.us');
+    const from = msg.key.remoteJid; // tempat command diketik
+    const sender = isGroup ? msg.key.participant : msg.key.remoteJid; // siapa yang ngirim
 
-    const reply = (content) => sock.sendMessage(chatId, content, { quoted: msg });
+    const reply = (content) => sock.sendMessage(from, content, { quoted: msg });
 
-    if (!adminList.includes(senderId)) {
+    if (!adminList.includes(sender)) {
       return reply({
         text: '❌ Fitur ini hanya bisa dipakai oleh admin bot saja.',
       });
@@ -73,7 +74,7 @@ module.exports = async function waifuhen(sock, msg, text) {
         });
       });
 
-      await sock.sendMessage(chatId, {
+      await sock.sendMessage(from, {
         video: { url: mp4Path },
         caption,
         gifPlayback: true
@@ -82,7 +83,7 @@ module.exports = async function waifuhen(sock, msg, text) {
       fs.unlinkSync(gifPath);
       fs.unlinkSync(mp4Path);
     } else {
-      await sock.sendMessage(chatId, {
+      await sock.sendMessage(from, {
         image: { url: mediaUrl },
         caption
       }, { quoted: msg });
