@@ -71,7 +71,7 @@ module.exports = async function adminBotHandler(sock, msg, command, args) {
     return;
   }
 
-  if (action === 'add') {
+  if (action === 'adminbot') {
     if (adminList.includes(targetNumber)) {
       await sock.sendMessage(sender, { text: '⚠️ Nomor sudah terdaftar sebagai admin bot.' });
       return;
@@ -80,7 +80,7 @@ module.exports = async function adminBotHandler(sock, msg, command, args) {
     adminList.push(targetNumber);
     updateAdminList(adminList);
     await sock.sendMessage(sender, { text: `✅ ${targetNumber} berhasil jadi admin bot.` });
-  } else if (action === 'del') {
+  } else if (action === 'delbot') {
     if (targetNumber === ownerNumber) {
       await sock.sendMessage(sender, { text: '🚫 Nomor ini adalah OWNER dan tidak bisa dihapus.' });
       return;
