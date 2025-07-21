@@ -2,9 +2,7 @@ const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
 const { exec } = require('child_process'); 
-
-const setting = require('../setting/setting'); // langsung dari setting.js
-const { adminList } = setting; // ambil adminList langsung
+const importFresh = require('import-fresh');
 
 const allowedNSFW = ['ass', 'hentai', 'milf', 'oral', 'paizuri', 'ecchi'];
 
@@ -14,23 +12,24 @@ module.exports = async function waifuhen(sock, msg, text) {
     const isGroup = remoteJid.endsWith('@g.us');
     const userId = isGroup ? msg.key.participant : remoteJid;
 
-    const userJid = userId.includes('@s.whatsapp.net') ? userId : userId.replace(/\D/g, '') + '@s.whatsapp.net';
-    const isUserAdmin = adminList.includes(userJid); // cek langsung dari setting
+    const setting = importFresh('../setting/setting'); // 🧼 Always Fresh!
+    const { adminList } = setting;
+
+    const sender = userId.includes('@s.whatsapp.net') ? userId : userId.replace(/\D/g, '') + '@s.whatsapp.net';
+    const isUserAdmin = adminList.includes(sender); // bisa dipakai buat log juga
 
     if (!isUserAdmin) {
-      return sock.sendMessage(userId, {
-        text: '❌ Fitur ini hanya untuk admin AuraBot yaa 😘',
-      }, { quoted: msg });
+      return await sock.sendMessage(sender, { text: '❌ Kamu bukan admin bot!' });
     }
 
-   const args = text?.trim().split(/\s+/).slice(1);
+    const args = text?.trim().split(/\s+/).slice(1);
     if (!args.length) {
       return sock.sendMessage(sender, {
         text: `🔞 Gunakan: .waifuhen tag\nTag NSFW tersedia:\n• ${allowedNSFW.join('\n• ')}`
       }, { quoted: msg });
     }
-    const type = args[0]?.toLowerCase();
 
+    const type = args[0]?.toLowerCase();
 
     if (!allowedNSFW.includes(type)) {
       return sock.sendMessage(sender, {
@@ -38,6 +37,7 @@ module.exports = async function waifuhen(sock, msg, text) {
       }, { quoted: msg });
     }
 
+    // API request
     const params = new URLSearchParams({
       included_tags: type,
       is_nsfw: 'true',
