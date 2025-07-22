@@ -8,14 +8,6 @@ const path = require('path');
 const spamTracker = new Map()
 const mutedUsers = new Map()
 const muteDuration = 2 * 60 * 1000
-const greetedUsers = new Set()
-
-async function botFirstResponse({ sock, sender, msg }, options = {}) {
-  const botName = options.botBehavior?.botName || 'Bot'
-  const botMenu = options.botBehavior?.botMenu || '/menu'
-  const greetingText = `Halo! Saya *${botName}* 🤖.\nKetik *${botMenu}* untuk melihat menu yang tersedia yaa~`
-  await sock.sendMessage(sender, { text: greetingText }, { quoted: msg })
-}
 
 async function handleResponder(sock, msg) {
   try {
@@ -58,11 +50,6 @@ async function handleResponder(sock, msg) {
     const botJid = sock.user?.id;
     const mentionedJidList = content?.extendedTextMessage?.contextInfo?.mentionedJid || [];
     const isMentioned = mentionedJidList.includes(botJid);
-
-    if (isMentioned && !greetedUsers.has(userId)) {
-      greetedUsers.add(userId);
-      await botFirstResponse({ sock, sender, msg }, { botBehavior });
-    }
 
     for (const pattern of botResponsePatterns) {
       if (commandName !== pattern.command) continue;
