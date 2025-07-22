@@ -94,7 +94,6 @@ function registerGroupUpdateListener(sock) {
 
 module.exports = {
   handleResponder,
-  greetedUsers,
   botFirstResponse,
   registerGroupUpdateListener
 }
