@@ -1,4 +1,4 @@
-sfunction extractTargetJid(sock, msg, text) {
+function extractTargetJid(sock, msg, text) {
   const contextInfo = msg.message?.extendedTextMessage?.contextInfo;
   const mentioned = contextInfo?.mentionedJid;
   
