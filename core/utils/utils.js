@@ -1,12 +1,5 @@
 const fs = require("fs");
 const path = require("path");
-const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
-
-async function showTyping(sock, chatId, duration = 2000) {
-  await sock.sendPresenceUpdate('composing', chatId);
-  await delay(duration);
-}
-
 
 function extractText(msg) {
   return (
@@ -53,9 +46,9 @@ function formatTime() {
   });
 }
 
-// function delay(ms) {
-//   return new Promise((resolve) => setTimeout(resolve, ms));
-// }
+function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 function botLabel(text) {
   const { botBehavior } = require("../../setting/botConfig");
