@@ -86,6 +86,5 @@ module.exports = {
   formatTime,
   delay,
   botLabel,
-  loadCommands,
-  showTyping
+  loadCommands
 };
