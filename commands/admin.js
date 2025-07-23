@@ -1,9 +1,6 @@
-const { showTyping } = require('../core/utils/utils');
-function extractTargetJid(sock, msg, text) {
+sfunction extractTargetJid(sock, msg, text) {
   const contextInfo = msg.message?.extendedTextMessage?.contextInfo;
   const mentioned = contextInfo?.mentionedJid;
-  
-  await showTyping(sock, chatId, 2500);
   
   if (mentioned && mentioned.length > 0) {
     return mentioned[0];
