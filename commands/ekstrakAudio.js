@@ -26,7 +26,7 @@ module.exports = async function ekstrakAudio(sock, msg) {
       mediaMsg = msg;
     } else {
       return sock.sendMessage(sender, {
-        text: '❌ Tidak ada video ditemukan. Kirim video dengan caption "ets" atau reply video dan ketik "ets".',
+        text: '❌ Tidak ada video ditemukan. Kirim video dengan caption ".ets" atau reply video dan ketik ".ets".',
       }, { quoted: msg });
     }
 
@@ -72,7 +72,7 @@ module.exports = async function ekstrakAudio(sock, msg) {
   } catch (err) {
     console.error('❌ Gagal ekstrak audio:', err);
     await sock.sendMessage(msg.key.remoteJid, {
-      text: '⚠️ Gagal mengekstrak audio. Mungkin videonya rusak atau ffmpeg error 🥲',
+      text: '⚠️ Gagal mengekstrak audio. Mungkin videonya rusak atau ffmpeg error',
     }, { quoted: msg });
   }
 };
