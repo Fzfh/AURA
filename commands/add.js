@@ -18,7 +18,7 @@ module.exports = async function(sock, msg, text, sender, userId) {
 
   if (!isGroupAdmin) {
     await sock.sendMessage(groupId, {
-      text: '🚫 Maaf, hanya *admin grup* yang boleh menggunakan perintah ini.',
+      text: '🚫 Maaf yaa, hanya *admin grup* yang boleh menambahkan member.',
     }, { quoted: msg });
     return true;
   }
