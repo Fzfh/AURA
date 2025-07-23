@@ -1,4 +1,7 @@
+const { showTyping } = require('../core/utils/utils');
 module.exports = async (sock, msg) => {
+  await showTyping(sock, chatId, 2500);
+  
   await sock.sendMessage(
     msg.key.remoteJid,
     {
