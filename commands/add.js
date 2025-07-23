@@ -26,7 +26,7 @@ module.exports = async function(sock, msg, text, sender, userId) {
   const rawNomorList = text.split(' ').slice(1).join(' ');
   if (!rawNomorList) {
     await sock.sendMessage(groupId, {
-      text: '❗ Kirim seperti ini: `.add 628xxxxx, 089xxxx, +62 8xxx` untuk menambahkan member',
+      text: '❗Mau Tambah member ya? Kamu salah format tuhh, Kirim seperti ini: \n`.add 628xxxxx, 089xxxx, +62 8xxx` untuk menambahkan member',
     }, { quoted: msg });
     return true;
   }
