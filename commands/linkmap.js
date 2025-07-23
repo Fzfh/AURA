@@ -5,6 +5,7 @@ module.exports = async function linkMap(sock, msg, text) {
   const locationMsg = quoted?.locationMessage;
 
   let input = text.trim();
+  input = input.replace(/^\.?linkmap\s*/i, '').trim();
 
   // Kalau reply ke shareloc
   if (locationMsg) {
@@ -12,7 +13,7 @@ module.exports = async function linkMap(sock, msg, text) {
     const lon = locationMsg.degreesLongitude;
     input = `${lat},${lon}`;
   }
-
+  
   if (!input) {
     return sock.sendMessage(from, {
       text: '❌ Format salah!\nKetik: *.linkmap <lokasi atau koordinat>*\nAtau balas shareloc dan ketik *.linkmap*',
