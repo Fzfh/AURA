@@ -104,7 +104,7 @@ module.exports = async function admin(sock, msg, text, senderRaw, chatIdInput) {
   }
 
   if (isUNA) {
-  const stripJid = jid => jid.split(':')[0]; // 💡 Helper lokal
+  const getPureNumber = jid => jid.split('@')[0].split(':')[0];
 
   if (stripJid(target) === stripJid(sock.user.id)) {
     await sock.sendMessage(chatId, {
