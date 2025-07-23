@@ -1,5 +1,4 @@
-smodule.exports = async (sock, msg) => {
-  
+module.exports = async (sock, msg) => {
   await sock.sendMessage(
     msg.key.remoteJid,
     {
