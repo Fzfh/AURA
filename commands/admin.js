@@ -104,6 +104,12 @@ module.exports = async function admin(sock, msg, text, senderRaw, chatIdInput) {
   }
 
   if (isUNA) {
+    if (target === sock.user.id) {
+      await sock.sendMessage(chatId, {
+        text: `❌ *TIDAK BOLEH UN ADMIN NOMOR BOT*`,
+      }, { quoted: msg });
+      return true;
+    }
     if (!targetIsAdmin) {
       await sock.sendMessage(chatId, {
         text: `⚠️ User @${target.split('@')[0]} bukan admin grup kok~ 😅`,
