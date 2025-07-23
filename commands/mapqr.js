@@ -78,7 +78,7 @@ module.exports = async function mapsQR(sock, msg, text) {
     const media = fs.readFileSync(qrPath);
     await sock.sendMessage(from, {
       image: media,
-      caption: `📍 QR Code untuk lokasi:\n${mapsURL}`,
+      caption: `📍 QR Code Lokasi Kamu udah jadi nih, tinggal scan ajaa`,
     }, { quoted: msg });
 
     fs.unlinkSync(qrPath);
