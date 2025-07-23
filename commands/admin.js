@@ -103,12 +103,12 @@ module.exports = async function admin(sock, msg, text, senderRaw, chatIdInput) {
     return true;
   }
 
-  if (isUNA) {
+ if (isUNA) {
   const getPureNumber = jid => jid.split('@')[0].split(':')[0];
 
-  if (stripJid(target) === stripJid(sock.user.id)) {
+  if (getPureNumber(target) === getPureNumber(sock.user.id)) {
     await sock.sendMessage(chatId, {
-      text: `❌ *NGGAK BOLEH UNADMIN BOT SENDIRI DONGG!* 🤖💥\nNanti siapa yang jagain grup, ha?!`,
+      text: `❌ *NGGAK BOLEH UNADMIN BOT SENDIRI DONGG!* !`,
     }, { quoted: msg });
     return true;
   }
@@ -136,7 +136,6 @@ module.exports = async function admin(sock, msg, text, senderRaw, chatIdInput) {
 
   return true;
 }
-
 
   return false;
 };
