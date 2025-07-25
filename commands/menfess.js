@@ -1,83 +1,28 @@
-const menfessState = new Map();
-
-const kataTerlarang = [
-  "slot", "jp maxwin", "judi", "bo terpercaya", "zeus", "maxwin", "bet", "high return",
-  "rtp", "pragmatic", "scatter", "spin", "link", "deposit"
-];
-
-async function handleMenfess(sock, msg, text) {
-  if (typeof text !== 'string') return false;
-
-  const sender = msg.key.remoteJid;
-  const userId = msg.key.participant || sender;
-
-  if (menfessState.has(userId)) {
-    const input = text.trim();
-    const lowerInput = input.toLowerCase();
-
-    if (lowerInput === '/batal') {
-      menfessState.delete(userId);
-      await sock.sendMessage(sender, {
-        text: '❌ Menfess dibatalkan.'
+module.exports = {
+  async handler(sock, msg, { text, args, prefix, command, from, sender }) {
+    const [target, ...pesan] = args;
+    if (!target || !pesan.length) {
+      return sock.sendMessage(from, {
+        text: `Format salah!\nContoh: ${prefix}menfess 628xxxxx Halo kamu, aku suka sama kamu!`,
       }, { quoted: msg });
-      return true;
     }
 
-    const lines = input.split(/\r?\n/);
+    const tujuan = target.replace(/[^0-9]/g, '') + '@s.whatsapp.net';
+    const isiPesan = pesan.join(' ');
 
-    if (lines.length < 2) {
-      await sock.sendMessage(sender, {
-        text: '⚠ Format salah. Kirim dengan format:\n628xxxxxxx\nIsi pesan menfess'
+    try {
+      await sock.sendMessage(tujuan, {
+        text: `📩 *Menfess Message!*\n\n${isiPesan}\n\n🕊️ Kiriman anonim dari seseorang 😉`,
+      });
+
+      await sock.sendMessage(from, {
+        text: '✅ Menfess berhasil dikirim!',
       }, { quoted: msg });
-      return true;
-    }
-
-    const nomorTujuan = lines[0].replace(/[^0-9]/g, '') + '@s.whatsapp.net';
-    const isiPesan = lines.slice(1).join('\n').trim();
-
-    if (!isiPesan) {
-      await sock.sendMessage(sender, {
-        text: '⚠ Isi pesan tidak boleh kosong!'
+    } catch (e) {
+      console.error(e);
+      sock.sendMessage(from, {
+        text: '❌ Gagal mengirim menfess. Cek nomornya ya!',
       }, { quoted: msg });
-      return true;
     }
-
-    const terdeteksi = kataTerlarang.some(kata => isiPesan.toLowerCase().includes(kata));
-    if (terdeteksi) {
-      await sock.sendMessage(sender, {
-        text: '🚫 Menfess gagal dikirim! Sistem mendeteksi kata terlarang atau promosi yang dilarang.'
-      }, { quoted: msg });
-      menfessState.delete(userId);
-      return true;
-    }
-
-    await sock.sendMessage(nomorTujuan, {
-      text: `📩 *Pesan Menfess Masuk!*\n\n💬 *Isi:* ${isiPesan}\n🔒 *Pengirim dirahasiakan oleh sistem.*`
-    });
-
-    await sock.sendMessage(sender, {
-      text: '✅ Menfess berhasil dikirim *RAHASIA, GA AKAN DIBERI TAU DARI SIAPA*!'
-    }, { quoted: msg });
-
-    menfessState.delete(userId);
-    return true;
   }
-
-  if (text.toLowerCase() === '/menfess') {
-    menfessState.set(userId, true);
-
-    await sock.sendMessage(sender, {
-      text: '💌 Silakan kirim nomor tujuan dan isi pesan seperti ini:\n6289xxxxxxx\nIsi pesan menfess...\n\nKetik */batal* untuk membatalkan.'
-    }, { quoted: msg });
-
-    return true;
-  }
-
-  return false;
-}
-
-handleMenfess.checkState = function (userId) {
-  return menfessState.has(userId);
 };
-
-module.exports = handleMenfess;
