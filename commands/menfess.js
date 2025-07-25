@@ -19,7 +19,10 @@ module.exports = async function menfess(sock, msg, text) {
     if (lowerInput === '/batal' || lowerInput.startsWith('/')) {
       menfessState.delete(userId)
       await sock.sendMessage(sender, {
-        text: '❌ Menfess dibatalkan.'
+        text: `❌ *Menfess dibatalkan!*
+
+Pesan rahasia kamu *tidak* dikirim.
+Ketik */menfess* untuk memulai lagi.`
       }, { quoted: msg })
       return true
     }
@@ -28,7 +31,21 @@ module.exports = async function menfess(sock, msg, text) {
 
     if (lines.length < 2) {
       await sock.sendMessage(sender, {
-        text: '⚠ Format salah. Kirim dengan format:\n 628xxxxxxx\nIsi pesan menfess'
+        text: `⚠️ *Format salah!*
+
+Kirim dalam format seperti ini:
+\`\`\`
+628xxxxxxx
+Isi pesan menfess kamu...
+\`\`\`
+
+Contoh:
+\`\`\`
+6281234567890
+Hai, aku suka kamu sejak lama. Tapi aku malu bilang langsung 🙈
+\`\`\`
+
+Ketik */batal* untuk membatalkan.`
       }, { quoted: msg })
       return true
     }
@@ -38,14 +55,33 @@ module.exports = async function menfess(sock, msg, text) {
 
     if (!isiPesan) {
       await sock.sendMessage(sender, {
-        text: '⚠ Isi pesan tidak boleh kosong!' }, { quoted: msg })
+        text: `⚠️ Oops, pesan kamu kosong.
+
+Kamu cuma kirim nomor tanpa isi pesan ya? Coba kirim ulang dengan format:
+\`\`\`
+628xxxxxxx
+Isi pesan menfess di bawahnya
+\`\`\`
+
+Contoh:
+\`\`\`
+6281234567890
+Halo, ini pesan rahasia dari seseorang 👀
+\`\`\`
+
+Ketik */batal* untuk membatalkan.` }, { quoted: msg })
       return true
     }
 
     const terdeteksi = kataTerlarang.some(kata => isiPesan.toLowerCase().includes(kata))
     if (terdeteksi) {
       await sock.sendMessage(sender, {
-        text: '🚫 Menfess gagal dikirim! Sistem mendeteksi kata terlarang atau promosi yang dilarang.'
+        text: `🚫 *Menfess Gagal Dikirim!*
+
+Sistem mendeteksi adanya *kata terlarang* dalam isi pesan kamu.
+
+Mohon hindari kata-kata promosi atau spam.
+Ketik */menfess* untuk coba lagi.`
       }, { quoted: msg })
 
       menfessState.delete(userId)
@@ -53,11 +89,23 @@ module.exports = async function menfess(sock, msg, text) {
     }
 
     await sock.sendMessage(nomorTujuan, {
-      text: `📩 *Pesan Menfess Masuk!*\n\n💬 *Isi:* ${isiPesan}\n🔒 *Pengirim dirahasiakan oleh sistem.*`
+      text: `┏━━━━━━━━━━━━━━━┓
+┃  💌 *MENFESS MASUK*  ┃
+┗━━━━━━━━━━━━━━━┛
+
+📝 *Pesan Rahasia:*
+${isiPesan}
+
+🔐 *Pengirim dirahasiakan.*
+_*Kamu dipilih untuk menerima pesan ini secara pribadi...*_`
     });
 
     await sock.sendMessage(sender, {
-      text: '✅ Menfess berhasil dikirim *RAHASIA, GA AKAN DIBERI TAU DARI SIAPA*!' }, { quoted: msg })
+      text: `✅ *Menfess berhasil dikirim!*
+
+📬 Pesanmu telah dikirim secara *RAHASIA* ke nomor tujuan.
+
+_*Tenang, identitasmu dijaga 100% oleh sistem.*_` }, { quoted: msg })
 
     menfessState.delete(userId)
     return true
@@ -67,7 +115,15 @@ module.exports = async function menfess(sock, msg, text) {
     menfessState.set(userId, true)
 
     await sock.sendMessage(sender, {
-      text: '💌 Silakan kirim nomor tujuan dan isi pesan seperti ini:\n 6289xxxxxxx\nIsi pesan menfess...\n\nKetik */batal* untuk membatalkan.'
+      text: `💌 *Fitur Menfess Aktif!*
+
+Silakan kirim *nomor tujuan dan isi pesan* dengan format seperti ini:
+\`\`\`
+628xxxxxxxxxx
+Isi pesanmu di sini...
+\`\`\`
+
+Ketik */batal* kapan saja untuk membatalkan pengiriman.`
     }, { quoted: msg })
 
     return true
