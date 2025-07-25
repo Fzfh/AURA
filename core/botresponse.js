@@ -2,6 +2,12 @@ const { adminList } = require('../setting/setting')
 const { botResponsePatterns } = require('../setting/botconfig')
 const { handleStaticCommand } = require('../core/handler/staticCommand')
 const { handleOpenAIResponder, memoryMap } = require('../core/utils/openai')
+const { loadCommands } = require('../core/utils/utils');
+const returnCommand = loadCommands(
+  path.join(__dirname, '../commands'),
+  path.join(__dirname, '../core')
+);
+
 const path = require('path');
 
 
@@ -46,6 +52,12 @@ async function handleResponder(sock, msg) {
 
     const handledStatic = await handleStaticCommand(sock, msg, lowerText, userId, sender, body);
     if (handledStatic) return;
+    
+    const menfessHandler = returnCommand["commands_menfess"];
+    if (menfessHandler && menfessHandler.menfessState?.has(actualUserId)) {
+      const handledMenfess = await menfessHandler(sock, msg, text);
+      if (handledMenfess) return;
+    }
 
     const botJid = sock.user?.id;
     const mentionedJidList = content?.extendedTextMessage?.contextInfo?.mentionedJid || [];
