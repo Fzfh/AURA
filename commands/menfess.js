@@ -80,7 +80,7 @@ Ketik */batal* untuk membatalkan.` }, { quoted: msg })
 
 Sistem mendeteksi adanya *kata terlarang* dalam isi pesan kamu.
 
-Mohon hindari kata-kata promosi atau spam.
+Mohon hindari kata-kata Judol atau porno.
 Ketik */menfess* untuk coba lagi.`
       }, { quoted: msg })
 
