@@ -15,7 +15,7 @@ module.exports = async function menfess(sock, msg, text) {
     const input = text.trim()
     const lowerInput = input.toLowerCase()
 
-    if (lowerInput === '/batal' || lowerInput.startsWith('/')) {
+    if (lowerInput === '/batal') {
       menfessState.delete(userId)
       await sock.sendMessage(sender, {
         text: '❌ Menfess dibatalkan.'
