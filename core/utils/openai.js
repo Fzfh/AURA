@@ -282,7 +282,19 @@ function extractQueryFromMessage(msg, sock) {
     content?.videoMessage?.caption ||
     content?.documentMessage?.caption ||
     '';
+ 
+  const mentionedJid = content?.extendedTextMessage?.contextInfo?.mentionedJid || [];
+  const botJid = sock.user?.id;
+  const botNumber = botJid?.split('@')[0];
 
+   for (const jid of mentionedJid) {
+    const number = jid.split('@')[0];
+    if (number === botNumber) {
+      const tagPattern = new RegExp(`@${number}`, 'gi');
+      query = query.replace(tagPattern, '').trim();
+    }
+  }
+ 
   return query;
 }
 
