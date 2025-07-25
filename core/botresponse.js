@@ -1,3 +1,4 @@
+const path = require('path');
 const { adminList } = require('../setting/setting')
 const { botResponsePatterns } = require('../setting/botconfig')
 const { handleStaticCommand } = require('../core/handler/staticCommand')
@@ -7,9 +8,6 @@ const returnCommand = loadCommands(
   path.join(__dirname, '../commands'),
   path.join(__dirname, '../core')
 );
-
-const path = require('path');
-
 
 const spamTracker = new Map()
 const mutedUsers = new Map()
