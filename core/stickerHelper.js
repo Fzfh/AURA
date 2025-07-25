@@ -65,11 +65,21 @@ async function createStickerFromMessage(sock, msg) {
   try {
     const messageContent = msg.message;
     const type = Object.keys(messageContent)[0];
+    const content = messageContent[type];
 
     let mediaMessage;
-    if (type === 'imageMessage' || type === 'videoMessage') {
+
+    // ✅ Deteksi media langsung (image/video)
+    if (
+      (type === 'imageMessage' || type === 'videoMessage') &&
+      content?.mimetype &&
+      content?.url
+    ) {
       mediaMessage = msg;
-    } else if (
+    }
+
+    // ✅ Deteksi media dari reply (quoted)
+    else if (
       type === 'extendedTextMessage' &&
       messageContent.extendedTextMessage.contextInfo &&
       messageContent.extendedTextMessage.contextInfo.quotedMessage
@@ -88,12 +98,18 @@ async function createStickerFromMessage(sock, msg) {
 
     if (!mediaMessage) throw new Error('❌ Tidak ada media untuk dijadikan stiker.');
 
+    // ⏱️ Delay biar media sempat siap di sisi Baileys
+    await new Promise(resolve => setTimeout(resolve, 300));
+
     const buffer = await downloadMediaMessage(mediaMessage, 'buffer', {}, {
       logger: sock.logger,
       reuploadRequest: sock,
     });
 
-    const isVideo = type === 'videoMessage' || mediaMessage.message?.videoMessage;
+    const isVideo =
+      type === 'videoMessage' ||
+      mediaMessage.message?.videoMessage;
+
     const stickerBuffer = isVideo
       ? await convertVideoToSticker(buffer)
       : await new Sticker(buffer, {
