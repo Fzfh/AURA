@@ -62,6 +62,7 @@ Stiker akan langsung tercipta dari teks kamu!
 
 
 async function createStickerFromMessage(sock, msg) {
+  console.log('🔥 msg.message:', JSON.stringify(msg.message, null, 2));
   try {
     const messageContent = msg.message;
     const type = Object.keys(messageContent)[0];
