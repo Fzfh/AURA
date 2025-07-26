@@ -1,24 +1,41 @@
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
+const { tmpdir } = require('os');
 
-// 🔐 API KEY ElevenLabs kamu (JANGAN bocorin pas upload ya!)
-const API_KEY = 'sk_0ea6a643a6051826cf88c402e7752ad36d542c667b1e5a9f'; // potong di sini ya kalau upload ke publik!
-const VOICE_ID = 'EXAVITQu4vr4xnSDxMaL'; // Rachel (default)
+// Ganti dengan API KEY kamu yaa~ 🥺
+const API_KEY = 'sk_0ea6a643a6051826cf88c402e7752ad36d542c667b1e5a9f'; // Sensor kalau upload
+const VOICE_ID = 'EXAVITQu4vr4xnSDxMaL'; // Rachel
 
-function getRandom(ext = '.mp3') {
-  return `${Math.floor(Math.random() * 100000)}${ext}`;
+// Generate nama file random
+function getRandomFile(ext = '.mp3') {
+  return `speak-aura-${Date.now()}${ext}`;
 }
 
-module.exports = async function handler(m, { sock, text }) {
-  const reply = (msg) => sock.sendMessage(m.chat, { text: msg }, { quoted: m });
+module.exports = async function speak(sock, msg) {
+  const sender = msg.key.remoteJid;
 
-  if (!text) return reply('🗣️ Teksnya mana, sayang? Contoh: .speak Aku kangen kamu 💞');
+  const content = msg.message?.conversation ||
+                  msg.message?.extendedTextMessage?.text ||
+                  msg.message?.imageMessage?.caption ||
+                  msg.message?.videoMessage?.caption;
 
-  const fileName = getRandom('.mp3');
-  const filePath = path.join(__dirname, '../tmp', fileName);
+  if (!content || !content.trim().toLowerCase().startsWith('sp ')) {
+    return sock.sendMessage(sender, {
+      text: '🗣️ Format salah. Gunakan: sp <teks>\nContoh: sp Aku sayang kamu 💕',
+    }, { quoted: msg });
+  }
+
+  const text = content.trim().slice(3); // Hapus 'sp ' di depan
+
+  const fileName = getRandomFile('.mp3');
+  const filePath = path.join(tmpdir(), fileName);
 
   try {
+    await sock.sendMessage(sender, {
+      text: '🔊 Lagi diubah jadi suara dulu yaa... tungguin~',
+    }, { quoted: msg });
+
     const response = await axios({
       method: 'post',
       url: `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`,
@@ -41,22 +58,28 @@ module.exports = async function handler(m, { sock, text }) {
     response.data.pipe(writer);
 
     writer.on('finish', async () => {
-      await sock.sendMessage(m.chat, {
-        audio: fs.readFileSync(filePath),
+      const audioBuffer = fs.readFileSync(filePath);
+
+      await sock.sendMessage(sender, {
+        audio: audioBuffer,
         mimetype: 'audio/mpeg',
         ptt: false
-      }, { quoted: m });
+      }, { quoted: msg });
 
-      fs.unlinkSync(filePath); // bersihkan file setelah dikirim
+      fs.unlinkSync(filePath); // bersihin temp file
     });
 
-    writer.on('error', err => {
-      console.error('❌ Error simpan audio:', err);
-      reply('⚠️ Gagal simpan audio, coba lagi yaa.');
+    writer.on('error', async (err) => {
+      console.error('❌ Gagal simpan audio:', err);
+      await sock.sendMessage(sender, {
+        text: '⚠️ Gagal simpan audio, coba lagi ya.',
+      }, { quoted: msg });
     });
 
   } catch (err) {
-    console.error('❌ Error ElevenLabs:', err.response?.data || err.message);
-    reply('🚫 Gagal hubungi ElevenLabs. Cek API Key dan koneksi kamu yaa~');
+    console.error('❌ Error dari ElevenLabs:', err.response?.data || err.message);
+    await sock.sendMessage(sender, {
+      text: '🚫 Gagal ambil suara dari ElevenLabs. Cek API key & koneksi ya.',
+    }, { quoted: msg });
   }
 };
