@@ -77,18 +77,24 @@ function extractWiFiInfo(data) {
 }
 
 async function handleQR(sock, msg) {
-  const quoted = msg.message?.extendedTextMessage?.contextInfo?.quotedMessage;
   const from = msg.key.remoteJid;
 
-  if (!quoted?.imageMessage) {
+  // Deteksi apakah reply, media langsung, atau sticker
+  const quoted = msg.message?.extendedTextMessage?.contextInfo?.quotedMessage;
+  const mediaMessage =
+    quoted?.imageMessage || quoted?.stickerMessage?.isAnimated === false
+      ? quoted
+      : msg.message?.imageMessage || msg.message?.stickerMessage;
+
+  if (!mediaMessage) {
     return sock.sendMessage(from, {
-      text: '❌ Balas gambar QR-nya dulu ya, Auraa sayang~',
+      text: '❌ Kirim atau balas gambar QR ya, Auraa sayang~',
     }, { quoted: msg });
   }
 
   try {
     const mediaBuffer = await downloadMediaMessage(
-      { key: msg.key, message: quoted },
+      quoted ? { key: msg.key, message: quoted } : msg,
       'buffer',
       {},
       { logger: console }
@@ -124,20 +130,16 @@ async function handleQR(sock, msg) {
       resultText = result.getText();
     } catch {
       const jsqrResult = jsQR(data, width, height);
-      if (jsqrResult) {
-        resultText = jsqrResult.data;
-      }
+      if (jsqrResult) resultText = jsqrResult.data;
     }
 
     if (resultText) {
-      // Deteksi QRIS
       if (/^000201/.test(resultText)) {
         const { merchantName, merchantCity, issuer } = extractQRISInfo(resultText);
         const info = `✅ *QRIS berhasil dibaca!*\n\n*Isi QR Merchant:*\n\`${resultText}\`\n\n🏪 *Merchant/Toko:* ${merchantName || 'Tidak ditemukan'}\n📍 *Kota:* ${merchantCity || 'Tidak tersedia'}\n🏢 *Penyedia:* ${issuer || 'Tidak diketahui'}`;
         return sock.sendMessage(from, { text: info }, { quoted: msg });
       }
 
-      // Deteksi Wi-Fi
       if (/^WIFI:/.test(resultText)) {
         const wifiInfo = extractWiFiInfo(resultText);
         if (wifiInfo) {
@@ -146,21 +148,19 @@ async function handleQR(sock, msg) {
         }
       }
 
-      // Jika QR biasa (text / link / apapun)
       return sock.sendMessage(from, {
         text: `✅ *QR berhasil dibaca!*\n\n\`Isi QR:\`\n${resultText.length > 300 ? resultText.slice(0, 300) + '... (terpotong)' : resultText}`,
       }, { quoted: msg });
     }
 
-    // Gagal terbaca sama sekali
     return sock.sendMessage(from, {
-      text: '❌ QR tidak terbaca, bahkan oleh scanner cadangan 😭\n\nCoba pastikan:\n- Gambar cukup besar\n- QR tidak terlalu buram\n- Bukan QR view-once yang blur~',
+      text: '❌ QR tidak terbaca 😭\nPastikan:\n- Gambar cukup besar\n- Tidak blur\n- Bukan 1x View',
     }, { quoted: msg });
 
   } catch (err) {
     console.error('❌ Error QR:', err);
     return sock.sendMessage(from, {
-      text: '⚠️ Gagal membaca QR. Pastikan gambarnya jelas yaa~',
+      text: '⚠️ Gagal membaca QR. Coba lagi nanti ya, Auraa~',
     }, { quoted: msg });
   }
 }
