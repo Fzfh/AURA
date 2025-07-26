@@ -4,11 +4,10 @@ const fs = require('fs');
 const path = require('path');
 const { tmpdir } = require('os');
 
-// Ganti dengan API KEY kamu yaa~ 🥺
-const API_KEY = process.env.SOUND_API_KEY; // Sensor kalau upload
+// API & Voice ID
+const API_KEY = process.env.SOUND_API_KEY;
 const VOICE_ID = 'pNInz6obpgDQGcFmaJgB'; // Rachel
 
-// Generate nama file random
 function getRandomFile(ext = '.mp3') {
   return `speak-aura-${Date.now()}${ext}`;
 }
@@ -16,22 +15,27 @@ function getRandomFile(ext = '.mp3') {
 module.exports = async function speak(sock, msg) {
   const sender = msg.key.remoteJid;
 
+  // ✅ CEK JENIS CHAT (grup / pribadi)
+  const isGroup = sender.endsWith('@g.us');
+
+  // ✅ CEK ADMIN JIKA DI GRUP
+  if (isGroup) {
+    const metadata = await sock.groupMetadata(sender);
+    const participants = metadata.participants || [];
+    const senderId = msg.key.participant || msg.key.remoteJid;
+    const isAdmin = participants.some(p => p.id === senderId && (p.admin === 'admin' || p.admin === 'superadmin'));
+
+    if (!isAdmin) {
+      return sock.sendMessage(sender, {
+        text: '❌ Maaf, fitur ini cuma bisa dipakai oleh admin grup ya~',
+      }, { quoted: msg });
+    }
+  }
+
   const content = msg.message?.conversation ||
                   msg.message?.extendedTextMessage?.text ||
                   msg.message?.imageMessage?.caption ||
                   msg.message?.videoMessage?.caption;
-  const metadata = await sock.groupMetadata(groupId);
-  
-  const isGroupAdmin = metadata.participants.some(
-    p => p.id === realSender && (p.admin === 'admin' || p.admin === 'superadmin')
-  );
-
-  if (!isGroupAdmin) {
-    await sock.sendMessage(groupId, {
-      text: '🚫 Maaf yaa, hanya *admin grup* yang boleh menambahkan member.',
-    }, { quoted: msg });
-    return true;
-  }
   
   if (!content || !content.trim().toLowerCase().startsWith('sp ')) {
     return sock.sendMessage(sender, {
@@ -39,14 +43,14 @@ module.exports = async function speak(sock, msg) {
     }, { quoted: msg });
   }
 
-  const text = content.trim().slice(3); // Hapus 'sp ' di depan
+  const text = content.trim().slice(3); // hapus 'sp '
 
   const fileName = getRandomFile('.mp3');
   const filePath = path.join(tmpdir(), fileName);
 
   try {
     await sock.sendMessage(sender, {
-      text: '🔊 Lagi diubah jadi suara dulu yaa... tungguin~',
+      text: '🔊 Sedang Generate suara dari teks kamu....',
     }, { quoted: msg });
 
     const response = await axios({
@@ -79,7 +83,7 @@ module.exports = async function speak(sock, msg) {
         ptt: false
       }, { quoted: msg });
 
-      fs.unlinkSync(filePath); // bersihin temp file
+      fs.unlinkSync(filePath);
     });
 
     writer.on('error', async (err) => {
