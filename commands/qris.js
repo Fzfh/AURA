@@ -1,4 +1,5 @@
 const { downloadMediaMessage } = require('@whiskeysockets/baileys');
+const sharp = require('sharp');
 const Jimp = require('jimp');
 const jsQR = require('jsqr');
 const {
@@ -100,7 +101,14 @@ async function handleQR(sock, msg) {
       { logger: console }
     );
 
-    let image = await Jimp.read(mediaBuffer);
+    let image;
+    try {
+      const pngBuffer = await sharp(mediaBuffer).png().toBuffer();
+      image = await Jimp.read(pngBuffer);
+    } catch {
+      image = await Jimp.read(mediaBuffer);
+    }
+
     if (image.bitmap.width < 300) {
       image = image.resize(400, Jimp.AUTO);
     }
