@@ -54,7 +54,7 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
 ┃ 🔐 *Kelola Grup*
 ┃  ⤷ Buka/Tutup: \`.open\` / \`.close\`
 ┃  ⤷ Hapus pesan: \`.del\`
-┃  ⤷ Lihat 1x View: \`.show\`
+┃  ⤷ Lihat 1x View: \`.1\`
 ┃
 ┃ 🏗️ *Buat Grup*
 ┃  ⤷ Tanpa member: \`.bg Nama\`
