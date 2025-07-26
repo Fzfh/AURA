@@ -1,10 +1,11 @@
+require('dotenv').config({ path: __dirname + '/.env' })
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
 const { tmpdir } = require('os');
 
 // Ganti dengan API KEY kamu yaa~ 🥺
-const API_KEY = 'sk_0ea6a643a6051826cf88c402e7752ad36d542c667b1e5a9f'; // Sensor kalau upload
+const API_KEY = '${process.env.SOUND_API_KEY'; // Sensor kalau upload
 const VOICE_ID = 'EXAVITQu4vr4xnSDxMaL'; // Rachel
 
 // Generate nama file random
