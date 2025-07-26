@@ -6,7 +6,7 @@ const { tmpdir } = require('os');
 
 // Ganti dengan API KEY kamu yaa~ 🥺
 const API_KEY = process.env.SOUND_API_KEY; // Sensor kalau upload
-const VOICE_ID = 'EXAVITQu4vr4xnSDxMaL'; // Rachel
+const VOICE_ID = 'pNInz6obpgDQGcFmaJgB'; // Rachel
 
 // Generate nama file random
 function getRandomFile(ext = '.mp3') {
