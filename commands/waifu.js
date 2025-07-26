@@ -25,21 +25,8 @@ module.exports = async function waifu(sock, msg, text) {
         text: '🕓 Tunggu sebentar ya... jangan spam waifuuu~ 😵‍💫',
       }, { quoted: msg });
     }
-
-    const args = text?.trim().split(/\s+/).slice(1);
-    const type = args[0]?.toLowerCase();
-
-    if (!type) {
-      return sock.sendMessage(sender, {
-        text: `💡Contoh:\n.waifu maid\n.waifu raiden-shogun\n\n📜 List tag SFW:\n• ${allowedTags.join('\n• ')}`,
-      }, { quoted: msg });
-    }
-
-    if (!allowedTags.includes(type)) {
-      return sock.sendMessage(sender, {
-        text: `❌ Tag *${type}* gak ditemukan. Coba:\n• ${allowedTags.join('\n• ')}`,
-      }, { quoted: msg });
-    }
+    
+    const type = allowedTags[Math.floor(Math.random() * allowedTags.length)];
 
     spamTracker.set(userId, now);
     const res = await axios.get(`https://api.waifu.im/search`, {
