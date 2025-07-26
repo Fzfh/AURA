@@ -24,6 +24,8 @@ module.exports = async function mapsQR(sock, msg, text) {
   const locationMsg = quoted?.locationMessage;
 
   let input = text.trim();
+  input = input.replace(/^\.?mapqr\s*/i, '').trim();
+  
   if (locationMsg) {
     const lat = locationMsg.degreesLatitude;
     const lon = locationMsg.degreesLongitude;
