@@ -51,6 +51,10 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
 ┃  ⤷ Tambah member: \`.add 628xxx\`
 ┃  ⤷ Tag semua: \`.t\`
 ┃
+┃  🔊 Text ke suara
+┃  ⤷ \`sp\` teks
+┃  ⤷ Contoh = \`sp\` Aku... sayang kamu.
+┃
 ┃ 🔐 *Kelola Grup*
 ┃  ⤷ Buka/Tutup: \`.open\` / \`.close\`
 ┃  ⤷ Hapus pesan: \`.del\`
