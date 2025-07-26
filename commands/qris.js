@@ -10,17 +10,51 @@ const {
   HybridBinarizer
 } = require('@zxing/library');
 
-// Ekstrak info dari QRIS
-function extractQRISInfo(data) {
-  const tag59Match = data.match(/591[0-9](.*?)60/);
-  const tag60Match = data.match(/601[0-9](.*?)62/);
+function parseTLV(data) {
+  const result = {};
+  let i = 0;
 
-  const merchantName = tag59Match ? tag59Match[1].replace(/\*/g, ' ').trim() : null;
-  const merchantCity = tag60Match ? tag60Match[1].replace(/\*/g, ' ').trim() : null;
-  return { merchantName, merchantCity };
+  while (i < data.length - 4) {
+    const tag = data.substr(i, 2);
+    const len = parseInt(data.substr(i + 2, 2));
+    const value = data.substr(i + 4, len);
+    result[tag] = value;
+    i += 4 + len;
+  }
+
+  return result;
 }
 
-// Ekstrak info dari QR WiFi (urutan fleksibel)
+function extractQRISInfo(data) {
+  const tlv = parseTLV(data);
+  const merchantName = tlv['59'] || null;
+  const merchantCity = tlv['60'] || null;
+
+  let issuer = 'Tidak ditemukan';
+
+  for (const tag of ['26', '27', '28', '29', '30', '51']) {
+    if (tlv[tag]) {
+      const nestedTLV = parseTLV(tlv[tag]);
+      if (nestedTLV['00']) {
+        const id = nestedTLV['00'];
+        if (id.includes('shopee')) issuer = 'Shopee';
+        else if (id.includes('dana')) issuer = 'DANA';
+        else if (id.includes('linkaja')) issuer = 'LinkAja';
+        else if (id.includes('gopay')) issuer = 'GoPay';
+        else if (id.includes('ovo')) issuer = 'OVO';
+        else issuer = id;
+        break;
+      }
+    }
+  }
+
+  return {
+    merchantName: merchantName?.trim(),
+    merchantCity: merchantCity?.trim(),
+    issuer
+  };
+}
+
 function extractWiFiInfo(data) {
   const match = data.match(/^WIFI:(.*?);;$/);
   if (!match) return null;
@@ -98,8 +132,8 @@ async function handleQR(sock, msg) {
     if (resultText) {
       // Deteksi QRIS
       if (/^000201/.test(resultText)) {
-        const { merchantName, merchantCity } = extractQRISInfo(resultText);
-        const info = `✅ *QRIS berhasil dibaca!*\n\n*Isi QR Merchant:*\n\`${resultText}\`\n\n🏪 *Merchant/Toko:* ${merchantName || 'Tidak ditemukan'}\n📍 *Kota:* ${merchantCity || 'Tidak tersedia'}`;
+        const { merchantName, merchantCity, issuer } = extractQRISInfo(resultText);
+        const info = `✅ *QRIS berhasil dibaca!*\n\n*Isi QR Merchant:*\n\`${resultText}\`\n\n🏪 *Merchant/Toko:* ${merchantName || 'Tidak ditemukan'}\n📍 *Kota:* ${merchantCity || 'Tidak tersedia'}\n🏢 *Penyedia:* ${issuer || 'Tidak diketahui'}`;
         return sock.sendMessage(from, { text: info }, { quoted: msg });
       }
 
