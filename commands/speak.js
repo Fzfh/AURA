@@ -10,6 +10,7 @@ const MODEL_ID = 'eleven_multilingual_v2';
 
 const API_KEYS = [
   process.env.SOUND_API_KEY,
+  process.env.SOUND_API_KEY1,
   process.env.SOUND_API_KEY2
 ];
 
