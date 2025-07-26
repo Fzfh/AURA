@@ -9,18 +9,6 @@ module.exports = async function buatQR(sock, msg, text) {
     const remoteJid = msg.key.remoteJid;
 
     const isGroup = remoteJid.endsWith('@g.us');
-    if (isGroup) {
-      const metadata = await sock.groupMetadata(remoteJid);
-      const admins = metadata.participants
-        .filter(p => p.admin === 'admin' || p.admin === 'superadmin')
-        .map(p => p.id);
-
-      if (!admins.includes(sender)) {
-        return sock.sendMessage(remoteJid, {
-          text: '🚫 Hanya admin grup yang boleh menggunakan perintah *.cqr*!',
-        }, { quoted: msg });
-      }
-    }
 
     let qrText = text.trim();
     
