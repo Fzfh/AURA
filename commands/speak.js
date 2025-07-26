@@ -9,13 +9,7 @@ const VOICE_ID = 'EXAVITQu4vr4xnSDxMaL'; // Rachel - default
 function getRandom(ext = '.mp3') {
   return `${Math.floor(Math.random() * 100000)}${ext}`;
 }
-
-module.exports = {
-  name: 'speak',
-  aliases: ['say', 'bisik', 'suara'],
-  category: 'fun',
-  desc: 'Ubah teks jadi suara cewek manja via ElevenLabs ✨',
-  async handler(m, { sock, text }) {
+  async function handler(m, { sock, text }) {
     const reply = (msg) => sock.sendMessage(m.chat, { text: msg }, { quoted: m });
 
     if (!text) return reply('🗣️ Teksnya mana, sayang? Contoh: .speak Aku kangen kamu 💞');
@@ -65,4 +59,4 @@ module.exports = {
       reply('🚫 Gagal hubungi ElevenLabs. Cek API Key dan koneksi kamu yaa~');
     }
   }
-};
+module.exports = handler;
