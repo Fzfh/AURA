@@ -24,7 +24,6 @@ module.exports = async function speak(sock, msg) {
     const participants = metadata.participants || [];
     const senderId = msg.participant || msg.key.participant || msg.key.remoteJid;
     const isAdmin = participants.some(p => p.id === senderId && (p.admin === 'admin' || p.admin === 'superadmin'));
-    console.log('[SP] sender:', senderId);
 
     if (!isAdmin) {
       return sock.sendMessage(sender, {
