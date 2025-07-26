@@ -11,7 +11,7 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
     case '.menu':
       await sock.sendMessage(sender, {
        text: `╭──〔 ✨ MENU AURABOT ✨ 〕──╮
-┃ 👋 Hai @\${actualUserId.split('@')[0]}!
+┃ 👋 Hai @${actualUserId.split('@')[0]}!
 ┃ Yuk cobain fitur-fitur bot ini:
 ┃
 ┃ 🎨 *Sticker*
