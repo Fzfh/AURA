@@ -6,7 +6,7 @@ const { tmpdir } = require('os');
 
 // API & Voice ID
 const API_KEY = process.env.SOUND_API_KEY;
-const VOICE_ID = 'pNInz6obpgDQGcFmaJgB'; // Rachel
+const VOICE_ID = 'MF3mGyEYCl7XYWbV9V6O'; // ELLI INI
 
 function getRandomFile(ext = '.mp3') {
   return `speak-aura-${Date.now()}${ext}`;
