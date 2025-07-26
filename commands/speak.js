@@ -5,7 +5,7 @@ const path = require('path');
 const { tmpdir } = require('os');
 
 // Ganti dengan API KEY kamu yaa~ 🥺
-const API_KEY = '${process.env.SOUND_API_KEY'; // Sensor kalau upload
+const API_KEY = ${process.env.SOUND_API_KEY; // Sensor kalau upload
 const VOICE_ID = 'EXAVITQu4vr4xnSDxMaL'; // Rachel
 
 // Generate nama file random
