@@ -79,12 +79,14 @@ function extractWiFiInfo(data) {
 
 async function handleQR(sock, msg) {
   const from = msg.key.remoteJid;
+
+  // Deteksi apakah reply, media langsung, atau sticker
   const quoted = msg.message?.extendedTextMessage?.contextInfo?.quotedMessage;
   const mediaMessage =
     quoted?.imageMessage || quoted?.stickerMessage?.isAnimated === false
       ? quoted
       : msg.message?.imageMessage || msg.message?.stickerMessage;
-
+  
   if (!mediaMessage) {
     return sock.sendMessage(from, {
       text: '❌ Kirim atau balas gambar QR ya, Auraa sayang~',
@@ -99,8 +101,17 @@ async function handleQR(sock, msg) {
       { logger: console }
     );
 
-    const pngBuffer = await sharp(mediaBuffer).png().toBuffer();
-    const image = await Jimp.read(pngBuffer);
+    let image;
+    try {
+      const pngBuffer = await sharp(mediaBuffer).png().toBuffer();
+      image = await Jimp.read(pngBuffer);
+    } catch {
+      image = await Jimp.read(mediaBuffer);
+    }
+
+    if (image.bitmap.width < 300) {
+      image = image.resize(400, Jimp.AUTO);
+    }
 
     const { width, height, data } = image.bitmap;
     const grayscale = new Uint8ClampedArray(width * height);
@@ -114,56 +125,50 @@ async function handleQR(sock, msg) {
 
     const source = new RGBLuminanceSource(grayscale, width, height);
     const bitmap = new BinaryBitmap(new HybridBinarizer(source));
+
     const reader = new MultiFormatReader();
     reader.setHints(new Map([
       [DecodeHintType.POSSIBLE_FORMATS, [BarcodeFormat.QR_CODE]]
     ]));
 
-    let results = [];
+    let resultText = null;
+
     try {
       const result = reader.decode(bitmap);
-      results.push(result.getText());
+      resultText = result.getText();
     } catch {
       const jsqrResult = jsQR(data, width, height);
-      if (jsqrResult) results.push(jsqrResult.data);
+      if (jsqrResult) resultText = jsqrResult.data;
     }
 
-    if (results.length === 0) {
+    if (resultText) {
+      if (/^000201/.test(resultText)) {
+        const { merchantName, merchantCity, issuer } = extractQRISInfo(resultText);
+        const info = `✅ *QRIS berhasil dibaca!*\n\n*Isi QR Merchant:*\n\`${resultText}\`\n\n🏪 *Merchant/Toko:* ${merchantName || 'Tidak ditemukan'}\n📍 *Kota:* ${merchantCity || 'Tidak tersedia'}\n🏢 *Penyedia:* ${issuer || 'Tidak diketahui'}`;
+        return sock.sendMessage(from, { text: info }, { quoted: msg });
+      }
+
+      if (/^WIFI:/.test(resultText)) {
+        const wifiInfo = extractWiFiInfo(resultText);
+        if (wifiInfo) {
+          const wifiMsg = `📶 *QR Wi-Fi Terdeteksi!*\n\n🔐 *Tipe:* ${wifiInfo.type || 'Tidak diketahui'}\n📡 *Nama WiFi:* ${wifiInfo.ssid || 'Tidak ditemukan'}\n🔑 *Password:* ${wifiInfo.password || 'Kosong / Terbuka'}\n*Status Hidden:* ${wifiInfo.hidden ? 'Iya (disembunyikan)' : 'Tidak'}`;
+          return sock.sendMessage(from, { text: wifiMsg }, { quoted: msg });
+        }
+      }
+
       return sock.sendMessage(from, {
-        text: '❌ QR tidak terbaca 😭 Coba perbesar, jangan blur yaa~',
+        text: `✅ *QR berhasil dibaca!*\n\n\`Isi QR:\`\n${resultText.length > 300 ? resultText.slice(0, 300) + '... (terpotong)' : resultText}`,
       }, { quoted: msg });
     }
 
-    let combinedInfo = `🔍 *${results.length} QR Terdeteksi!*
+    return sock.sendMessage(from, {
+      text: '❌ QR tidak terbaca 😭\nPastikan:\n- Gambar cukup besar\n- Tidak blur\n- Bukan 1x View',
+    }, { quoted: msg });
 
-`;
-    for (const resultText of results) {
-      if (/^000201/.test(resultText)) {
-        const { merchantName, merchantCity, issuer } = extractQRISInfo(resultText);
-        combinedInfo += `🏪 *Merchant:* ${merchantName || '-'}
-📍 *Kota:* ${merchantCity || '-'}
-🏢 *Penyedia:* ${issuer || '-'}
-────────────────────
-`;
-      } else if (/^WIFI:/.test(resultText)) {
-        const wifiInfo = extractWiFiInfo(resultText);
-        combinedInfo += `📡 *WiFi:* ${wifiInfo?.ssid || '-'}
-🔑 *Password:* ${wifiInfo?.password || '-'}
-────────────────────
-`;
-      } else {
-        combinedInfo += `🔸 *QR Lain:*
-${resultText.slice(0, 300)}
-────────────────────
-`;
-      }
-    }
-
-    await sock.sendMessage(from, { text: combinedInfo }, { quoted: msg });
   } catch (err) {
     console.error('❌ Error QR:', err);
     return sock.sendMessage(from, {
-      text: '⚠️ Gagal membaca QR. Coba ulang yaa~',
+      text: '⚠️ Gagal membaca QR. Coba lagi nanti ya, Auraa~',
     }, { quoted: msg });
   }
 }
