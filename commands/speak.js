@@ -20,7 +20,19 @@ module.exports = async function speak(sock, msg) {
                   msg.message?.extendedTextMessage?.text ||
                   msg.message?.imageMessage?.caption ||
                   msg.message?.videoMessage?.caption;
+  const metadata = await sock.groupMetadata(groupId);
+  
+  const isGroupAdmin = metadata.participants.some(
+    p => p.id === realSender && (p.admin === 'admin' || p.admin === 'superadmin')
+  );
 
+  if (!isGroupAdmin) {
+    await sock.sendMessage(groupId, {
+      text: '🚫 Maaf yaa, hanya *admin grup* yang boleh menambahkan member.',
+    }, { quoted: msg });
+    return true;
+  }
+  
   if (!content || !content.trim().toLowerCase().startsWith('sp ')) {
     return sock.sendMessage(sender, {
       text: '🗣️ Format salah. Gunakan: sp <teks>\nContoh: sp Aku sayang kamu 💕',
