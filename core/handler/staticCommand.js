@@ -39,7 +39,7 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
 ┃  ⤷ Baca: reply QR + \`.sqr\`
 ┃  ⤷ Buat: \`.cqr halo dunia\`
 ┃
-┃ 👘 *Waifu Lucu*: \`.waifu neko\`
+┃ 👘 *Waifu Lucu*: \`.w\`
 ┃
 ┃ 🤖 *Info Bot*: \`beli bot\` / \`admin\`
 ┃ ❓ *Bantuan*: \`tutorial\` / \`tutor\`
