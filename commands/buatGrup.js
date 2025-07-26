@@ -60,11 +60,18 @@ module.exports = async function buatGrup(sock, msg, text) {
   const gagalNumbers = [];
 
   if (afterAdd) {
-    const nomorList = afterAdd.split(',').map(n => {
-      let num = n.trim().replace(/[^0-9]/g, '');
-      if (num.startsWith('0')) num = '62' + num.slice(1);
-      return num;
-    });
+  const nomorList = afterAdd.split(',').map(n => {
+    let num = n.trim().replace(/[^0-9]/g, '');
+
+    if (num.startsWith('0')) num = '62' + num.slice(1);
+    else if (num.startsWith('8')) num = '62' + num;
+    else if (num.startsWith('62')) num = num;           
+    else if (num.startsWith('1')) num = '62' + num;       
+    else if (num.startsWith('+62')) num = num.slice(1);
+
+    return num;
+  }).filter(n => n.length >= 9);
+
 
     for (const nomor of nomorList) {
       const jid = `${nomor}@s.whatsapp.net`;
