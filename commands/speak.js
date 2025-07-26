@@ -3,16 +3,22 @@ const fs = require('fs');
 const path = require('path');
 
 // 🔐 Ganti dengan API Key ElevenLabs kamu
-const API_KEY = 'sk_0ea6a643a6051826cf88c402e7752ad36d542c667b1e5a9f';
-const VOICE_ID = 'EXAVITQu4vr4xnSDxMaL'; // Contoh: Rachel
+const API_KEY = 'sk_0ea6a643a6051826cf88c402e7752ad36d542c667b1e5a9f'; // Jangan bocorin full di publik ya 😘
+const VOICE_ID = 'EXAVITQu4vr4xnSDxMaL'; // Rachel - default
 
-// Fungsi pembuat nama file random
 function getRandom(ext = '.mp3') {
   return `${Math.floor(Math.random() * 100000)}${ext}`;
 }
 
-  async function handler(m, { sock, text }) {
-    if (!text) return m.reply('🗣️ Teksnya mana, sayang? Contoh: .speak Aku kangen kamu 💞');
+module.exports = {
+  name: 'speak',
+  aliases: ['say', 'bisik', 'suara'],
+  category: 'fun',
+  desc: 'Ubah teks jadi suara cewek manja via ElevenLabs ✨',
+  async handler(m, { sock, text }) {
+    const reply = (msg) => sock.sendMessage(m.chat, { text: msg }, { quoted: m });
+
+    if (!text) return reply('🗣️ Teksnya mana, sayang? Contoh: .speak Aku kangen kamu 💞');
 
     const fileName = getRandom('.mp3');
     const filePath = path.join(__dirname, '../tmp', fileName);
@@ -46,18 +52,17 @@ function getRandom(ext = '.mp3') {
           ptt: false
         }, { quoted: m });
 
-        fs.unlinkSync(filePath); // hapus file setelah dikirim
+        fs.unlinkSync(filePath); // bersihkan setelah kirim
       });
 
       writer.on('error', err => {
         console.error('❌ Error simpan audio:', err);
-        m.reply('⚠️ Gagal simpan audio, coba lagi yaa.');
+        reply('⚠️ Gagal simpan audio, coba lagi yaa.');
       });
 
     } catch (err) {
       console.error('❌ Error ElevenLabs:', err.response?.data || err.message);
-      m.reply('🚫 Gagal hubungi ElevenLabs. Cek API Key dan koneksi kamu yaa~');
+      reply('🚫 Gagal hubungi ElevenLabs. Cek API Key dan koneksi kamu yaa~');
     }
   }
-
-module.exports = handler;
+};
