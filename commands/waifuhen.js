@@ -4,34 +4,20 @@ const path = require('path');
 const fs = require('fs');
 const { exec } = require('child_process');
 
-
 const allowedNSFW = ['ass', 'hentai', 'milf', 'oral', 'paizuri', 'ecchi'];
 
 module.exports = async function waifuhen(sock, msg, text) {
   try {
     const sender = msg.key.remoteJid;
     const userId = msg.key.participant || sender;
-    
+
     if (!adminList.includes(userId)) {
       return sock.sendMessage(sender, {
         text: '❌ Fitur ini hanya bisa dipakai oleh admin bot saja.',
       }, { quoted: msg });
     }
 
-    const args = text?.trim().split(/\s+/).slice(1);
-    const type = args[0]?.toLowerCase();
-
-    if (!type) {
-      return sock.sendMessage(sender, {
-        text: `🔞 Gunakan: .waifuhen tag\nTag NSFW tersedia:\n• ${allowedNSFW.join('\n• ')}`
-      }, { quoted: msg });
-    }
-
-    if (!allowedNSFW.includes(type)) {
-      return sock.sendMessage(sender, {
-        text: `❌ Tag *${type}* gak tersedia!\n\nPilih salah satu:\n• ${allowedNSFW.join('\n• ')}`
-      }, { quoted: msg });
-    }
+    const type = allowedNSFW[Math.floor(Math.random() * allowedNSFW.length)];
 
     const params = new URLSearchParams({
       included_tags: type,
