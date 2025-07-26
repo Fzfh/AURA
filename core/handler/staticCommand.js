@@ -10,116 +10,59 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
     case 'menu':
     case '.menu':
       await sock.sendMessage(sender, {
-       text: `╭━━━〔 ✨ MENU UTAMA ✨ 〕━━━╮  
-┃ 👋 Hai @${actualUserId.split('@')[0]}, selamat datang!
-┃ ini daftar fitur member yang bisa kamu gunakan:
+       text: `╭──〔 ✨ MENU AURABOT ✨ 〕──╮
+┃ 👋 Hai @\${actualUserId.split('@')[0]}!
+┃ Yuk cobain fitur-fitur bot ini:
 ┃
-┃ 🖼 *Sticker dari Gambar/Video*
-┃   ➤ Kirim foto/video + caption: \`s\` atau \`sticker\`
-┃   ➤ Bot akan otomatis mengubah jadi stiker
+┃ 🎨 *Sticker*
+┃  ⤷ Kirim foto/video + caption \`s\`
+┃  ⤷ Dari teks: \`.stickertext Halo\`
+┃  ⤷ Balik stiker ke media: \`.sm\`
 ┃
-┃ ⬆️ *Ambil Sticker Jadi Gambar/Video*
-┃   ➤ Reply ke stiker, lalu ketik: \`.sm\`
-┃   ➤ Bot akan mengembalikannya jadi media asli
+┃ 🎧 *Audio & Musik*
+┃  ⤷ Ekstrak dari video: \`.ets\`
+┃  ⤷ Musik TikTok: \`.ds <link>\`
 ┃
-┃ ✍️ *Sticker dari Teks*
-┃   ➤ \`.stickertext\` teks kamu
-┃   ➤ Contoh: \`.stickertext Halo\`
-┃   ➤ Bisa juga singkat: \`.st AuraBot\`
+┃ 📥 *Downloader*
+┃  ⤷ TikTok: \`.d <link>\`
+┃  ⤷ Reels IG: \`.dig <link>\`
 ┃
-┃ 🎵 *Ekstrak Audio dari Video*
-┃   ➤ Kirim video + caption: \`.ets\`
-┃   ➤ Atau reply video lalu ketik: \`.ets\`
+┃ 🗺️ *Maps & Lokasi*
+┃  ⤷ Cari lokasi: \`.linkmap Monas\`
+┃  ⤷ QR lokasi: \`.mapqr Monas\`
 ┃
-┃ 💌 *Menfess Anonim*
-┃   ➤ Ketik: \`/menfess\` lalu ikuti instruksi
+┃ 💌 *Menfess Anonim*: \`/menfess\`
 ┃
-┃ 🗺️ *Cari Lokasi (Google Maps)*
-┃   ➤ \`.linkmap\` [nama lokasi]
-┃   ➤ Contoh: \`.linkmap Monas Jakarta\`
-┃   ➤ Bisa juga reply shareloc lalu ketik \`.linkmap\`
+┃ 🖼️ *Foto Profil*: \`.pp\` 628xxx / @tag
 ┃
-┃ 🗺️🎛️ *Cari Lokasi dan Convert ke QR (MapQR)*
-┃   ➤ \`.mapqr\` [nama lokasi]
-┃   ➤ Contoh: \`.mapqr Monas Jakarta\`
-┃   ➤ Bisa reply shareloc juga
+┃ 🧾 *QR Code*:
+┃  ⤷ Baca: reply QR + \`.sqr\`
+┃  ⤷ Buat: \`.cqr halo dunia\`
 ┃
-┃ 👰🏻 *Cari Waifu Lucu*
-┃   ➤ \`.waifu\` [jenis/nama waifu]
-┃   ➤ Contoh: \`.waifu neko\`
+┃ 👘 *Waifu Lucu*: \`.waifu neko\`
 ┃
-┃ ⬇️ *Download TikTok (Video & Foto)*
-┃   ➤ \`.d\` [link TikTok]
-┃   ➤ Contoh: \`.d https://tiktok.com/xxx\`
-┃
-┃ ⬇️ *Download Musik TikTok*
-┃   ➤ \`.ds\` [link TikTok]
-┃   ➤ Contoh: \`.ds https://tiktok.com/xxx\`
-┃
-┃ ⬇️ *Download Reels Instagram*
-┃   ⚠️ *IG butuh waktu ±1 menit, jangan spam ya!*
-┃   ➤ \`.dig\` [link Instagram]
-┃
-┃ 📸 *Ambil Foto Profil*
-┃   ➤ \`.pp\` [nomor atau @tag]
-┃   ➤ Contoh: \`.pp\` 628xxx atau \`.pp\` @username
-┃
-┃ 🎛️ *Baca Isi QR Code*
-┃   ➤ Reply QR dan ketik: \`.sqr\`
-┃   ➤ Bisa juga langsung ketik \`.sqr\`
-┃
-┃ 🤖 *Beli Bot WA*
-┃   ➤ Ketik: \`beli bot\` untuk info harga & fitur
-┃
-┃ ❓ *Bingung Gunain Bot?*
-┃   ➤ Ketik: \`tutorial\` atau \`tutor\`
-┃   ➤ Hubungi Owner, Ketik: \`admin\`
-╰━━━━━━━━━━━━━━━━━━━━━━━━━━╯  
+┃ 🤖 *Info Bot*: \`beli bot\` / \`admin\`
+┃ ❓ *Bantuan*: \`tutorial\` / \`tutor\`
+╰──────────────────────╯
 
-╭━━━〔 🔒 FITUR ADMIN GRUP 〕━━━╮  
-┃ 📸 *Lihat Media Sekali Lihat (1x View)*
-┃   ➤ \`.show\` lalu reply ke foto/video 1x lihat
+╭──〔 🔒 ADMIN GRUP 〕──╮
+┃ 👥 *Member & Tag*
+┃  ⤷ Promote/Demote: \`.na\` / \`.una\`
+┃  ⤷ Tambah member: \`.add 628xxx\`
+┃  ⤷ Tag semua: \`.t\`
 ┃
-┃ 🔓 *Buka/Tutup Grup Chat*
-┃   ➤ \`.open\` = Buka  
-┃   ➤ \`.close\` = Tutup
+┃ 🔐 *Kelola Grup*
+┃  ⤷ Buka/Tutup: \`.open\` / \`.close\`
+┃  ⤷ Hapus pesan: \`.del\`
+┃  ⤷ Lihat 1x View: \`.show\`
 ┃
-┃ ⤴️ *Promote Member Jadi Admin*
-┃   ➤ \`.na\` + reply atau @tag
-┃   ➤ Contoh: \`.na\` @aurabot
-┃
-┃ ⤵️ *Demote Admin ke Member*
-┃   ➤ \`.una\` + reply atau @tag
-┃   ➤ Contoh: \`.una\` @aurabot
-┃
-┃ 👥 *Tambah Member ke Grup*
-┃   ➤ \`add\` atau \`tambah\` [nomor]
-┃   ➤ Contoh: \`tambah 628123456789\`
-┃
-┃ 🗣️ *Tag Semua Anggota Grup*
-┃   ➤ \`.tagall\`  
-┃   ➤ Contoh: \`.tagall Halo semua!\`
-┃
-┃ 📵 *Hapus Pesan*
-┃   ➤ \`.del\`
-┃   ➤ Reply ke pesan lalu ketik \`.del\`
-┃
-┃ 🧾 *Buat QR Code dengan Logo*
-┃   ➤ \`.cqr\` [teks]
-┃   ➤ Contoh: \`.cqr\` halo dunia
-┃
-┃ 🏗️ *Buat Grup Baru via Bot*
-┃   ➤ \`.bg\` [nama grup]
-┃   ➤ Contoh: \`.bg Aura Squad\`
-┃   ➤ Tambah member langsung:
-┃     \`.bg Aura Squad add 62812,62813\`
-╰━━━━━━━━━━━━━━━━━━━━━━━━━━╯  
+┃ 🏗️ *Buat Grup*
+┃  ⤷ Tanpa member: \`.bg Nama\`
+┃  ⤷ Dengan member: \`.bg Nama add 628xx,...\`
+╰────────────────────╯
 
-💡 *Tips:*  
-➤ Kalau kamu admin, kamu bisa akses semua fitur admin secara otomatis!  
-🧠 Ketik sesuai menu ya, dan hindari typo biar AURABOT nggak salah paham 😄  
-
-✨ Selamat mencoba dan semoga membantu aktivitasmu!
+💡 *Tips:* Admin grup langsung bisa akses fitur admin!  
+✨ Selamat mencoba Fitur Kami
 `,
        mentions: [actualUserId]
       }, { quoted: msg })
