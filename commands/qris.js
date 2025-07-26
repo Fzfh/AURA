@@ -82,11 +82,8 @@ async function handleQR(sock, msg) {
 
   // Deteksi apakah reply, media langsung, atau sticker
   const quoted = msg.message?.extendedTextMessage?.contextInfo?.quotedMessage;
-  const mediaMessage =
-    quoted?.imageMessage || quoted?.stickerMessage?.isAnimated === false
-      ? quoted
-      : msg.message?.imageMessage || msg.message?.stickerMessage;
-
+  const message = msg.message;
+  
   if (!mediaMessage) {
     return sock.sendMessage(from, {
       text: '❌ Kirim atau balas gambar QR ya, Auraa sayang~',
