@@ -6,7 +6,7 @@ const { tmpdir } = require('os');
 
 // ✅ Gunakan voice hemat: Rachel (monolingual)
 const VOICE_ID = 'EXAVITQu4vr4xnSDxMaL';
-const MODEL_ID = 'eleven_monolingual_v1';
+const MODEL_ID = 'eleven_multilingual_v2';
 
 const API_KEYS = [
   process.env.SOUND_API_KEY,
