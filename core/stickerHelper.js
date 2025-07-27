@@ -59,16 +59,56 @@ Stiker akan langsung tercipta dari teks kamu!
   return true;
 }
 
+async function overlayTextToImage(buffer, text) {
+  const W = 512, H = 512, fontSize = 42, pad = 20;
+
+  const canvas = createCanvas(W, H);
+  const ctx = canvas.getContext('2d');
+
+  const img = await loadImage(buffer);
+  ctx.drawImage(img, 0, 0, W, H);
+
+  ctx.font = `bold ${fontSize}px "Arial Narrow"`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'bottom';
+
+  const lines = wrapText(ctx, text, W - pad * 2);
+  const lh = fontSize + 5;
+  const startY = H - pad - ((lines.length - 1) * lh);
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const y = startY + i * lh;
+
+    // Outline hitam
+    ctx.strokeStyle = 'black';
+    ctx.lineWidth = 4;
+    ctx.strokeText(line, W / 2, y);
+
+    // Teks putih
+    ctx.fillStyle = 'white';
+    ctx.fillText(line, W / 2, y);
+  }
+
+  return canvas.toBuffer('image/jpeg', { quality: 0.95 });
+}
 
 
 async function createStickerFromMessage(sock, msg) {
-  // console.log(' msg.message:', JSON.stringify(msg.message, null, 2));
   try {
     const messageContent = msg.message;
     const type = Object.keys(messageContent)[0];
     const content = messageContent[type];
 
     let mediaMessage;
+    let captionText = content?.caption?.trim(); // 🆕 ambil teks dari caption kalau ada
+
+    // Cek ada teks & awalan 's '
+    if (captionText && /^s\s/i.test(captionText)) {
+      captionText = captionText.slice(2).trim(); // ambil teks setelah 's '
+    } else {
+      captionText = null;
+    }
 
     // ✅ Deteksi media langsung (image/video)
     if (
@@ -99,7 +139,6 @@ async function createStickerFromMessage(sock, msg) {
 
     if (!mediaMessage) throw new Error('❌ Tidak ada media untuk dijadikan stiker.');
 
-    // ⏱️ Delay biar media sempat siap di sisi Baileys
     await new Promise(resolve => setTimeout(resolve, 300));
 
     const buffer = await downloadMediaMessage(mediaMessage, 'buffer', {}, {
@@ -111,14 +150,29 @@ async function createStickerFromMessage(sock, msg) {
       type === 'videoMessage' ||
       mediaMessage.message?.videoMessage;
 
-    const stickerBuffer = isVideo
-      ? await convertVideoToSticker(buffer)
-      : await new Sticker(buffer, {
+    let stickerBuffer;
+
+    if (isVideo) {
+      stickerBuffer = await convertVideoToSticker(buffer);
+    } else {
+      // 🆕 Kalau ada captionText → overlay ke gambar
+      if (captionText) {
+        const memeBuffer = await overlayTextToImage(buffer, captionText);
+        stickerBuffer = await new Sticker(memeBuffer, {
           pack: 'AuraBot',
           author: 'AURA',
           type: StickerTypes.DEFAULT,
           quality: 70,
         }).toBuffer();
+      } else {
+        stickerBuffer = await new Sticker(buffer, {
+          pack: 'AuraBot',
+          author: 'AURA',
+          type: StickerTypes.DEFAULT,
+          quality: 70,
+        }).toBuffer();
+      }
+    }
 
     await sock.sendMessage(msg.key.remoteJid, { sticker: stickerBuffer }, { quoted: msg });
 
@@ -129,6 +183,7 @@ async function createStickerFromMessage(sock, msg) {
     }, { quoted: msg });
   }
 }
+
 
 async function convertVideoToSticker(buffer) {
   const tempId = uuidv4();
