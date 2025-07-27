@@ -62,7 +62,7 @@ Stiker akan langsung tercipta dari teks kamu!
 }
 
 async function overlayTextToImage(buffer, text) {
-  const W = 512, H = 512, fontSize = 70, pad = 20;
+  const W = 512, H = 512, fontSize = 65, pad = 20;
   const canvas = createCanvas(W, H);
   const ctx = canvas.getContext('2d');
 
@@ -210,7 +210,7 @@ async function convertVideoToSticker(buffer, captionText = null) {
     if (captionText) {
       const escapedText = captionText.replace(/:/g, '\\:').replace(/'/g, "\\\\'");
 
-      drawtextFilter = `drawtext=fontfile='${fontPath}':text='${escapedText}':fontcolor=white:bordercolor=black:borderw=2:x=(w-text_w)/2:y=h-text_h-20:fontsize=36,`;
+      drawtextFilter = `drawtext=fontfile='${fontPath}':text='${escapedText}':fontcolor=white:bordercolor=black:borderw=2:x=(w-text_w)/2:y=h-text_h-20:fontsize=60,`;
     }
 
     const ffmpegCmd = `ffmpeg -i "${inputPath}" -vf "${drawtextFilter}fps=12,scale=iw*min(512/iw\\,512/ih):ih*min(512/iw\\,512/ih):flags=lanczos,pad=512:512:(ow-iw)/2:(oh-ih)/2:color=0x00000000" -ss 0 -t 6 -an -loop 0 -y "${outputPath}"`;
