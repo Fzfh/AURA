@@ -16,7 +16,8 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
 ┃
 ┃ 🎨 *Sticker*
 ┃  ⤷ Kirim foto/video + caption \`s\`
-┃  ⤷ Dari teks: \`.stickertext Halo\`
+┃  ⤷ Kasih teks langsung ke foto/video: \`s Halo Banh\`
+┃  ⤷ Dari teks ke sticker: \`.stickertext Halo\`
 ┃  ⤷ Balik stiker ke media: \`.sm\`
 ┃
 ┃ 🎧 *Audio & Musik*
@@ -102,11 +103,12 @@ Bot akan membuat stiker berbasis teks dengan gaya unik. Cocok untuk kirim pesan 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 🖼️ *2. Membuat Stiker dari Foto/Video*
-➤ Kirim foto/video dengan caption: *s* atau *sticker*  
-➤ Atau *balas (reply)* ke media dengan teks *s*
+➤ Kirim foto/video dengan caption: *s*  
+➤ Kirim caption dengan teks langsung: *s Aku cantik 😍*  
+➤ Atau *balas (reply)* ke media dengan teks *s Halo Dunia*
 
 📌 Penjelasan:  
-Bot akan otomatis mengubah media menjadi stiker WhatsApp. Bisa digunakan untuk membuat stiker dari selfie, meme, dan video pendek!
+Bot akan otomatis mengubah media menjadi stiker WhatsApp. Teks akan ditampilkan di bagian bawah stiker dengan \`style\` ala meme! Bisa dari foto *meme*, selfie, bahkan video pendek!
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -181,8 +183,16 @@ Bot akan mengambil suara dari video dan mengubahnya menjadi file MP3. Cocok buat
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-🚪 *10. Keluar dari Sesi Aktif*
-➤ Jika kamu sedang dalam mode fitur (seperti menfess), ketik: */keluar*
+📣 *10. Mention Semua Member*
+➤ Ketik: \`t\`
+
+📌 Penjelasan:  
+Fitur ini akan men-tag semua member di grup secara otomatis. Hanya bisa digunakan oleh admin.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚪 *11. Keluar dari Sesi Aktif*
+➤ Jika kamu sedang dalam mode fitur (seperti menfess), ketik: */batal*
 
 📌 Penjelasan:  
 Digunakan untuk membatalkan proses atau keluar dari mode interaktif jika kamu berubah pikiran.
