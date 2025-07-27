@@ -61,7 +61,7 @@ Stiker akan langsung tercipta dari teks kamu!
 }
 
 async function overlayTextToImage(buffer, text) {
-  const W = 512, H = 512, fontSize = 82, pad = 20;
+  const W = 512, H = 512, fontSize = 72, pad = 20;
   const canvas = createCanvas(W, H);
   const ctx = canvas.getContext('2d');
 
