@@ -1,7 +1,7 @@
+const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const axios = require('axios');
 const fs = require('fs');
-const path = require('path');
 const { tmpdir } = require('os');
 
 const VOICE_ID = 'EXAVITQu4vr4xnSDxMaL';
