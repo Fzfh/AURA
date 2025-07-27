@@ -75,32 +75,33 @@ module.exports = async function speak(sock, msg) {
       text: '🔍 Sedang cek semua API Key...\nTunggu sebentar yaa~',
     }, { quoted: msg });
   
-    let result = `🧾 *Cek Sisa Credit (ElevenLabs)*\n\n`;
+   let result = `🧾 *Cek Sisa Credit (ElevenLabs)*\n\n`;
     for (let i = 0; i < API_KEYS.length; i++) {
       const key = API_KEYS[i];
       if (!key) continue;
-  
+    
       try {
         const res = await axios.get('https://api.elevenlabs.io/v1/user', {
           headers: { 'xi-api-key': key }
         });
-  
+    
         const { subscription, email } = res.data;
         const charsUsed = subscription.character_count || 0;
         const charsLimit = subscription.character_limit || 0;
         const remaining = charsLimit - charsUsed;
-  
-        result += `🧪 *API Key ke-${i + 1}*\n`;
-        result += `📧 Email: ${email}\n`;
+    
+        result += `🎯 *API Key ke-${i + 1}*\n`;
+        result += `📧 Email: ${email || 'undefined'}\n`;
         result += `🔤 Digunakan: ${charsUsed} karakter\n`;
         result += `💰 Sisa: ${remaining} karakter\n`;
-        result += `🧱 Limit: ${charsLimit} karakter\n\n`;
+        result += `🧱 Limit: ${charsLimit} karakter\n`;
+        result += `━━━━━━━━━━━━━━━━━━━━━━\n\n`;
       } catch (err) {
         result += `⚠️ *API Key ke-${i + 1} gagal dicek:*\n`;
-        result += `${err.response?.data?.message || err.message}\n\n`;
+        result += `${err.response?.data?.message || err.message}\n`;
+        result += `⚡━━━━━━━━━━━━━━━━━━⚡\n\n`;
       }
     }
-  
     return sock.sendMessage(sender, { text: result.trim() }, { quoted: msg });
   }
 
