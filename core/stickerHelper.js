@@ -6,9 +6,12 @@ const { exec } = require('child_process');
 const { v4: uuidv4 } = require('uuid');
 const { downloadMediaMessage } = require('@whiskeysockets/baileys');
 const { createCanvas, loadImage, registerFont } = require('canvas');
-const fontPath = path.join(__dirname, '..', 'media', 'fonts', 'ArialNarrow.ttf');
+const fontPathImpact = '/usr/share/fonts/truetype/msttcorefonts/Impact.ttf';
+const fontPathArialNarrow = path.join(__dirname, '..', 'media', 'fonts', 'ArialNarrow.ttf');
 
-registerFont(fontPath, { family: 'Arial Narrow' });
+registerFont(fontPathImpact, { family: 'Impact' });
+registerFont(fontPathArialNarrow, { family: 'Arial Narrow' });
+
 
 const { Sticker, StickerTypes } = require('wa-sticker-formatter');
 const twemoji = require('twemoji');
@@ -65,7 +68,7 @@ async function overlayTextToImage(buffer, text) {
   const img = await loadImage(buffer);
   ctx.drawImage(img, 0, 0, W, H);
 
-  ctx.font = `bold ${fontSize}px "Arial Narrow"`;
+  ctx.font = `bold ${fontSize}px "Impact"`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'bottom';
 
