@@ -21,13 +21,6 @@ function getRandomFile(ext = '.mp3') {
   return `speak-aura-${Date.now()}${ext}`;
 }
 
-const text = content.trim().slice(3);
-if (text.length > 500) {
-  return sock.sendMessage(sender, {
-    text: `🚫 Teks terlalu panjang! Kamu ngetik ${text.length} karakter, maksimal hanya 500 karakter yaa 🥺`,
-  }, { quoted: msg });
-}
-
 async function tryGenerateAudio(apiKey, text, filePath) {
   const response = await axios({
     method: 'post',
@@ -117,8 +110,13 @@ module.exports = async function speak(sock, msg) {
       text: '🗣️ Format salah. Gunakan: sp <teks>\nContoh: sp Aku sayang kamu 💕',
     }, { quoted: msg });
   }
-
+  
   const text = content.trim().slice(3);
+  if (text.length > 500) {
+    return sock.sendMessage(sender, {
+      text: `🚫 Teks terlalu panjang! Kamu ngetik ${text.length} karakter, maksimal hanya 500 karakter yaa 🥺`,
+    }, { quoted: msg });
+  }
   const fileName = getRandomFile('.mp3');
   const filePath = path.join(tmpdir(), fileName);
 
