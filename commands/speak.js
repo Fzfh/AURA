@@ -11,7 +11,8 @@ const API_KEYS = [
   process.env.SOUND_API_KEY,
   process.env.SOUND_API_KEY1,
   process.env.SOUND_API_KEY2,
-  process.env.SOUND_API_KEY3
+  process.env.SOUND_API_KEY3,
+  process.env.SOUND_API_KEY4
 ];
 
 function getRandomFile(ext = '.mp3') {
