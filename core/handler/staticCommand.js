@@ -113,11 +113,10 @@ Bot akan otomatis mengubah media menjadi stiker WhatsApp. Teks akan ditampilkan 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 👩‍🎨 *3. Cari Gambar Waifu Anime*
-➤ Ketik: *.waifu* [nama/kategori]  
-   Contoh: *.waifu zero-two*
+➤ Ketik: *.w*  
 
 📌 Penjelasan:  
-Fitur ini menampilkan gambar karakter anime populer. Bisa random, atau berdasarkan nama yang kamu ketik.
+Fitur ini menampilkan gambar karakter anime populer secara random.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
