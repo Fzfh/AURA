@@ -1,4 +1,4 @@
-require('dotenv').config({ path: __dirname + '/.env' });
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
