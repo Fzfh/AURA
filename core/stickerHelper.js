@@ -116,9 +116,9 @@ async function createStickerFromMessage(sock, msg) {
       captionText = content?.text?.trim();
     }
 
-    // Ambil hanya jika caption diawali 's '
-    if (captionText && /^s\s/i.test(captionText)) {
-      captionText = captionText.slice(2).trim();
+     // Ambil hanya jika caption diawali s, .s, !s, -s (fleksibel)
+    if (captionText && /^[\.\!\-]?s\s/i.test(captionText)) {
+      captionText = captionText.replace(/^[\.\!\-]?s\s/i, '').trim();
     } else {
       captionText = null;
     }
