@@ -15,7 +15,6 @@ const API_KEYS = [
   process.env.SOUND_API_KEY4,
   process.env.SOUND_API_KEY5
 ];
-console.log('🔑 KEY 1:', process.env.SOUND_API_KEY); // Harus tampil
 
 function getRandomFile(ext = '.mp3') {
   return `speak-aura-${Date.now()}${ext}`;
@@ -91,7 +90,7 @@ module.exports = async function speak(sock, msg) {
         const remaining = charsLimit - charsUsed;
     
         result += `🎯 *API Key ke-${i + 1}*\n`;
-        result += `📧 Email: ${email || 'undefined'}\n`;
+        result += `📧 Email: \`(disembunyikan oleh ElevenLabs)\`\n`;
         result += `🔤 Digunakan: ${charsUsed} karakter\n`;
         result += `💰 Sisa: ${remaining} karakter\n`;
         result += `🧱 Limit: ${charsLimit} karakter\n`;
