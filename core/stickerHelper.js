@@ -165,7 +165,7 @@ async function createStickerFromMessage(sock, msg) {
     let stickerBuffer;
 
     if (isVideo) {
-      stickerBuffer = await convertVideoToSticker(buffer);
+      stickerBuffer = await convertVideoToSticker(buffer, captionText);
     } else {
       // Kalau ada caption meme
       if (captionText) {
@@ -196,15 +196,24 @@ async function createStickerFromMessage(sock, msg) {
   }
 }
 
-async function convertVideoToSticker(buffer) {
+async function convertVideoToSticker(buffer, captionText = null) {
   const tempId = uuidv4();
   const inputPath = path.join(tmpdir(), `${tempId}.mp4`);
   const outputPath = path.join(tmpdir(), `${tempId}.webp`);
+  const fontPath = '/usr/share/fonts/truetype/msttcorefonts/Impact.ttf'; // pastikan file ini ada
 
   try {
     await writeFile(inputPath, buffer);
 
-    const ffmpegCmd = `ffmpeg -i "${inputPath}" -vf "fps=12,scale=iw*min(512/iw\\,512/ih):ih*min(512/iw\\,512/ih):flags=lanczos,pad=512:512:(ow-iw)/2:(oh-ih)/2:color=0x00000000" -ss 0 -t 6 -an -loop 0 -y "${outputPath}"`;
+    // Teks akan di-escape agar tidak error di shell
+    let drawtextFilter = '';
+    if (captionText) {
+      const escapedText = captionText.replace(/:/g, '\\:').replace(/'/g, "\\\\'");
+
+      drawtextFilter = `drawtext=fontfile='${fontPath}':text='${escapedText}':fontcolor=white:bordercolor=black:borderw=2:x=(w-text_w)/2:y=h-text_h-20:fontsize=36,`;
+    }
+
+    const ffmpegCmd = `ffmpeg -i "${inputPath}" -vf "${drawtextFilter}fps=12,scale=iw*min(512/iw\\,512/ih):ih*min(512/iw\\,512/ih):flags=lanczos,pad=512:512:(ow-iw)/2:(oh-ih)/2:color=0x00000000" -ss 0 -t 6 -an -loop 0 -y "${outputPath}"`;
 
     await execPromise(ffmpegCmd);
 
@@ -215,6 +224,7 @@ async function convertVideoToSticker(buffer) {
     cleanupFiles([inputPath, outputPath]);
   }
 }
+
 
 // Fungsi wrap teks
 function wrapText(ctx, text, maxWidth) {
