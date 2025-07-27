@@ -114,7 +114,7 @@ module.exports = async function speak(sock, msg) {
   const text = content.trim().slice(3);
   if (text.length > 500) {
     return sock.sendMessage(sender, {
-      text: `🚫 Teks terlalu panjang! Kamu ngetik ${text.length} karakter, maksimal hanya 500 karakter yaa 🥺`,
+      text: `🚫 Teks terlalu panjang! Kamu ngetik ${text.length} karakter, maksimal hanya 500 karakter yaa`,
     }, { quoted: msg });
   }
   const fileName = getRandomFile('.mp3');
