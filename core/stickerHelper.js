@@ -66,17 +66,18 @@ async function overlayTextToImage(buffer, text) {
   const canvas = createCanvas(W, H);
   const ctx = canvas.getContext('2d');
 
-  // Convert buffer ke JPEG supaya bisa dipakai di loadImage
+  // Konversi WebP ke JPEG dulu (fix error canvas)
   const jpegBuffer = await sharp(buffer).jpeg().toBuffer();
   const img = await loadImage(jpegBuffer);
 
   ctx.drawImage(img, 0, 0, W, H);
 
-  ctx.font = `bold ${fontSize}px "Impact"`;
+  ctx.font = `bold ${fontSize}px "Impact", "Arial Narrow", Arial`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'bottom';
 
-  const lines = wrapText(ctx, text.toUpperCase(), W - pad * 2);
+  // 📝 Pakai teks asli TANPA toUpperCase!
+  const lines = wrapText(ctx, text, W - pad * 2);
   const lh = fontSize + 5;
   const startY = H - pad - ((lines.length - 1) * lh);
 
@@ -84,10 +85,12 @@ async function overlayTextToImage(buffer, text) {
     const line = lines[i];
     const y = startY + i * lh;
 
+    // Outline hitam
     ctx.strokeStyle = 'black';
     ctx.lineWidth = 5;
     ctx.strokeText(line, W / 2, y);
 
+    // Isi putih
     ctx.fillStyle = 'white';
     ctx.fillText(line, W / 2, y);
   }
