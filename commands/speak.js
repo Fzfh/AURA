@@ -21,6 +21,13 @@ function getRandomFile(ext = '.mp3') {
   return `speak-aura-${Date.now()}${ext}`;
 }
 
+const text = content.trim().slice(3);
+if (text.length > 500) {
+  return sock.sendMessage(sender, {
+    text: `🚫 Teks terlalu panjang! Kamu ngetik ${text.length} karakter, maksimal hanya 500 karakter yaa 🥺`,
+  }, { quoted: msg });
+}
+
 async function tryGenerateAudio(apiKey, text, filePath) {
   const response = await axios({
     method: 'post',
