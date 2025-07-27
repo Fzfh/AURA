@@ -246,7 +246,7 @@ function wrapTextFfmpeg(text, maxCharsPerLine = 20) {
     lines.push(currentLine.trim());
   }
 
-  return lines.join('\\n'); // <- HARUS pakai \\n biar dibaca literal oleh ffmpeg
+  return lines.join('\n');
 }
 
 
