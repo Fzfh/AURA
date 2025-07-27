@@ -213,7 +213,7 @@ async function convertVideoToSticker(buffer, captionText = null) {
         .replace(/:/g, '\\:')     // penting agar tidak error
         .replace(/'/g, "\\\\'");  // penting agar tidak patah shell
     
-      drawtextFilter = `drawtext=fontfile='${fontPath}':text='${escapedText}':fontcolor=white:bordercolor=black:borderw=2:x=(w-text_w)/2:y=h-text_h-20:fontsize=40,`;
+      drawtextFilter = `drawtext=fontfile='${fontPath}':text='${escapedText}':fontcolor=white:bordercolor=black:borderw=2:x=(w-text_w)/2:y=h-text_h-20:fontsize=35,`;
     }
 
 
