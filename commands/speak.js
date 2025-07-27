@@ -15,6 +15,7 @@ const API_KEYS = [
   process.env.SOUND_API_KEY4,
   process.env.SOUND_API_KEY5
 ];
+console.log('🔑 KEY 1:', process.env.SOUND_API_KEY); // Harus tampil
 
 function getRandomFile(ext = '.mp3') {
   return `speak-aura-${Date.now()}${ext}`;
