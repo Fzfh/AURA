@@ -4,6 +4,7 @@ const { tmpdir } = require('os');
 const { promisify } = require('util');
 const { exec } = require('child_process');
 const { v4: uuidv4 } = require('uuid');
+const sharp = require('sharp');
 const { downloadMediaMessage } = require('@whiskeysockets/baileys');
 const { createCanvas, loadImage, registerFont } = require('canvas');
 const fontPathImpact = '/usr/share/fonts/truetype/msttcorefonts/Impact.ttf';
@@ -61,18 +62,21 @@ Stiker akan langsung tercipta dari teks kamu!
 }
 
 async function overlayTextToImage(buffer, text) {
-  const W = 512, H = 512, fontSize = 72, pad = 20;
+  const W = 512, H = 512, fontSize = 82, pad = 20;
   const canvas = createCanvas(W, H);
   const ctx = canvas.getContext('2d');
 
-  const img = await loadImage(buffer);
+  // Convert buffer ke JPEG supaya bisa dipakai di loadImage
+  const jpegBuffer = await sharp(buffer).jpeg().toBuffer();
+  const img = await loadImage(jpegBuffer);
+
   ctx.drawImage(img, 0, 0, W, H);
 
   ctx.font = `bold ${fontSize}px "Impact"`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'bottom';
 
-  const lines = wrapText(ctx, text, W - pad * 2);
+  const lines = wrapText(ctx, text.toUpperCase(), W - pad * 2);
   const lh = fontSize + 5;
   const startY = H - pad - ((lines.length - 1) * lh);
 
@@ -80,12 +84,10 @@ async function overlayTextToImage(buffer, text) {
     const line = lines[i];
     const y = startY + i * lh;
 
-    // Outline hitam
     ctx.strokeStyle = 'black';
-    ctx.lineWidth = 4;
+    ctx.lineWidth = 5;
     ctx.strokeText(line, W / 2, y);
 
-    // Teks putih
     ctx.fillStyle = 'white';
     ctx.fillText(line, W / 2, y);
   }
