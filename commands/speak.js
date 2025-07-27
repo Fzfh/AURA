@@ -4,7 +4,7 @@ const axios = require('axios');
 const fs = require('fs');
 const { tmpdir } = require('os');
 
-const VOICE_ID = 'EXAVITQu4vr4xnSDxMaL';
+const VOICE_ID = 'MF3mGyEYCl7XYWbV9V6O';
 const MODEL_ID = 'eleven_multilingual_v2';
 
 const API_KEYS = [
