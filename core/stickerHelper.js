@@ -8,9 +8,7 @@ const { downloadMediaMessage } = require('@whiskeysockets/baileys');
 const { createCanvas, loadImage, registerFont } = require('canvas');
 const fontPath = path.join(__dirname, '..', 'media', 'fonts', 'ArialNarrow.ttf');
 
-registerFont(fontPath, {
-  family: 'Arial Narrow'
-});
+registerFont(fontPath, { family: 'Arial Narrow' });
 
 const { Sticker, StickerTypes } = require('wa-sticker-formatter');
 const twemoji = require('twemoji');
@@ -61,7 +59,6 @@ Stiker akan langsung tercipta dari teks kamu!
 
 async function overlayTextToImage(buffer, text) {
   const W = 512, H = 512, fontSize = 42, pad = 20;
-
   const canvas = createCanvas(W, H);
   const ctx = canvas.getContext('2d');
 
@@ -93,7 +90,6 @@ async function overlayTextToImage(buffer, text) {
   return canvas.toBuffer('image/jpeg', { quality: 0.95 });
 }
 
-
 async function createStickerFromMessage(sock, msg) {
   try {
     const messageContent = msg.message;
@@ -101,16 +97,25 @@ async function createStickerFromMessage(sock, msg) {
     const content = messageContent[type];
 
     let mediaMessage;
-    let captionText = content?.caption?.trim(); // 🆕 ambil teks dari caption kalau ada
+    let captionText = null;
 
-    // Cek ada teks & awalan 's '
+    // Ambil caption jika dari media langsung
+    if (type === 'imageMessage' || type === 'videoMessage') {
+      captionText = content?.caption?.trim();
+    }
+    // Ambil caption jika dari reply (extendedTextMessage)
+    else if (type === 'extendedTextMessage') {
+      captionText = content?.text?.trim();
+    }
+
+    // Ambil hanya jika caption diawali 's '
     if (captionText && /^s\s/i.test(captionText)) {
-      captionText = captionText.slice(2).trim(); // ambil teks setelah 's '
+      captionText = captionText.slice(2).trim();
     } else {
       captionText = null;
     }
 
-    // ✅ Deteksi media langsung (image/video)
+    // Deteksi media langsung
     if (
       (type === 'imageMessage' || type === 'videoMessage') &&
       content?.mimetype &&
@@ -118,8 +123,7 @@ async function createStickerFromMessage(sock, msg) {
     ) {
       mediaMessage = msg;
     }
-
-    // ✅ Deteksi media dari reply (quoted)
+    // Deteksi media dari reply
     else if (
       type === 'extendedTextMessage' &&
       messageContent.extendedTextMessage.contextInfo &&
@@ -155,7 +159,7 @@ async function createStickerFromMessage(sock, msg) {
     if (isVideo) {
       stickerBuffer = await convertVideoToSticker(buffer);
     } else {
-      // 🆕 Kalau ada captionText → overlay ke gambar
+      // Kalau ada caption meme
       if (captionText) {
         const memeBuffer = await overlayTextToImage(buffer, captionText);
         stickerBuffer = await new Sticker(memeBuffer, {
@@ -184,7 +188,6 @@ async function createStickerFromMessage(sock, msg) {
   }
 }
 
-
 async function convertVideoToSticker(buffer) {
   const tempId = uuidv4();
   const inputPath = path.join(tmpdir(), `${tempId}.mp4`);
@@ -205,9 +208,7 @@ async function convertVideoToSticker(buffer) {
   }
 }
 
-
-
-// Fungsi wrap teks di canvas
+// Fungsi wrap teks
 function wrapText(ctx, text, maxWidth) {
   const words = text.split(' ');
   const lines = [];
@@ -226,7 +227,6 @@ function wrapText(ctx, text, maxWidth) {
   return lines;
 }
 
-// 🛠️ ALIGN TENGAH teks sticker
 async function createStickerFromText(text) {
   const W = 512, H = 512, fontSize = 80, pad = 40;
   const canvas = createCanvas(W, H);
@@ -286,7 +286,7 @@ async function createStickerFromText(text) {
     }
   }
 
-  const imgBuf = canvas.toBuffer('image/jpeg', { quality: 0.1 }); 
+  const imgBuf = canvas.toBuffer('image/jpeg', { quality: 0.1 });
   const sticker = new Sticker(imgBuf, {
     pack: 'AuraBot',
     author: 'Mau Sewa Bot Auto Sticker Anomali? Hub: 083194900080',
@@ -295,7 +295,6 @@ async function createStickerFromText(text) {
   });
   return sticker.toBuffer();
 }
-
 
 function execPromise(command) {
   return new Promise((resolve, reject) => {
