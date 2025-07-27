@@ -208,14 +208,20 @@ async function convertVideoToSticker(buffer, captionText = null) {
     // Teks akan di-escape agar tidak error di shell
     let drawtextFilter = '';
     if (captionText) {
-      const wrappedText = wrapTextFfmpeg(captionText, 20); // <== tambahin ini
-      const escapedText = wrappedText
-        .replace(/:/g, '\\:')     // penting agar tidak error
-        .replace(/'/g, "\\\\'");  // penting agar tidak patah shell
+      const wrappedText = wrapTextFfmpeg(captionText, 24); // wrap normal
+      const lines = wrappedText.split('\n');
     
-      drawtextFilter = `drawtext=fontfile='${fontPath}':text='${escapedText}':fontcolor=white:bordercolor=black:borderw=2:x=(w-text_w)/2:y=h-text_h-20:fontsize=40,`;
+      drawtextFilter = lines.map((line, i) => {
+        const escaped = line
+          .replace(/:/g, '\\:')
+          .replace(/'/g, "\\\\'")
+          .replace(/\\/g, '\\\\');
+    
+        return `drawtext=fontfile='${fontPath}':text='${escaped}':fontcolor=white:bordercolor=black:borderw=2:x=(w-text_w)/2:y=(h-text_h)/2+${(i - (lines.length - 1) / 2) * 45}:fontsize=40`;
+      }).join(',');
+    
+      drawtextFilter += ','; // untuk sambung ke filter selanjutnya
     }
-
 
     const ffmpegCmd = `ffmpeg -i "${inputPath}" -vf "${drawtextFilter}fps=12,scale=iw*min(512/iw\\,512/ih):ih*min(512/iw\\,512/ih):flags=lanczos,pad=512:512:(ow-iw)/2:(oh-ih)/2:color=0x00000000" -ss 0 -t 6 -an -loop 0 -y "${outputPath}"`;
 
