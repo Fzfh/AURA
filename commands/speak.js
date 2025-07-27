@@ -4,14 +4,14 @@ const fs = require('fs');
 const path = require('path');
 const { tmpdir } = require('os');
 
-// ✅ Gunakan voice hemat: Rachel (monolingual)
 const VOICE_ID = 'EXAVITQu4vr4xnSDxMaL';
 const MODEL_ID = 'eleven_multilingual_v2';
 
 const API_KEYS = [
   process.env.SOUND_API_KEY,
   process.env.SOUND_API_KEY1,
-  process.env.SOUND_API_KEY2
+  process.env.SOUND_API_KEY2,
+  process.env.SOUND_API_KEY3
 ];
 
 function getRandomFile(ext = '.mp3') {
