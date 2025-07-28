@@ -15,6 +15,7 @@ const express = require('express');
 
 const tampilkanBanner = require('./core/utils/tampilanbanner');
 const { handleResponder, registerGroupUpdateListener } = require('./core/botresponse');
+ const { setupAntiDelete } = require("./commands/antidelete");
 
 const app = express();
 const PORT = 3000;
@@ -99,6 +100,7 @@ async function startBot() {
         if (qrRetryInterval) clearInterval(qrRetryInterval);
         if (pairingRetryTimeout) clearTimeout(pairingRetryTimeout);
         registerGroupUpdateListener(sock);
+        setupAntiDelete(sock);
       }
 
       if (connection === 'close') {
