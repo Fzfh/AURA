@@ -47,7 +47,9 @@ async function setupAntiDelete(conn) {
 async function handler(m, { conn }) {
   const chat = m.chat;
   const logs = logDeleted.filter(l => l.jid === chat);
-  if (!logs.length) return m.reply('📭 Belum ada pesan yang dihapus.');
+  if (!logs.length) {
+    return await conn.sendMessage(chat, { text: '📭 Belum ada pesan yang dihapus.' }, { quoted: m });
+  }
 
   let teks = '📜 *Log Pesan Terhapus:*\n\n';
   for (const log of logs) {
@@ -69,7 +71,7 @@ async function handler(m, { conn }) {
     teks += `👤 *${nama}*: ${isi}\n🕐 ${log.time.toLocaleString()}\n\n`;
   }
 
-  m.reply(teks.trim());
+  await conn.sendMessage(chat, { text: teks.trim() }, { quoted: m });
 }
 
 module.exports = {
