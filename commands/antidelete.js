@@ -45,12 +45,14 @@ async function setupAntiDelete(conn) {
   });
 }
 
-// ⚠️ DIUBAH! Sekarang pakai `m, conn` bukan destructuring!
 async function handler(m, conn) {
+  // fallback jika conn tidak ada
+  const socket = conn?.sendMessage ? conn : (m.conn || global.conn);
   const chat = m.chat;
   const logs = logDeleted.filter(l => l.jid === chat);
+
   if (!logs.length) {
-    return await conn.sendMessage(chat, { text: '📭 Belum ada pesan yang dihapus.' }, { quoted: m });
+    return await socket.sendMessage(chat, { text: '📭 Belum ada pesan yang dihapus.' }, { quoted: m });
   }
 
   let teks = '📜 *Log Pesan Terhapus:*\n\n';
@@ -73,7 +75,7 @@ async function handler(m, conn) {
     teks += `👤 *${nama}*: ${isi}\n🕐 ${log.time.toLocaleString()}\n\n`;
   }
 
-  await conn.sendMessage(chat, { text: teks.trim() }, { quoted: m });
+  await socket.sendMessage(chat, { text: teks.trim() }, { quoted: m });
 }
 
 module.exports = {
