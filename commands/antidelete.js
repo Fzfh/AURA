@@ -31,16 +31,16 @@ function setupAntiDelete(sock) {
 
       logDeleted.push({ ...pesan, jid: remoteJid });
 
-      // Kirim notifikasi hanya ke adminList
-      for (const admin of adminList) {
-        try {
-          await sock.sendMessage(admin, {
-            text: `🕵️ Pesan dari @${pesan.from.split('@')[0]} telah dihapus di chat: ${remoteJid}`,
-            mentions: [pesan.from],
-          });
+      // Kirim notifikasi hanya ke adminList jika pesan berupa media
+      const mediaType = Object.keys(pesan.content)[0];
+      if (['imageMessage', 'videoMessage', 'stickerMessage', 'documentMessage'].includes(mediaType)) {
+        for (const admin of adminList) {
+          try {
+            await sock.sendMessage(admin, {
+              text: `🕵️ Pesan dari @${pesan.from.split('@')[0]} telah dihapus di chat: ${remoteJid}`,
+              mentions: [pesan.from],
+            });
 
-          const mediaType = Object.keys(pesan.content)[0];
-          if (['imageMessage', 'videoMessage', 'stickerMessage', 'documentMessage'].includes(mediaType)) {
             const mediaBuffer = await downloadMediaMessage(
               { message: pesan.content, key: pesan.key },
               'buffer',
@@ -53,9 +53,9 @@ function setupAntiDelete(sock) {
               caption: `📎 Media yang dihapus dari @${pesan.from.split('@')[0]}`,
               mentions: [pesan.from],
             });
+          } catch (err) {
+            console.error('❌ Gagal kirim media terhapus:', err);
           }
-        } catch (err) {
-          console.error('❌ Gagal kirim media terhapus:', err);
         }
       }
     }
@@ -67,40 +67,33 @@ async function handler(sock, msg) {
   const sender = msg.key.participant || msg.key.remoteJid;
   const chat = msg.key.remoteJid;
 
-  if (!adminList.includes(sender)) {
+  // Cek apakah pengirim adalah admin grup
+  const metadata = await sock.groupMetadata(chat).catch(() => null);
+  const isGroupAdmin = metadata?.participants?.find(p => p.id === sender && (p.admin === 'admin' || p.admin === 'superadmin'));
+  if (!isGroupAdmin) {
     return sock.sendMessage(chat, {
-      text: '❌ Fitur ini hanya bisa digunakan oleh admin bot!',
+      text: '❌ Fitur ini hanya bisa digunakan oleh admin grup!',
     }, { quoted: msg });
   }
 
-  const logs = logDeleted.filter(l => l.jid === chat);
+  const logs = logDeleted.filter(l => l.jid === chat && (
+    'conversation' in l.content || 'extendedTextMessage' in l.content
+  ));
+
   if (!logs.length) {
     return sock.sendMessage(chat, {
-      text: '📭 Belum ada pesan yang dihapus di sini.',
+      text: '📭 Belum ada pesan teks yang dihapus di sini.',
     }, { quoted: msg });
   }
 
   let teks = '📜 *Log Pesan Terhapus:*\n\n';
   for (const log of logs) {
-    const nama = log.from.split('@')[0];
-    const jenis = Object.keys(log.content)[0];
-    let isi = '';
-
-    switch (jenis) {
-      case 'conversation':
-        isi = log.content.conversation;
-        break;
-      case 'extendedTextMessage':
-        isi = log.content.extendedTextMessage?.text;
-        break;
-      default:
-        isi = `[${jenis}]`;
-    }
-
-    teks += `👤 *${nama}*: ${isi}\n🕐 ${new Date(log.timestamp * 1000).toLocaleString()}\n\n`;
+    const tag = '@' + log.from.split('@')[0];
+    let isi = log.content.conversation || log.content.extendedTextMessage?.text || '[teks tidak ditemukan]';
+    teks += `👤 ${tag}: ${isi}\n🕐 ${new Date(log.timestamp * 1000).toLocaleString()}\n\n`;
   }
 
-  await sock.sendMessage(chat, { text: teks.trim() }, { quoted: msg });
+  await sock.sendMessage(chat, { text: teks.trim(), mentions: logs.map(l => l.from) }, { quoted: msg });
 }
 
 module.exports = { setupAntiDelete, handler };
