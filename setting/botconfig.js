@@ -32,6 +32,7 @@ const botResponsePatterns = [
   { command: 'sp', handler: returnCommand["commands_speak"] },
   { command: 'csp', handler: returnCommand["commands_speak"] },
   { command: 'p1', handler: returnCommand["commands_antidelete"].handler },
+  { command: 'dp1', handler: returnCommand["commands_antidelete"].resetLogDeleted },
 
   // Command Admin Only
   { command: 'kick', handler: returnCommand["commands_kick"], isAdmin: true },
