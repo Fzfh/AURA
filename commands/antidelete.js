@@ -141,5 +141,5 @@ module.exports = {
   setupAntiDelete,
   handler,
   resetLogDeleted,
-  resetLogDeleted: resetHandler
+  // resetLogDeleted: resetHandler
 };
