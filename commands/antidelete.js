@@ -105,4 +105,20 @@ async function handler(sock, msg) {
   await sock.sendMessage(chat, { text: teks.trim(), mentions: logs.map(l => l.from) }, { quoted: msg });
 }
 
-module.exports = { setupAntiDelete, handler };
+function resetLogDeleted(chatId) {
+  const index = logDeleted.findIndex(log => log.jid === chatId);
+  if (index !== -1) {
+    for (let i = logDeleted.length - 1; i >= 0; i--) {
+      if (logDeleted[i].jid === chatId) {
+        logDeleted.splice(i, 1);
+      }
+    }
+  }
+}
+
+
+module.exports = {
+  setupAntiDelete,
+  handler,
+  resetLogDeleted,
+};
