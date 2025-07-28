@@ -97,6 +97,7 @@ async function handler(sock, msg) {
       timeZone: 'Asia/Jakarta',
       hour12: false
     })}\n\n`;
+  }
 
   if (teks === '📜 *Log Pesan Terhapus:*\n\n') {
     return sock.sendMessage(chat, {
@@ -141,5 +142,5 @@ module.exports = {
   setupAntiDelete,
   handler,
   resetLogDeleted,
-  // resetLogDeleted: resetHandler
+  resetLogDeleted: resetHandler
 };
