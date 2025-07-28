@@ -3,56 +3,45 @@ const { downloadMediaMessage } = require('@whiskeysockets/baileys');
 const cachePesan = {};
 const logDeleted = [];
 
-async function setupAntiDelete(conn) {
-  conn.ev.on('messages.upsert', async ({ messages }) => {
+// Dipanggil sekali waktu koneksi terbentuk
+function setupAntiDelete(sock) {
+  sock.ev.on('messages.upsert', async ({ messages }) => {
     const msg = messages[0];
-    if (!msg.message) return;
+    if (!msg.message || msg.key.fromMe) return;
 
-    const { remoteJid, id, participant } = msg.key;
-    const sender = participant || msg.key.remoteJid;
-    if (!remoteJid || !id || msg.key.fromMe) return;
-
+    const { remoteJid, id } = msg.key;
     cachePesan[remoteJid] = cachePesan[remoteJid] || {};
     cachePesan[remoteJid][id] = {
-      id,
-      from: sender,
+      from: msg.key.participant || msg.key.remoteJid,
       content: msg.message,
       timestamp: msg.messageTimestamp
     };
   });
 
-  conn.ev.on('messages.update', async updates => {
-    for (const update of updates) {
-      const { key, update: msgUpdate } = update;
-      if (!msgUpdate || msgUpdate.message !== null) continue;
+  sock.ev.on('messages.update', async updates => {
+    for (const { key, update } of updates) {
+      if (!update || update.message !== null) continue;
 
       const { remoteJid, id } = key;
-      const pesanTerhapus = cachePesan?.[remoteJid]?.[id];
-      if (!pesanTerhapus) continue;
+      const pesan = cachePesan?.[remoteJid]?.[id];
+      if (!pesan) continue;
 
-      logDeleted.push({
-        from: pesanTerhapus.from,
-        content: pesanTerhapus.content,
-        time: new Date(),
-        jid: remoteJid
-      });
+      logDeleted.push({ ...pesan, jid: remoteJid });
 
-      await conn.sendMessage(remoteJid, {
-        text: `🕵️ Pesan dari @${pesanTerhapus.from.split('@')[0]} telah dihapus!`,
-        mentions: [pesanTerhapus.from]
+      await sock.sendMessage(remoteJid, {
+        text: `🕵️ Pesan dari @${pesan.from.split('@')[0]} telah dihapus!`,
+        mentions: [pesan.from]
       });
     }
   });
 }
 
-async function handler(m, conn) {
-  // fallback jika conn tidak ada
-  const socket = conn?.sendMessage ? conn : (m.conn || global.conn);
-  const chat = m.chat;
+// Handler command `.p1`
+async function handler(sock, msg) {
+  const chat = msg.key.remoteJid;
   const logs = logDeleted.filter(l => l.jid === chat);
-
   if (!logs.length) {
-    return await socket.sendMessage(chat, { text: '📭 Belum ada pesan yang dihapus.' }, { quoted: m });
+    return sock.sendMessage(chat, { text: '📭 Belum ada pesan yang dihapus.' }, { quoted: msg });
   }
 
   let teks = '📜 *Log Pesan Terhapus:*\n\n';
@@ -72,13 +61,10 @@ async function handler(m, conn) {
         isi = `[${jenis}]`;
     }
 
-    teks += `👤 *${nama}*: ${isi}\n🕐 ${log.time.toLocaleString()}\n\n`;
+    teks += `👤 *${nama}*: ${isi}\n🕐 ${new Date(log.timestamp * 1000).toLocaleString()}\n\n`;
   }
 
-  await socket.sendMessage(chat, { text: teks.trim() }, { quoted: m });
+  await sock.sendMessage(chat, { text: teks.trim() }, { quoted: msg });
 }
 
-module.exports = {
-  handler,
-  setupAntiDelete
-};
+module.exports = { setupAntiDelete, handler };
