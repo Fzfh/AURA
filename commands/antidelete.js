@@ -115,10 +115,29 @@ function resetLogDeleted(chatId) {
     }
   }
 }
+async function resetHandler(sock, msg) {
+  const sender = msg.key.participant || msg.key.remoteJid;
+  const chat = msg.key.remoteJid;
+
+  // Cek apakah admin grup
+  const metadata = await sock.groupMetadata(chat).catch(() => null);
+  const isGroupAdmin = metadata?.participants?.find(p => p.id === sender && (p.admin === 'admin' || p.admin === 'superadmin'));
+  if (!isGroupAdmin) {
+    return sock.sendMessage(chat, {
+      text: '❌ Fitur ini hanya bisa digunakan oleh admin grup!',
+    }, { quoted: msg });
+  }
+
+  resetLogDeleted(chat);
+  return sock.sendMessage(chat, {
+    text: '🧹 Log pesan terhapus berhasil dihapus!',
+  }, { quoted: msg });
+}
 
 
 module.exports = {
   setupAntiDelete,
   handler,
   resetLogDeleted,
+  resetLogDeleted: resetHandler
 };
