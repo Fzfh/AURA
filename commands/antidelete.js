@@ -89,8 +89,17 @@ async function handler(sock, msg) {
   let teks = '📜 *Log Pesan Terhapus:*\n\n';
   for (const log of logs) {
     const tag = '@' + log.from.split('@')[0];
-    let isi = log.content.conversation || log.content.extendedTextMessage?.text || '[teks tidak ditemukan]';
+    const isTeks = log.content.conversation || log.content.extendedTextMessage?.text;
+    if (!isTeks) continue;
+
+    let isi = log.content.conversation || log.content.extendedTextMessage?.text;
     teks += `👤 ${tag}: ${isi}\n🕐 ${new Date(log.timestamp * 1000).toLocaleString()}\n\n`;
+  }
+
+  if (teks === '📜 *Log Pesan Terhapus:*\n\n') {
+    return sock.sendMessage(chat, {
+      text: '📭 Tidak ada pesan teks valid yang dihapus.',
+    }, { quoted: msg });
   }
 
   await sock.sendMessage(chat, { text: teks.trim(), mentions: logs.map(l => l.from) }, { quoted: msg });
