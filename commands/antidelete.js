@@ -44,7 +44,9 @@ async function setupAntiDelete(conn) {
     }
   });
 }
-async function handler(m, { conn }) {
+
+// ⚠️ DIUBAH! Sekarang pakai `m, conn` bukan destructuring!
+async function handler(m, conn) {
   const chat = m.chat;
   const logs = logDeleted.filter(l => l.jid === chat);
   if (!logs.length) {
@@ -75,6 +77,6 @@ async function handler(m, { conn }) {
 }
 
 module.exports = {
-  handler,           
-  setupAntiDelete     
+  handler,
+  setupAntiDelete
 };
