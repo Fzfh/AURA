@@ -93,8 +93,10 @@ async function handler(sock, msg) {
     if (!isTeks) continue;
 
     let isi = log.content.conversation || log.content.extendedTextMessage?.text;
-    teks += `👤 ${tag}: ${isi}\n🕐 ${new Date(log.timestamp * 1000).toLocaleString()}\n\n`;
-  }
+    teks += `👤 ${tag}: ${isi}\n🕐 ${new Date(log.timestamp * 1000).toLocaleString('id-ID', {
+      timeZone: 'Asia/Jakarta',
+      hour12: false
+    })}\n\n`;
 
   if (teks === '📜 *Log Pesan Terhapus:*\n\n') {
     return sock.sendMessage(chat, {
