@@ -51,7 +51,7 @@ function delay(ms) {
 }
 
 function botLabel(text) {
-  const { botBehavior } = require("../../setting/botConfig");
+  const { botBehavior } = require("../../setting/botconfig");
   return `${botBehavior.botLabel} ${text}`;
 }
 
