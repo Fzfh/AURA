@@ -56,6 +56,8 @@ async function startBot() {
       },
       printQRInTerminal: false,
     });
+    
+    global.sock = sock;
 
     sock.ev.on('creds.update', saveCreds);
 
