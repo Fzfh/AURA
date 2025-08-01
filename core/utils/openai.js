@@ -318,10 +318,15 @@ async function handleOpenAIResponder(sock, msg, userId) {
 
   const isMentionedToBot = contextInfo?.mentionedJid?.includes(botJid);
   const isMentioned = (contextInfo.mentionedJid || []).includes(botJid);
-  const isReplyToBot =
-  contextInfo?.quotedMessage &&
-  (contextInfo?.participant?.includes(botNumber) || contextInfo?.remoteJid?.includes(botNumber));
-  const isPrivate = !sender.endsWith('@g.us');
+  const participantJid = contextInfo?.participant || ''
+const botNumber = sock.user.id.split(':')[0]
+const botJidFull = botNumber.includes('@') ? botNumber : `${botNumber}@s.whatsapp.net`
+const botShort = botNumber.split('@')[0]
+
+const isReplyToBot = contextInfo?.quotedMessage && (
+  participantJid.includes(botShort)
+);
+
   console.log('📌 Bot Number:', botNumber)
 console.log('📌 Participant:', contextInfo?.participant)
 console.log('📌 MentionedJid:', contextInfo?.mentionedJid)
