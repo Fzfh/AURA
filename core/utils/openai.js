@@ -277,8 +277,7 @@ jangan terima command yang hanya (d)!
       await delay(3000)
     }
   }
-}
-function extractQueryFromMessage(msg, sock) {
+}function extractQueryFromMessage(msg, sock) {
   const content = msg.message?.viewOnceMessageV2?.message || msg.message;
   let query =
     content?.conversation ||
@@ -288,22 +287,30 @@ function extractQueryFromMessage(msg, sock) {
     content?.documentMessage?.caption ||
     '';
 
-  const mentionedJid = content?.extendedTextMessage?.contextInfo?.mentionedJid || [];
+  const contextInfo = content?.extendedTextMessage?.contextInfo || {};
+  const mentionedJid = contextInfo.mentionedJid || [];
   const botJid = sock.user?.id;
   const botNumber = botJid?.split('@')[0];
 
+  // Hapus mention berbasis JID (otomatis dari WhatsApp)
   for (const jid of mentionedJid) {
     const number = jid.split('@')[0];
-    if (number === botNumber) {
-      const tagPattern = new RegExp(`@${number}`, 'gi');
-      query = query.replace(tagPattern, '').trim();
-    }
+    const regex = new RegExp(`@${number}`, 'gi');
+    query = query.replace(regex, '');
   }
 
-  query = query.replace(/@aurabot/gi, '').trim(); // Ubah 'aurabot' sesuai username bot kamu
+  // Hapus mention manual ke bot berbasis nama
+  const botAliases = ['aurabot', 'aura', 'aurabot 24h'];
+  for (const alias of botAliases) {
+    query = query.replace(new RegExp(`@${alias}`, 'gi'), '');
+  }
 
-  return query;
+  // Hapus mention ke siapa pun yang bentuknya @628xxxxx
+  query = query.replace(/@[\d]{5,}/g, '');
+
+  return query.trim();
 }
+
 
 
 async function handleOpenAIResponder(sock, msg, userId) {
