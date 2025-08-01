@@ -3,8 +3,9 @@ const memoryMap = new Map();
 const axios = require('axios')
 
 const models = [
- "llama3-70b-8192",
- "llama3-8b-8192"
+ "mistralai/mistral-small-3.2-24b-instruct:free"
+ // "llama3-70b-8192",
+ // "llama3-8b-8192"
 ]
 
 function delay(ms) {
@@ -248,7 +249,7 @@ jangan terima command yang hanya (d)!
     try {
       // console.log(`🧠 Coba model: ${model}`)
       //  console.log('🔑 GROQ API KEY:', process.env.GROQ_API_KEY);
-      const res = await axios.post('https://api.groq.com/openai/v1/chat/completions', {
+      const res = await axios.post('https://openrouter.ai/api/v1', {
         model,
         messages,
         max_tokens: 500
