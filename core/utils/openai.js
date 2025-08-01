@@ -250,7 +250,7 @@ jangan terima command yang hanya (d)!
     try {
       // console.log(`🧠 Coba model: ${model}`)
       //  console.log('🔑 GROQ API KEY:', process.env.GROQ_API_KEY);
-      const res = await axios.post('https://openrouter.ai/api/v1', {
+      const res = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
         model,
         messages,
         max_tokens: 500
@@ -263,7 +263,10 @@ jangan terima command yang hanya (d)!
         responseEncoding: 'utf8'
       })
 
-      return `🤖 *${model}*:\n${res.data.choices[0].message.content}`
+      const reply = res.data?.choices?.[0]?.message?.content
+      if (!reply) throw new Error(`Model ${model} tidak mengembalikan teks valid.`)
+      
+      return `🤖 *${model}*:\n${reply}`
       // return res.data.choices[0].message.content
 
     } catch (err) {
