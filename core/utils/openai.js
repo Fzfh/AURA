@@ -266,8 +266,8 @@ jangan terima command yang hanya (d)!
       const reply = res.data?.choices?.[0]?.message?.content
       if (!reply) throw new Error(`Model ${model} tidak mengembalikan teks valid.`)
       
-      return `🤖 *${model}*:\n${reply}`
-      // return res.data.choices[0].message.content
+      // return `🤖 *${model}*:\n${reply}`
+      return res.data.choices[0].message.content
 
     } catch (err) {
       console.warn(`❌ Model gagal: ${model} | Alasan:`, err.response?.data?.error?.message || err.message)
