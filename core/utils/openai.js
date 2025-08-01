@@ -4,8 +4,6 @@ const axios = require('axios')
 
 const models = [
   "z-ai/glm-4.5-air:free",
-  "mistralai/mixtral-8x7b-instruct:free",
-  "meta-llama/llama-3-8b-instruct:nitro",
   "google/gemma-7b-it:free"
 ]
 
@@ -283,8 +281,9 @@ jangan terima command yang hanya (d)!
 
   const contextInfo = content?.extendedTextMessage?.contextInfo || {};
   const mentionedJid = contextInfo.mentionedJid || [];
-  const botJid = sock.user?.id;
-  const botNumber = botJid?.split('@')[0];
+  const botNumber = sock.user.id.split(':')[0];
+  const botJid = botNumber.includes('@') ? botNumber : `${botNumber}@s.whatsapp.net`;
+
 
   // Hapus mention berbasis JID (otomatis dari WhatsApp)
   for (const jid of mentionedJid) {
@@ -319,8 +318,15 @@ async function handleOpenAIResponder(sock, msg, userId) {
 
   const isMentionedToBot = contextInfo?.mentionedJid?.includes(botJid);
   const isMentioned = (contextInfo.mentionedJid || []).includes(botJid);
-  const isReplyToBot = contextInfo?.quotedMessage && (contextInfo?.participant === botJid || contextInfo?.remoteJid === botJid);
+  const isReplyToBot =
+  contextInfo?.quotedMessage &&
+  (contextInfo?.participant?.includes(botNumber) || contextInfo?.remoteJid?.includes(botNumber));
   const isPrivate = !sender.endsWith('@g.us');
+  console.log('📌 Bot Number:', botNumber)
+console.log('📌 Participant:', contextInfo?.participant)
+console.log('📌 MentionedJid:', contextInfo?.mentionedJid)
+console.log('📌 isReplyToBot:', isReplyToBot)
+
 
   if (!(isMentionedToBot || isMentioned || isReplyToBot || isPrivate)) return false;
 
