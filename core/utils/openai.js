@@ -3,7 +3,7 @@ const memoryMap = new Map();
 const axios = require('axios')
 
 const models = [
-  "mistralai/mistral-small-3.2-24b-instruct:free",
+  "z-ai/glm-4.5-air:free",
   "mistralai/mixtral-8x7b-instruct:free",
   "meta-llama/llama-3-8b-instruct:nitro",
   "google/gemma-7b-it:free"
