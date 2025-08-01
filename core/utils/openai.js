@@ -341,7 +341,8 @@ async function handleOpenAIResponder(sock, msg, userId) {
       quoted?.imageMessage?.caption ||
       quoted?.videoMessage?.caption || '';
 
-    const aiReply = await askOpenAI(history, quotedText);
+    let aiReply = await askOpenAI(history, quotedText);
+    aiReply = aiReply.trimStart();
     history.push({ role: 'assistant', content: aiReply });
     memoryMap.set(userId, history.slice(-15));
 
