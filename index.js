@@ -141,6 +141,8 @@ async function startBot() {
       if (!messages || type !== 'notify') return;
       const msg = messages[0];
       if (!msg.message) return;
+      console.log('🧩 ContextInfo:', JSON.stringify(msg.message?.extendedTextMessage?.contextInfo, null, 2));
+      console.log('📣 MentionedJid:', msg.message?.extendedTextMessage?.contextInfo?.mentionedJid);
 
       const { text, realMsg } = extractMessageContent(msg);
       msg._realMessage = realMsg;
