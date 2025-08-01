@@ -7,8 +7,6 @@ const models = [
   "mistralai/mixtral-8x7b-instruct:free",
   "meta-llama/llama-3-8b-instruct:nitro",
   "google/gemma-7b-it:free"
- // "llama3-70b-8192",
- // "llama3-8b-8192"
 ]
 
 function delay(ms) {
