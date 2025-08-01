@@ -308,38 +308,33 @@ function extractQueryFromMessage(msg, sock) {
 
 
 async function handleOpenAIResponder(sock, msg, userId) {
-  const sender = msg.key.remoteJid;
+ const sender = msg.key.remoteJid;
   const isPrivate = !sender.endsWith('@g.us');
 
   const msgContent = msg.message;
   const contextInfo = msgContent?.extendedTextMessage?.contextInfo || {};
   const quoted = contextInfo.quotedMessage;
-  const quotedSender = quoted?.senderKeyDistributionMessage?.groupId || 
-                     quoted?.sender || 
-                     quoted?.key?.participant || 
-                     contextInfo.participant || null;
 
   const botNumber = sock.user.id.split(':')[0];
-  const botJid = botNumber.includes('@s.whatsapp.net') ? botNumber : `${botNumber}@s.whatsapp.net`;
-
-  const quotedSenderId = quotedSender?.split('@')[0];
+  const botJid = botNumber.includes('@') ? botNumber : `${botNumber}@s.whatsapp.net`;
   const botId = botNumber.split('@')[0];
+
+  const quotedMessageOwner = contextInfo?.remoteJid || contextInfo?.quotedMessageOwner || '';
+  const quotedSenderId = quotedMessageOwner.split('@')[0];
 
   const isMentionedToBot = contextInfo?.mentionedJid?.includes(botJid);
   const isMentioned = (contextInfo.mentionedJid || []).includes(botJid);
-  const participantJid = contextInfo?.participant || ''
-  const botShort = botNumber.split('@')[0]
   const isReplyToBot =
-  !!contextInfo?.quotedMessage &&
-  quotedSenderId === botId;
-  
-  console.log('📌 Bot Number:', botNumber)
-  console.log('📌 Participant:', contextInfo?.participant)
-  console.log('📌 MentionedJid:', contextInfo?.mentionedJid)
-  console.log('📌 isReplyToBot:', isReplyToBot)
-  
+    !!quoted &&
+    quotedSenderId &&
+    quotedSenderId === botId;
+
+  // 🔍 Logging Bantu Debug
+  console.log('📌 Bot Number:', botNumber);
+  console.log('📌 MentionedJid:', contextInfo?.mentionedJid);
+  console.log('📌 isReplyToBot:', isReplyToBot);
   console.log('🧾 QuotedMessage:', JSON.stringify(quoted, null, 2));
-  console.log('👤 quotedSender:', quotedSender);
+  console.log('👤 quotedSenderId:', quotedSenderId);
   console.log('🤖 botId:', botId);
   console.log('🔁 isReplyToBot:', isReplyToBot);
 
