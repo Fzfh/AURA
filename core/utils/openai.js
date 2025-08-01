@@ -280,28 +280,31 @@ jangan terima command yang hanya (d)!
 }
 function extractQueryFromMessage(msg, sock) {
   const content = msg.message?.viewOnceMessageV2?.message || msg.message;
-  const query =
+  let query =
     content?.conversation ||
     content?.extendedTextMessage?.text ||
     content?.imageMessage?.caption ||
     content?.videoMessage?.caption ||
     content?.documentMessage?.caption ||
     '';
- 
+
   const mentionedJid = content?.extendedTextMessage?.contextInfo?.mentionedJid || [];
   const botJid = sock.user?.id;
   const botNumber = botJid?.split('@')[0];
 
-   for (const jid of mentionedJid) {
+  for (const jid of mentionedJid) {
     const number = jid.split('@')[0];
     if (number === botNumber) {
       const tagPattern = new RegExp(`@${number}`, 'gi');
       query = query.replace(tagPattern, '').trim();
     }
   }
- 
+
+  query = query.replace(/@aurabot/gi, '').trim(); // Ubah 'aurabot' sesuai username bot kamu
+
   return query;
 }
+
 
 async function handleOpenAIResponder(sock, msg, userId) {
   const sender = msg.key.remoteJid;
