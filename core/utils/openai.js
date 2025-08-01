@@ -322,15 +322,9 @@ async function handleOpenAIResponder(sock, msg, userId) {
   const isMentioned = (contextInfo.mentionedJid || []).includes(botJid);
   const participantJid = contextInfo?.participant || ''
   const botShort = botNumber.split('@')[0]
-const isReplyToBot =
-  !!contextInfo?.quotedMessage &&
-  (
-    contextInfo.participant?.includes(botShort) || // cek domain normal
-    contextInfo.participant?.startsWith(botShort) || // untuk domain aneh seperti .lid
-    contextInfo.quotedMessage?.conversation?.includes('AuraBot') || // bisa juga isi khas dari bot
-    contextInfo.quotedMessage?.conversation?.includes('Fitur ini') // atau pattern lain dari bot
-  );
-
+  const isReplyToBot =
+    !!contextInfo?.quotedMessage &&
+    quotedSender?.startsWith(botNumber);
   console.log('📌 Bot Number:', botNumber)
 console.log('📌 Participant:', contextInfo?.participant)
 console.log('📌 MentionedJid:', contextInfo?.mentionedJid)
