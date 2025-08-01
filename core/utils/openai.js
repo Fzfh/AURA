@@ -318,17 +318,21 @@ async function handleOpenAIResponder(sock, msg, userId) {
   const botNumber = sock.user.id.split(':')[0];
   const botJid = botNumber.includes('@s.whatsapp.net') ? botNumber : `${botNumber}@s.whatsapp.net`;
 
+  const quotedSenderId = quotedSender?.split('@')[0];
+  const botId = botNumber.split('@')[0];
+
   const isMentionedToBot = contextInfo?.mentionedJid?.includes(botJid);
   const isMentioned = (contextInfo.mentionedJid || []).includes(botJid);
   const participantJid = contextInfo?.participant || ''
   const botShort = botNumber.split('@')[0]
   const isReplyToBot =
   !!contextInfo?.quotedMessage &&
-  quotedSender?.split('@')[0] === botNumber.split('@')[0];
+  quotedSenderId === botId;
+  
   console.log('📌 Bot Number:', botNumber)
-console.log('📌 Participant:', contextInfo?.participant)
-console.log('📌 MentionedJid:', contextInfo?.mentionedJid)
-console.log('📌 isReplyToBot:', isReplyToBot)
+  console.log('📌 Participant:', contextInfo?.participant)
+  console.log('📌 MentionedJid:', contextInfo?.mentionedJid)
+  console.log('📌 isReplyToBot:', isReplyToBot)
 
 
   if (!(isMentionedToBot || isMentioned || isReplyToBot || isPrivate)) return false;
