@@ -31,14 +31,26 @@ let pairingRetryTimeout = null;
 let pairingRequested = false;
 
 function extractMessageContent(msg) {
-  const isViewOnce = !!msg.message?.viewOnceMessageV2;
-  const realMsg = isViewOnce ? msg.message.viewOnceMessageV2.message : msg.message;
+  let realMsg = msg.message;
+  if (!realMsg) return { text: '', realMsg: null };
+
+  if (realMsg?.ephemeralMessage) {
+    realMsg = realMsg.ephemeralMessage.message;
+  } else if (realMsg?.viewOnceMessageV2) {
+    realMsg = realMsg.viewOnceMessageV2.message;
+  }
+
   const text =
     realMsg?.conversation ||
     realMsg?.extendedTextMessage?.text ||
     realMsg?.imageMessage?.caption ||
     realMsg?.videoMessage?.caption ||
+    realMsg?.documentMessage?.caption ||
+    realMsg?.buttonsResponseMessage?.selectedButtonId ||
+    realMsg?.buttonsResponseMessage?.selectedDisplayText ||
+    realMsg?.templateButtonReplyMessage?.selectedDisplayText ||
     '';
+
   return { text, realMsg };
 }
 
@@ -131,7 +143,9 @@ async function startBot() {
       if (!msg.message) return;
 
       const { text, realMsg } = extractMessageContent(msg);
-      msg.message = realMsg;
+      msg._realMessage = realMsg;
+      msg._text = text;
+
 
       try {
         await handleResponder(sock, msg);
