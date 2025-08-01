@@ -272,72 +272,43 @@ jangan terima command yang hanya (d)!
 }
 function extractQueryFromMessage(msg, sock) {
   const content = msg.message?.viewOnceMessageV2?.message || msg.message;
-  let query =
+  const query =
     content?.conversation ||
     content?.extendedTextMessage?.text ||
     content?.imageMessage?.caption ||
     content?.videoMessage?.caption ||
     content?.documentMessage?.caption ||
     '';
+ 
+  const mentionedJid = content?.extendedTextMessage?.contextInfo?.mentionedJid || [];
+  const botJid = sock.user?.id;
+  const botNumber = botJid?.split('@')[0];
 
-  const contextInfo = content?.extendedTextMessage?.contextInfo || {};
-  const mentionedJid = contextInfo.mentionedJid || [];
-  const botNumber = sock.user.id.split(':')[0];
-  const botJid = botNumber.includes('@') ? botNumber : `${botNumber}@s.whatsapp.net`;
-
-
-  // Hapus mention berbasis JID (otomatis dari WhatsApp)
-  for (const jid of mentionedJid) {
+   for (const jid of mentionedJid) {
     const number = jid.split('@')[0];
-    const regex = new RegExp(`@${number}`, 'gi');
-    query = query.replace(regex, '');
+    if (number === botNumber) {
+      const tagPattern = new RegExp(`@${number}`, 'gi');
+      query = query.replace(tagPattern, '').trim();
+    }
   }
-
-  // Hapus mention manual ke bot berbasis nama
-  const botAliases = ['aurabot', 'aura', 'aurabot 24h'];
-  for (const alias of botAliases) {
-    query = query.replace(new RegExp(`@${alias}`, 'gi'), '');
-  }
-
-  // Hapus mention ke siapa pun yang bentuknya @628xxxxx
-  query = query.replace(/@[\d]{5,}/g, '');
-
-  return query.trim();
+ 
+  return query;
 }
 
-
-
 async function handleOpenAIResponder(sock, msg, userId) {
- const sender = msg.key.remoteJid;
-  const isPrivate = !sender.endsWith('@g.us');
+  const sender = msg.key.remoteJid;
 
   const msgContent = msg.message;
   const contextInfo = msgContent?.extendedTextMessage?.contextInfo || {};
   const quoted = contextInfo.quotedMessage;
-
+  const quotedSender = contextInfo.participant || null;
   const botNumber = sock.user.id.split(':')[0];
-  const botJid = botNumber.includes('@') ? botNumber : `${botNumber}@s.whatsapp.net`;
-  const botId = botNumber.split('@')[0];
-
-  const quotedMessageOwner = contextInfo?.remoteJid || contextInfo?.quotedMessageOwner || '';
-  const quotedSenderId = quotedMessageOwner.split('@')[0];
+  const botJid = botNumber.includes('@s.whatsapp.net') ? botNumber : `${botNumber}@s.whatsapp.net`;
 
   const isMentionedToBot = contextInfo?.mentionedJid?.includes(botJid);
   const isMentioned = (contextInfo.mentionedJid || []).includes(botJid);
-  const isReplyToBot =
-    !!quoted &&
-    quotedSenderId &&
-    quotedSenderId === botId;
-
-  // 🔍 Logging Bantu Debug
-  console.log('📌 Bot Number:', botNumber);
-  console.log('📌 MentionedJid:', contextInfo?.mentionedJid);
-  console.log('📌 isReplyToBot:', isReplyToBot);
-  console.log('🧾 QuotedMessage:', JSON.stringify(quoted, null, 2));
-  console.log('👤 quotedSenderId:', quotedSenderId);
-  console.log('🤖 botId:', botId);
-  console.log('🔁 isReplyToBot:', isReplyToBot);
-
+  const isReplyToBot = contextInfo?.quotedMessage && (contextInfo?.participant === botJid || contextInfo?.remoteJid === botJid);
+  const isPrivate = !sender.endsWith('@g.us');
 
   if (!(isMentionedToBot || isMentioned || isReplyToBot || isPrivate)) return false;
 
@@ -355,8 +326,7 @@ async function handleOpenAIResponder(sock, msg, userId) {
       quoted?.imageMessage?.caption ||
       quoted?.videoMessage?.caption || '';
 
-    let aiReply = await askOpenAI(history, quotedText);
-    aiReply = aiReply.trimStart();
+    const aiReply = await askOpenAI(history, quotedText);
     history.push({ role: 'assistant', content: aiReply });
     memoryMap.set(userId, history.slice(-15));
 
