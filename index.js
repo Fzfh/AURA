@@ -119,6 +119,13 @@ async function startBot() {
     });
 
     sock.ev.on('messages.upsert', async ({ messages, type }) => {
+      console.log('🔔 Pesan baru masuk:', {
+  type,
+  from: messages?.[0]?.key?.remoteJid,
+  isGroup: messages?.[0]?.key?.remoteJid?.endsWith('@g.us'),
+  contentPreview: JSON.stringify(messages?.[0]?.message)?.slice(0, 100)
+});
+
       if (!messages || type !== 'notify') return;
       const msg = messages[0];
       if (!msg.message) return;
