@@ -323,8 +323,8 @@ async function handleOpenAIResponder(sock, msg, userId) {
   const participantJid = contextInfo?.participant || ''
   const botShort = botNumber.split('@')[0]
   const isReplyToBot =
-    !!contextInfo?.quotedMessage &&
-    quotedSender?.startsWith(botNumber);
+  !!contextInfo?.quotedMessage &&
+  quotedSender?.replace(/[@].*$/, '') === botNumber;
   console.log('📌 Bot Number:', botNumber)
 console.log('📌 Participant:', contextInfo?.participant)
 console.log('📌 MentionedJid:', contextInfo?.mentionedJid)
