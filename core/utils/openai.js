@@ -263,9 +263,6 @@ jangan terima command yang hanya (d)!
         responseEncoding: 'utf8'
       })
 
-      const reply = res.data?.choices?.[0]?.message?.content
-      if (!reply) throw new Error(`Model ${model} tidak mengembalikan teks valid.`)
-      
       // return `🤖 *${model}*:\n${reply}`
       return res.data.choices[0].message.content
 
