@@ -130,6 +130,13 @@ async function startBot() {
         console.error(chalk.red('❌ Error di handleResponder:'), err);
       }
     });
+    
+    setInterval(async () => {
+      if (!sock?.user) {
+        console.log(chalk.redBright('[⛔] Socket tidak aktif! Restart bot...'));
+        process.exit(1); // Atau langsung panggil startBot()
+      }
+    }, 60_000); // Cek setiap 1 menit
   } catch (err) {
     console.error(chalk.bgRed('🔥 Gagal memulai bot:'), err);
   }
