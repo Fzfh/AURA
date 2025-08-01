@@ -3,8 +3,8 @@ const memoryMap = new Map();
 const axios = require('axios')
 
 const models = [
-  "z-ai/glm-4.5-air:free",
-  "google/gemma-7b-it:free"
+  "llama3-70b-8192",
+ "llama3-8b-8192"
 ]
 
 function delay(ms) {
@@ -245,7 +245,7 @@ jangan terima command yang hanya (d)!
     try {
       // console.log(`🧠 Coba model: ${model}`)
       //  console.log('🔑 GROQ API KEY:', process.env.GROQ_API_KEY);
-      const res = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
+      const res = await axios.post('https://api.groq.com/openai/v1/chat/completions', {
         model,
         messages,
         max_tokens: 500
@@ -269,7 +269,8 @@ jangan terima command yang hanya (d)!
       await delay(3000)
     }
   }
-}function extractQueryFromMessage(msg, sock) {
+}
+function extractQueryFromMessage(msg, sock) {
   const content = msg.message?.viewOnceMessageV2?.message || msg.message;
   let query =
     content?.conversation ||
@@ -308,6 +309,7 @@ jangan terima command yang hanya (d)!
 
 async function handleOpenAIResponder(sock, msg, userId) {
   const sender = msg.key.remoteJid;
+  const isPrivate = !sender.endsWith('@g.us');
 
   const msgContent = msg.message;
   const contextInfo = msgContent?.extendedTextMessage?.contextInfo || {};
@@ -319,9 +321,7 @@ async function handleOpenAIResponder(sock, msg, userId) {
   const isMentionedToBot = contextInfo?.mentionedJid?.includes(botJid);
   const isMentioned = (contextInfo.mentionedJid || []).includes(botJid);
   const participantJid = contextInfo?.participant || ''
-const botNumber = sock.user.id.split(':')[0]
-const botJidFull = botNumber.includes('@') ? botNumber : `${botNumber}@s.whatsapp.net`
-const botShort = botNumber.split('@')[0]
+  const botShort = botNumber.split('@')[0]
 
 const isReplyToBot = contextInfo?.quotedMessage && (
   participantJid.includes(botShort)
