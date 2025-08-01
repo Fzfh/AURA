@@ -314,7 +314,11 @@ async function handleOpenAIResponder(sock, msg, userId) {
   const msgContent = msg.message;
   const contextInfo = msgContent?.extendedTextMessage?.contextInfo || {};
   const quoted = contextInfo.quotedMessage;
-  const quotedSender = contextInfo.participant || null;
+  const quotedSender = quoted?.senderKeyDistributionMessage?.groupId || 
+                     quoted?.sender || 
+                     quoted?.key?.participant || 
+                     contextInfo.participant || null;
+
   const botNumber = sock.user.id.split(':')[0];
   const botJid = botNumber.includes('@s.whatsapp.net') ? botNumber : `${botNumber}@s.whatsapp.net`;
 
@@ -333,6 +337,11 @@ async function handleOpenAIResponder(sock, msg, userId) {
   console.log('📌 Participant:', contextInfo?.participant)
   console.log('📌 MentionedJid:', contextInfo?.mentionedJid)
   console.log('📌 isReplyToBot:', isReplyToBot)
+  
+  console.log('🧾 QuotedMessage:', JSON.stringify(quoted, null, 2));
+  console.log('👤 quotedSender:', quotedSender);
+  console.log('🤖 botId:', botId);
+  console.log('🔁 isReplyToBot:', isReplyToBot);
 
 
   if (!(isMentionedToBot || isMentioned || isReplyToBot || isPrivate)) return false;
