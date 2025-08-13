@@ -98,10 +98,10 @@ async function startBot() {
 
         const requestPairing = async () => {
           try {
-            console.log(chalk.cyan(`🔐 Mode pairing aktif dengan nomor: ${phoneNumber}`));
+            console.log(chalk.cyan(🔐 Mode pairing aktif dengan nomor: ${phoneNumber}));
             const code = await sock.requestPairingCode(phoneNumber);
             const formatted = code.slice(0, 4) + '-' + code.slice(4);
-            console.log(chalk.yellowBright(`\n🔑 Masukkan kode ini di WhatsApp:\n\n${chalk.bold(formatted)}\n`));
+            console.log(chalk.yellowBright(\n🔑 Masukkan kode ini di WhatsApp:\n\n${chalk.bold(formatted)}\n));
           } catch (err) {
             console.error(chalk.red('❌ Gagal generate pairing code. Ulang dalam 30 detik...'));
             pairingRetryTimeout = setTimeout(requestPairing, 30_000);
@@ -123,19 +123,16 @@ async function startBot() {
 
       // Koneksi mati → restart aman
       if (connection === 'close') {
-  const reason = lastDisconnect?.error?.output?.statusCode 
-              || lastDisconnect?.error?.output?.payload?.statusCode;
-  const errorMsg = String(lastDisconnect?.error || '').toLowerCase();
-
-  if (reason === DisconnectReason.loggedOut || errorMsg.includes('bad mac')) {
-    fs.rmSync('./auth_info', { recursive: true, force: true });
-    console.log(chalk.redBright('\n🗑 Session corrupt, menghapus dan restart...\n'));
-    setTimeout(startBot, 5000);
-  } else {
-    console.log(chalk.redBright('\n🔁 Koneksi terputus. Reconnect...\n'));
-    setTimeout(startBot, 8000);
-  }
-}
+        const reason = lastDisconnect?.error?.output?.statusCode || lastDisconnect?.error?.output?.payload?.statusCode;
+        if (reason === DisconnectReason.loggedOut) {
+          fs.rmSync('./auth_info', { recursive: true, force: true });
+          console.log(chalk.redBright('\n❌ Logout terdeteksi. Restarting...\n'));
+          setTimeout(startBot, 3000);
+        } else {
+          console.log(chalk.redBright('\n🔁 Koneksi terputus. Mencoba ulang...\n'));
+          setTimeout(startBot, 5000);
+        }
+      }
     });
 
     // Pesan masuk
@@ -176,7 +173,7 @@ app.get('/qr', (req, res) => {
 });
 
 app.listen(PORT, '0.0.0.0', () =>
-  console.log(chalk.cyanBright(`🌐 Web server aktif di http://localhost:${PORT} (/qr optional)`))
+  console.log(chalk.cyanBright(🌐 Web server aktif di http://localhost:${PORT} (/qr optional)))
 );
 
 tampilkanBanner();
