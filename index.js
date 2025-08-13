@@ -98,10 +98,10 @@ async function startBot() {
 
         const requestPairing = async () => {
           try {
-            console.log(chalk.cyan(🔐 Mode pairing aktif dengan nomor: ${phoneNumber}));
+            console.log(chalk.cyan(`🔐 Mode pairing aktif dengan nomor: ${phoneNumber}`));
             const code = await sock.requestPairingCode(phoneNumber);
             const formatted = code.slice(0, 4) + '-' + code.slice(4);
-            console.log(chalk.yellowBright(\n🔑 Masukkan kode ini di WhatsApp:\n\n${chalk.bold(formatted)}\n));
+            console.log(chalk.yellowBright(`\n🔑 Masukkan kode ini di WhatsApp:\n\n${chalk.bold(formatted)}\n`));
           } catch (err) {
             console.error(chalk.red('❌ Gagal generate pairing code. Ulang dalam 30 detik...'));
             pairingRetryTimeout = setTimeout(requestPairing, 30_000);
