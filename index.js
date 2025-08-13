@@ -173,7 +173,7 @@ app.get('/qr', (req, res) => {
 });
 
 app.listen(PORT, '0.0.0.0', () =>
-  console.log(chalk.cyanBright(`🌐 Web server aktif di http://localhost:${PORT} (/qr optional`)))
+  console.log(chalk.cyanBright(`🌐 Web server aktif di http://localhost:${PORT} (/qr optional)`))
 );
 
 tampilkanBanner();
