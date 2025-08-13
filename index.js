@@ -123,17 +123,19 @@ async function startBot() {
 
       // Koneksi mati → restart aman
       if (connection === 'close') {
-        const reason = lastDisconnect?.error?.output?.statusCode || lastDisconnect?.error?.output?.payload?.statusCode;
-        if (reason === DisconnectReason.loggedOut || String(err).includes('Bad MAC')) {
-  fs.rmSync('./auth_info', { recursive: true, force: true });
-  console.log(chalk.redBright('\n🗑 Session corrupt, menghapus dan restart...\n'));
-  setTimeout(startBot, 5000);
-} else {
-  console.log(chalk.redBright('\n🔁 Koneksi terputus. Reconnect...\n'));
-  setTimeout(startBot, 8000);
-}
+  const reason = lastDisconnect?.error?.output?.statusCode 
+              || lastDisconnect?.error?.output?.payload?.statusCode;
+  const errorMsg = String(lastDisconnect?.error || '').toLowerCase();
 
-      }
+  if (reason === DisconnectReason.loggedOut || errorMsg.includes('bad mac')) {
+    fs.rmSync('./auth_info', { recursive: true, force: true });
+    console.log(chalk.redBright('\n🗑 Session corrupt, menghapus dan restart...\n'));
+    setTimeout(startBot, 5000);
+  } else {
+    console.log(chalk.redBright('\n🔁 Koneksi terputus. Reconnect...\n'));
+    setTimeout(startBot, 8000);
+  }
+}
     });
 
     // Pesan masuk
