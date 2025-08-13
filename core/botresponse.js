@@ -61,7 +61,12 @@ async function handleResponder(sock, msg) {
 
     // 📣 Deteksi mention bot
     const botJid = normalizeJid(sock.user?.id);
-    const mentionedJidListRaw = content?.extendedTextMessage?.contextInfo?.mentionedJid || [];
+    const ctxInfo = content?.extendedTextMessage?.contextInfo ||
+                content?.imageMessage?.contextInfo ||
+                content?.videoMessage?.contextInfo ||
+                content?.documentMessage?.contextInfo ||
+                {};
+    const mentionedJidListRaw = ctxInfo?.mentionedJid || [];
     const mentionedJidList = mentionedJidListRaw.map(j => normalizeJid(j));
     const isMentioned = mentionedJidList.includes(botJid);
 
