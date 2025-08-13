@@ -13,7 +13,12 @@ async function handleResponder(sock, msg) {
   try {
     if (!msg.message) return;
 
-    const sender = msg.key.remoteJid;
+    const sender = (msg.key.participant || msg.key.remoteJid || '').replace(/:\d+/, '')
+// Normalisasi semua ID ke format @s.whatsapp.net kalau private
+const jidNormalized = sender.includes('@lid')
+    ? sender.replace('@lid', '@s.whatsapp.net')
+    : sender
+
     const userId = sender;
     const actualUserId = msg.key.participant || sender;
     const isGroup = sender.endsWith('@g.us');
