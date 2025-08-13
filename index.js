@@ -15,7 +15,7 @@ const express = require('express');
 
 const tampilkanBanner = require('./core/utils/tampilanbanner');
 const { handleResponder, registerGroupUpdateListener } = require('./core/botresponse');
- const { setupAntiDelete } = require("./commands/antidelete");
+const { setupAntiDelete } = require("./commands/antidelete");
 
 const app = express();
 const PORT = 3000;
@@ -62,13 +62,14 @@ async function startBot() {
     const sock = makeWASocket({
       logger: P({ level: 'silent' }),
       version,
+      syncFullHistory: false, // MATIKAN full history sync
       auth: {
         creds: state.creds,
         keys: makeCacheableSignalKeyStore(state.keys, P({ level: 'silent' })),
       },
       printQRInTerminal: false,
     });
-    
+
     global.sock = sock;
 
     sock.ev.on('creds.update', saveCreds);
@@ -76,6 +77,7 @@ async function startBot() {
     sock.ev.on('connection.update', async (update) => {
       const { connection, lastDisconnect, qr } = update;
 
+      // QR Mode
       if (qr && qrMode) {
         latestQR = qr;
         console.log(chalk.yellowBright('\n📸 Scan QR berikut ini:\n'));
@@ -90,6 +92,7 @@ async function startBot() {
         }, 60_000);
       }
 
+      // Pairing Mode
       if (qr && phoneNumber && !pairingRequested) {
         pairingRequested = true;
 
@@ -100,14 +103,15 @@ async function startBot() {
             const formatted = code.slice(0, 4) + '-' + code.slice(4);
             console.log(chalk.yellowBright(`\n🔑 Masukkan kode ini di WhatsApp:\n\n${chalk.bold(formatted)}\n`));
           } catch (err) {
-            console.error(chalk.red('❌ Gagal generate pairing code. Ulang dalam 10 detik...'));
-            pairingRetryTimeout = setTimeout(requestPairing, 10_000);
+            console.error(chalk.red('❌ Gagal generate pairing code. Ulang dalam 30 detik...'));
+            pairingRetryTimeout = setTimeout(requestPairing, 30_000);
           }
         };
 
         requestPairing();
       }
 
+      // Koneksi sukses
       if (connection === 'open') {
         console.log(chalk.greenBright('\n✅ Bot berhasil terhubung ke WhatsApp!'));
         console.log(chalk.cyanBright('✨ AURABOT SIAP MELAYANI TUAN AURAA 😎\n'));
@@ -117,26 +121,28 @@ async function startBot() {
         setupAntiDelete(sock);
       }
 
+      // Koneksi mati → restart aman
       if (connection === 'close') {
-        const reason = lastDisconnect?.error?.output?.statusCode;
+        const reason = lastDisconnect?.error?.output?.statusCode || lastDisconnect?.error?.output?.payload?.statusCode;
         if (reason === DisconnectReason.loggedOut) {
           fs.rmSync('./auth_info', { recursive: true, force: true });
           console.log(chalk.redBright('\n❌ Logout terdeteksi. Restarting...\n'));
-          setTimeout(startBot, 2000);
+          setTimeout(startBot, 3000);
         } else {
           console.log(chalk.redBright('\n🔁 Koneksi terputus. Mencoba ulang...\n'));
-          setTimeout(startBot, 3000);
+          setTimeout(startBot, 5000);
         }
       }
     });
 
+    // Pesan masuk
     sock.ev.on('messages.upsert', async ({ messages, type }) => {
       console.log('🔔 Pesan baru masuk:', {
-  type,
-  from: messages?.[0]?.key?.remoteJid,
-  isGroup: messages?.[0]?.key?.remoteJid?.endsWith('@g.us'),
-  contentPreview: JSON.stringify(messages?.[0]?.message)?.slice(0, 100)
-});
+        type,
+        from: messages?.[0]?.key?.remoteJid,
+        isGroup: messages?.[0]?.key?.remoteJid?.endsWith('@g.us'),
+        contentPreview: JSON.stringify(messages?.[0]?.message)?.slice(0, 100)
+      });
 
       if (!messages || type !== 'notify') return;
       const msg = messages[0];
@@ -148,25 +154,20 @@ async function startBot() {
       msg._realMessage = realMsg;
       msg._text = text;
 
-
       try {
         await handleResponder(sock, msg);
       } catch (err) {
         console.error(chalk.red('❌ Error di handleResponder:'), err);
       }
     });
-    
-    setInterval(async () => {
-      if (!sock?.user) {
-        console.log(chalk.redBright('[⛔] Socket tidak aktif! Restart bot...'));
-        process.exit(1); // Atau langsung panggil startBot()
-      }
-    }, 60_000); // Cek setiap 1 menit
+
   } catch (err) {
     console.error(chalk.bgRed('🔥 Gagal memulai bot:'), err);
+    setTimeout(startBot, 5000); // retry otomatis kalau gagal start
   }
 }
 
+// Web server kecil
 app.get('/qr', (req, res) => {
   res.send('🛑 QR ditampilkan langsung di terminal.');
 });
