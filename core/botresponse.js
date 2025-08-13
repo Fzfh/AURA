@@ -9,13 +9,19 @@ const spamTracker = new Map()
 const mutedUsers = new Map()
 const muteDuration = 2 * 60 * 1000
 
+// 🔹 Fungsi normalisasi JID agar @lid jadi @s.whatsapp.net
+function normalizeJid(jid) {
+  return jid?.replace(/:\d+/, '')?.replace('@lid', '@s.whatsapp.net');
+}
+
 async function handleResponder(sock, msg) {
   try {
     if (!msg.message) return;
 
-    const sender = msg.key.remoteJid;
+    // Normalisasi ID pengirim & peserta
+    const sender = normalizeJid(msg.key.remoteJid);
     const userId = sender;
-    const actualUserId = msg.key.participant || sender;
+    const actualUserId = normalizeJid(msg.key.participant || sender);
     const isGroup = sender.endsWith('@g.us');
 
     const content = msg.message?.viewOnceMessageV2?.message || msg.message;
@@ -30,6 +36,7 @@ async function handleResponder(sock, msg) {
     const commandName = body.trim().split(' ')[0].toLowerCase().replace(/^\.|\//, '');
     const args = body.trim().split(' ').slice(1);
 
+    // 🚫 Anti spam
     if (text.startsWith('/') || text.startsWith('.')) {
       const now = Date.now();
       const userSpam = spamTracker.get(userId) || [];
@@ -44,19 +51,25 @@ async function handleResponder(sock, msg) {
       }
     }
 
+    // 📌 Cek command static
     const handledStatic = await handleStaticCommand(sock, msg, lowerText, userId, sender, body);
     if (handledStatic) return;
 
+    // 💌 Menfess
     const handledMenfess = await menfess(sock, msg, text)
     if (handledMenfess) return
 
-    const botJid = sock.user?.id;
-    const mentionedJidList = content?.extendedTextMessage?.contextInfo?.mentionedJid || [];
+    // 📣 Deteksi mention bot
+    const botJid = normalizeJid(sock.user?.id);
+    const mentionedJidListRaw = content?.extendedTextMessage?.contextInfo?.mentionedJid || [];
+    const mentionedJidList = mentionedJidListRaw.map(j => normalizeJid(j));
     const isMentioned = mentionedJidList.includes(botJid);
 
+    // 🔄 Loop pattern command
     for (const pattern of botResponsePatterns) {
       if (commandName !== pattern.command) continue;
-       if (['waifu', 'waifuhen'].includes(pattern.command)) {
+
+      if (['waifu', 'waifuhen'].includes(pattern.command)) {
         if (args.length === 0) {
           return await pattern.handler(sock, msg, '', [], pattern.command);
         } else {
@@ -71,7 +84,7 @@ async function handleResponder(sock, msg) {
       return await pattern.handler(sock, msg, body, args, commandName, actualUserId);
     }
 
-
+    // 🤖 AI responder (skip untuk command tertentu)
     if (!['menu', 'reset', 'clear'].includes(commandName)) {
       await handleOpenAIResponder(sock, msg, userId);
     }
@@ -80,7 +93,6 @@ async function handleResponder(sock, msg) {
     console.error('❌ Error di handleResponder:', err);
   }
 }
-
 
 const registeredSockets = new WeakSet()
 
