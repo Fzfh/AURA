@@ -10,7 +10,7 @@ const allowedNSFW = [
 module.exports = async function waifuhen(sock, msg) {
   try {
     const sender = msg.key.remoteJid;
-    const userId = msg.key.participant || sender;
+    let userId = (msg.key.participant || msg.key.remoteJid).split('-')[0] + '@s.whatsapp.net';
 
     // cek admin
     if (!adminList.includes(userId)) {
