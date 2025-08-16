@@ -1,4 +1,3 @@
-buat kode ini
 function extractTargetJid(sock, msg, text) {
   const contextInfo = msg.message?.extendedTextMessage?.contextInfo;
   const mentioned = contextInfo?.mentionedJid;
