@@ -7,29 +7,20 @@ const allowedNSFW = [
   'ass', 'hentai', 'milf', 'oral', 'paizuri', 'ecchi', 'ero'
 ];
 
-module.exports = async function waifuhen(sock, msg, text) {
+module.exports = async function waifuhen(sock, msg) {
   try {
     const sender = msg.key.remoteJid;
     const userId = msg.key.participant || sender;
 
+    // cek admin
     if (!adminList.includes(userId)) {
       return sock.sendMessage(sender, {
         text: '❌ Fitur ini hanya bisa dipakai oleh admin bot saja.',
       }, { quoted: msg });
     }
 
-    const type = text?.toLowerCase()?.trim();
-    if (!type) {
-      return sock.sendMessage(sender, {
-        text: `🔞 Gunakan: .waifuhen tag\nTag NSFW tersedia:\n• ${allowedNSFW.join('\n• ')}`
-      }, { quoted: msg });
-    }
-
-    if (!allowedNSFW.includes(type)) {
-      return sock.sendMessage(sender, {
-        text: `❌ Tag *${type}* gak tersedia!\n\nPilih salah satu:\n• ${allowedNSFW.join('\n• ')}`
-      }, { quoted: msg });
-    }
+    // pilih tag acak
+    const type = allowedNSFW[Math.floor(Math.random() * allowedNSFW.length)];
 
     const params = new URLSearchParams({
       included_tags: type,
@@ -37,6 +28,7 @@ module.exports = async function waifuhen(sock, msg, text) {
       gif: 'true',
       limit: '1'
     });
+
     const res = await axios.get(`https://api.waifu.im/search?${params}`, {
       headers: { 'Accept-Version': 'v5' }
     });
@@ -48,6 +40,7 @@ module.exports = async function waifuhen(sock, msg, text) {
     const ext = path.extname(mediaUrl).toLowerCase();
     const caption = `🔞 ${type.charAt(0).toUpperCase() + type.slice(1)} by AuraBot`;
 
+    // kirim media
     if (['.gif', '.mp4', '.webm'].includes(ext)) {
       await sock.sendMessage(sender, {
         video: { url: mediaUrl },
@@ -63,8 +56,10 @@ module.exports = async function waifuhen(sock, msg, text) {
 
   } catch (err) {
     console.error('[WAIFUHEN ERROR]', err);
-    await sock.sendMessage(msg.key.remoteJid, {
-      text: '⚠️ Gagal kirim waifuhen. Cek tag atau coba lagi nanti ya.',
-    }, { quoted: msg });
+    try {
+      await sock.sendMessage(msg.key.remoteJid, {
+        text: '⚠️ Gagal kirim waifuhen. Cek tag atau coba lagi nanti ya.',
+      }, { quoted: msg });
+    } catch {}
   }
 };
