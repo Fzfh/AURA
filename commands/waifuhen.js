@@ -9,13 +9,28 @@ const allowedNSFW = ['ass', 'hentai', 'milf', 'oral', 'paizuri', 'ecchi'];
 module.exports = async function waifuhen(sock, msg, text) {
   try {
     const sender = msg.key.remoteJid;
-    const userId = msg.key.participant || msg.key.remoteJid;
+    let userId;
+
+// Kalau dari grup, ambil participant
+if (msg.key.participant) {
+  userId = msg.key.participant;
+} 
+// Kalau dari private, ambil remoteJid
+else if (msg.key.remoteJid.endsWith('@s.whatsapp.net')) {
+  userId = msg.key.remoteJid;
+} 
+// Kalau bukan keduanya (misal @g.us, broadcast), langsung stop
+else {
+  return; // biar ga crash
+}
+
 
     if (!adminList.includes(userId)) {
-      return sock.sendMessage(sender, {
-        text: '❌ Fitur ini hanya bisa dipakai oleh admin bot saja.',
-      }, { quoted: msg });
-    }
+  return sock.sendMessage(msg.key.remoteJid, {
+    text: '❌ Fitur ini hanya bisa dipakai oleh admin bot saja.',
+  }, { quoted: msg });
+}
+
 
     const type = allowedNSFW[Math.floor(Math.random() * allowedNSFW.length)];
 
