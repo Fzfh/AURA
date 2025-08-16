@@ -9,7 +9,7 @@ const allowedNSFW = ['ass', 'hentai', 'milf', 'oral', 'paizuri', 'ecchi'];
 module.exports = async function waifuhen(sock, msg, text) {
   try {
     const sender = msg.key.remoteJid;
-    const userId = msg.key.participant || sender;
+    const userId = msg.key.participant || msg.key.remoteJid;
 
     if (!adminList.includes(userId)) {
       return sock.sendMessage(sender, {
