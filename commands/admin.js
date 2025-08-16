@@ -1,3 +1,4 @@
+// adminGroup.js
 module.exports = async function admin(sock, msg, text) {
   const chatId = msg.key.remoteJid;
   const from = chatId;
