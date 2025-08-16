@@ -1,137 +1,105 @@
-function extractTargetJid(sock, msg, text) {
-  const contextInfo = msg.message?.extendedTextMessage?.contextInfo;
-  const mentioned = contextInfo?.mentionedJid;
-  
-  if (mentioned && mentioned.length > 0) {
-    return mentioned[0];
+// adminGroup.js
+module.exports = async function admin(sock, msg, text) {
+  const chatId = msg.key.remoteJid;
+  const isGroup = chatId.endsWith('@g.us');
+
+  if (!isGroup) {
+    return sock.sendMessage(chatId, {
+      text: '❌ Perintah Admin/unAdmin hanya bisa digunakan di grup!',
+    }, { quoted: msg });
   }
 
-  if (contextInfo?.participant && contextInfo?.quotedMessage) {
-    return contextInfo.participant;
-  }
-
-  const parts = text.trim().split(/\s+/);
-  let number = parts.slice(1).join('').replace(/[^+\d]/g, '');
-
-  if (number.startsWith('+')) {
-    number = number.slice(1);
-  } else if (number.startsWith('0')) {
-    number = '62' + number.slice(1);
-  }
-
-  if (/^\d{8,}$/.test(number)) {
-    return `${number}@s.whatsapp.net`;
-  }
-
-  return null;
-}
-
-async function isGroupAdmin(sock, groupId, jid) {
-  try {
-    const metadata = await sock.groupMetadata(groupId);
-    return metadata.participants.some(
-      p => p.id === jid && (p.admin === 'admin' || p.admin === 'superadmin')
-    );
-  } catch (e) {
-    console.error('❌ Gagal ambil metadata grup:', e);
-    return false;
-  }
-}
-
-module.exports = async function admin(sock, msg, text, senderRaw, chatIdInput) {
-  const sender = senderRaw || msg.key.participant || msg.participant || msg.key.remoteJid;
+  const sender = msg.key.participant || msg.participant;
   const lowerText = text.toLowerCase();
-  const isNA = lowerText.startsWith('.na');
-  const isUNA = lowerText.startsWith('.una');
-
+  const isNA = lowerText.startsWith('.na');   // promote
+  const isUNA = lowerText.startsWith('.una'); // demote
   if (!isNA && !isUNA) return false;
 
-  const chatId = chatIdInput || msg.key.remoteJid;
+  // ambil metadata grup
+  const metadata = await sock.groupMetadata(chatId);
 
-  if (!chatId.endsWith('@g.us')) {
-    await sock.sendMessage(chatId, {
-      text: '❌ Perintah Admin/unAdmin ini hanya bisa digunakan di grup',
+  // fungsi normalize JID untuk hapus device suffix
+  const normalizeJid = jid => jid?.split(':')[0] || '';
+
+  // daftar admin grup
+  const groupAdmins = metadata.participants
+    .filter(p => p.admin === 'admin' || p.admin === 'superadmin')
+    .map(p => normalizeJid(p.id));
+
+  if (!groupAdmins.includes(normalizeJid(sender))) {
+    return sock.sendMessage(chatId, {
+      text: '🚫 Perintah ini hanya bisa digunakan oleh *admin grup*!',
     }, { quoted: msg });
-    return true;
   }
 
-  const isSenderAdmin = await isGroupAdmin(sock, chatId, sender);
-  if (!isSenderAdmin) {
-    await sock.sendMessage(chatId, {
-      text: '❌ Maaf yaaa, Yang boleh Admin/unAdmin hanya admin grup saja',
-    }, { quoted: msg });
-    return true;
-  }
+  // ambil target: tag, reply, atau nomor
+  let target = null;
+  const contextInfo = msg.message?.extendedTextMessage?.contextInfo;
 
-  const target = extractTargetJid(sock, msg, text);
+  if (contextInfo?.mentionedJid?.length) target = contextInfo.mentionedJid[0];
+  else if (contextInfo?.participant && contextInfo?.quotedMessage) target = contextInfo.participant;
+  else {
+    const parts = text.trim().split(/\s+/);
+    let number = parts[1]?.replace(/[^+\d]/g, '');
+    if (number?.startsWith('0')) number = '62' + number.slice(1);
+    if (number) target = `${number}@s.whatsapp.net`;
+  }
 
   if (!target || typeof target !== 'string' || !target.endsWith('@s.whatsapp.net')) {
-    await sock.sendMessage(chatId, {
-      text: '❌ Gagal mengenali user yang kamu maksud \nCoba tag, reply, atau tulis nomornya!',
+    return sock.sendMessage(chatId, {
+      text: '❌ Gagal mengenali user! Tag, reply, atau tulis nomor dengan benar.',
     }, { quoted: msg });
-    return true;
   }
 
-  const targetIsAdmin = await isGroupAdmin(sock, chatId, target);
+  const normalizedTarget = normalizeJid(target);
+  const targetIsAdmin = groupAdmins.includes(normalizedTarget);
+  const botId = normalizeJid(sock.user.id);
 
+  // PROMOTE
   if (isNA) {
     if (targetIsAdmin) {
-      await sock.sendMessage(chatId, {
-        text: `⚠️ User @${target.split('@')[0]} sudah jadi *Admin Grup*!`,
+      return sock.sendMessage(chatId, {
+        text: `⚠️ User @${normalizedTarget} sudah Admin Grup`,
         mentions: [target]
       }, { quoted: msg });
-      return true;
     }
 
     try {
       await sock.groupParticipantsUpdate(chatId, [target], 'promote');
-      await sock.sendMessage(chatId, {
-        text: `✅ Berhasil menjadikan @${target.split('@')[0]} sebagai *Admin Grup*!`,
+      return sock.sendMessage(chatId, {
+        text: `✅ Berhasil menjadikan @${normalizedTarget} Admin Grup`,
         mentions: [target]
       }, { quoted: msg });
     } catch (e) {
       console.error('❌ Gagal promote:', e);
-      await sock.sendMessage(chatId, {
-        text: '❌ Gagal Promote Admin. Pastikan bot punya akses admin yaa',
+      return sock.sendMessage(chatId, { text: '❌ Bot harus admin untuk promote!' }, { quoted: msg });
+    }
+  }
+
+  // DEMOTE
+  if (isUNA) {
+    if (normalizedTarget === botId) {
+      return sock.sendMessage(chatId, { text: '❌ Bot tidak bisa demote sendiri!' }, { quoted: msg });
+    }
+
+    if (!targetIsAdmin) {
+      return sock.sendMessage(chatId, {
+        text: `⚠️ User @${normalizedTarget} bukan Admin Grup`,
+        mentions: [target]
       }, { quoted: msg });
     }
 
-    return true;
+    try {
+      await sock.groupParticipantsUpdate(chatId, [target], 'demote');
+      return sock.sendMessage(chatId, {
+        text: `✅ User @${normalizedTarget} telah dicabut Admin Grup`,
+        mentions: [target]
+      }, { quoted: msg });
+    } catch (e) {
+      console.error('❌ Gagal demote:', e);
+      return sock.sendMessage(chatId, { text: '❌ Bot harus admin untuk demote!' }, { quoted: msg });
+    }
   }
-
- if (isUNA) {
-  const getPureNumber = jid => jid.split('@')[0].split(':')[0];
-
-  if (getPureNumber(target) === getPureNumber(sock.user.id)) {
-    await sock.sendMessage(chatId, {
-      text: `❌ *NGGAK BOLEH UNADMIN BOT SENDIRI DONGG!* !`,
-    }, { quoted: msg });
-    return true;
-  }
-
-  if (!targetIsAdmin) {
-    await sock.sendMessage(chatId, {
-      text: `⚠️ User @${target.split('@')[0]} Memang bukan *Admin Grup* kok`,
-      mentions: [target]
-    }, { quoted: msg });
-    return true;
-  }
-
-  try {
-    await sock.groupParticipantsUpdate(chatId, [target], 'demote');
-    await sock.sendMessage(chatId, {
-      text: `✅ User @${target.split('@')[0]} telah dicabut sebagai *Admin Grup*`,
-      mentions: [target]
-    }, { quoted: msg });
-  } catch (e) {
-    console.error('❌ Gagal demote:', e);
-    await sock.sendMessage(chatId, {
-      text: '❌ Gagal menurunkan user. Pastikan bot adalah admin grup yaa',
-    }, { quoted: msg });
-  }
-
-  return true;
-}
 
   return false;
 };
