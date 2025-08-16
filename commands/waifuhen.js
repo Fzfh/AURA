@@ -2,18 +2,22 @@ const axios = require('axios');
 const path = require('path');
 const { adminList } = require('../setting/setting');
 
-const allowedNSFW = ['ass','hentai','milf','oral','paizuri','ecchi','ero'];
+// Tags NSFW lengkap dari waifu.im API
+const allowedNSFW = [
+  'ass', 'hentai', 'milf', 'oral', 'paizuri', 'ecchi', 'ero'
+];
 
 module.exports = async function waifuhen(sock, msg) {
   try {
-    const isGroup = msg.key.remoteJid.endsWith('@g.us');
     const sender = msg.key.remoteJid;
+    const userId = msg.key.participant || sender;
 
-    // normalisasi userId untuk cek admin
-    let userId = msg.key.participant || sender;
-    if (userId.includes('-')) userId = userId.split('-')[0] + '@s.whatsapp.net';
-
-    if (!adminList.includes(userId)) return; // silent kalau bukan admin
+    // cek admin
+    if (!adminList.includes(userId)) {
+      return sock.sendMessage(sender, {
+        text: '❌ Fitur ini hanya bisa dipakai oleh admin bot saja.',
+      }, { quoted: msg });
+    }
 
     // pilih tag acak
     const type = allowedNSFW[Math.floor(Math.random() * allowedNSFW.length)];
@@ -30,23 +34,32 @@ module.exports = async function waifuhen(sock, msg) {
     });
 
     const img = res.data.images?.[0];
-    if (!img?.url) return;
+    if (!img?.url) throw new Error('Gagal ambil gambar NSFW');
 
     const mediaUrl = img.url;
     const ext = path.extname(mediaUrl).toLowerCase();
-    const caption = `🔞 ${type.charAt(0).toUpperCase()+type.slice(1)} by AuraBot`;
-
-    // quote message di grup berbeda dari pribadi
-    const quoted = isGroup ? { key: { remoteJid: sender, participant: msg.key.participant, id: msg.key.id }, message: msg.message } : msg;
+    const caption = `🔞 ${type.charAt(0).toUpperCase() + type.slice(1)} by AuraBot`;
 
     // kirim media
-    await sock.sendMessage(sender, 
-      ['.gif','.mp4','.webm'].includes(ext) 
-        ? { video: { url: mediaUrl }, caption, gifPlayback:true } 
-        : { image: { url: mediaUrl }, caption }
-    , { quoted });
+    if (['.gif', '.mp4', '.webm'].includes(ext)) {
+      await sock.sendMessage(sender, {
+        video: { url: mediaUrl },
+        caption,
+        gifPlayback: true
+      }, { quoted: msg });
+    } else {
+      await sock.sendMessage(sender, {
+        image: { url: mediaUrl },
+        caption
+      }, { quoted: msg });
+    }
 
   } catch (err) {
     console.error('[WAIFUHEN ERROR]', err);
+    try {
+      await sock.sendMessage(msg.key.remoteJid, {
+        text: '⚠️ Gagal kirim waifuhen. Cek tag atau coba lagi nanti ya.',
+      }, { quoted: msg });
+    } catch {}
   }
 };
