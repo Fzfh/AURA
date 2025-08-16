@@ -38,9 +38,12 @@ module.exports = async function waifuhen(sock, msg, text) {
     const caption = `🔞 ${type.charAt(0).toUpperCase() + type.slice(1)} by AuraBot`;
 
     if (ext === '.gif') {
-      const gifPath = path.join(__dirname, `../temp/${Date.now()}.gif`);
+      const tempDir = path.join(__dirname, '../temp');
+      if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
+    
+      const gifPath = path.join(tempDir, `${Date.now()}.gif`);
       const mp4Path = gifPath.replace('.gif', '.mp4');
-
+    
       const writer = fs.createWriteStream(gifPath);
       const response = await axios.get(mediaUrl, { responseType: 'stream' });
       response.data.pipe(writer);
