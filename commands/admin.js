@@ -1,4 +1,9 @@
 // adminGroup.js
+function normalizeJid(jid) {
+  if (!jid) return '';
+  return jid.split(':')[0]; // hapus device info
+}
+
 module.exports = async function admin(sock, msg, text) {
   const chatId = msg.key.remoteJid;
   const from = chatId;
@@ -16,19 +21,18 @@ module.exports = async function admin(sock, msg, text) {
   const isUNA = lowerText.startsWith('.una'); // demote
   if (!isNA && !isUNA) return false;
 
-  // Ambil metadata grup dan list admin
   const metadata = await sock.groupMetadata(from);
   const groupAdmins = metadata.participants
     .filter(p => p.admin === 'admin' || p.admin === 'superadmin')
-    .map(p => p.id.split(':')[0]); // normalize JID tanpa extra
+    .map(p => normalizeJid(p.id));
 
-  if (!groupAdmins.includes(sender.split(':')[0])) {
+  if (!groupAdmins.includes(normalizeJid(sender))) {
     return sock.sendMessage(from, {
       text: '🚫 Perintah ini hanya bisa digunakan oleh *admin grup*!',
     }, { quoted: msg });
   }
 
-  // Extract target JID: tag, reply, atau nomor manual
+  // Extract target JID
   let target = null;
   const contextInfo = msg.message?.extendedTextMessage?.contextInfo;
   if (contextInfo?.mentionedJid?.length) target = contextInfo.mentionedJid[0];
@@ -46,25 +50,23 @@ module.exports = async function admin(sock, msg, text) {
     }, { quoted: msg });
   }
 
-  const normalizedTarget = target.split('@')[0];
-  const targetFullJid = target.split(':')[0]; // remove possible device suffix
-  const targetIsAdmin = groupAdmins.includes(targetFullJid);
-  const botId = sock.user.id.split(':')[0];
+  const targetIsAdmin = groupAdmins.includes(normalizeJid(target));
+  const botId = sock.user.id;
 
   // PROMOTE
   if (isNA) {
     if (targetIsAdmin) {
       return sock.sendMessage(from, {
-        text: `⚠️ User @${normalizedTarget} sudah Admin Grup`,
-        mentions: [targetFullJid]
+        text: `⚠️ User @${target.split('@')[0]} sudah Admin Grup`,
+        mentions: [target]
       }, { quoted: msg });
     }
 
     try {
-      await sock.groupParticipantsUpdate(from, [targetFullJid], 'promote');
+      await sock.groupParticipantsUpdate(from, [target], 'promote');
       return sock.sendMessage(from, {
-        text: `✅ Berhasil menjadikan @${normalizedTarget} Admin Grup`,
-        mentions: [targetFullJid]
+        text: `✅ Berhasil menjadikan @${target.split('@')[0]} Admin Grup`,
+        mentions: [target]
       }, { quoted: msg });
     } catch (e) {
       console.error('❌ Gagal promote:', e);
@@ -74,22 +76,22 @@ module.exports = async function admin(sock, msg, text) {
 
   // DEMOTE
   if (isUNA) {
-    if (targetFullJid === botId) {
+    if (normalizeJid(target) === normalizeJid(botId)) {
       return sock.sendMessage(from, { text: '❌ Bot tidak bisa demote sendiri!' }, { quoted: msg });
     }
 
     if (!targetIsAdmin) {
       return sock.sendMessage(from, {
-        text: `⚠️ User @${normalizedTarget} bukan Admin Grup`,
-        mentions: [targetFullJid]
+        text: `⚠️ User @${target.split('@')[0]} bukan Admin Grup`,
+        mentions: [target]
       }, { quoted: msg });
     }
 
     try {
-      await sock.groupParticipantsUpdate(from, [targetFullJid], 'demote');
+      await sock.groupParticipantsUpdate(from, [target], 'demote');
       return sock.sendMessage(from, {
-        text: `✅ User @${normalizedTarget} telah dicabut Admin Grup`,
-        mentions: [targetFullJid]
+        text: `✅ User @${target.split('@')[0]} telah dicabut Admin Grup`,
+        mentions: [target]
       }, { quoted: msg });
     } catch (e) {
       console.error('❌ Gagal demote:', e);
