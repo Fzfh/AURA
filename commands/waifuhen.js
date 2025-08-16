@@ -6,14 +6,14 @@ const allowedNSFW = ['ass','hentai','milf','oral','paizuri','ecchi','ero'];
 
 module.exports = async function waifuhen(sock, msg) {
   try {
+    const isGroup = msg.key.remoteJid.endsWith('@g.us');
     const sender = msg.key.remoteJid;
 
-    // normalisasi userId supaya cocok adminList
+    // normalisasi userId untuk cek admin
     let userId = msg.key.participant || sender;
     if (userId.includes('-')) userId = userId.split('-')[0] + '@s.whatsapp.net';
 
-    // cek admin
-    if (!adminList.includes(userId)) return;
+    if (!adminList.includes(userId)) return; // silent kalau bukan admin
 
     // pilih tag acak
     const type = allowedNSFW[Math.floor(Math.random() * allowedNSFW.length)];
@@ -36,12 +36,15 @@ module.exports = async function waifuhen(sock, msg) {
     const ext = path.extname(mediaUrl).toLowerCase();
     const caption = `🔞 ${type.charAt(0).toUpperCase()+type.slice(1)} by AuraBot`;
 
+    // quote message di grup berbeda dari pribadi
+    const quoted = isGroup ? { key: { remoteJid: sender, participant: msg.key.participant, id: msg.key.id }, message: msg.message } : msg;
+
     // kirim media
     await sock.sendMessage(sender, 
       ['.gif','.mp4','.webm'].includes(ext) 
         ? { video: { url: mediaUrl }, caption, gifPlayback:true } 
         : { image: { url: mediaUrl }, caption }
-    , { quoted: msg });
+    , { quoted });
 
   } catch (err) {
     console.error('[WAIFUHEN ERROR]', err);
