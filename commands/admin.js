@@ -1,7 +1,7 @@
 // adminGroup.js
 function normalizeJid(jid) {
-  if (!jid) return '';
-  return jid.split(':')[0]; // hapus device info
+  if (!jid) return null;
+  return jid.split(':')[0];
 }
 
 module.exports = async function admin(sock, msg, text) {
@@ -15,33 +15,35 @@ module.exports = async function admin(sock, msg, text) {
     }, { quoted: msg });
   }
 
-  const sender = msg.key.participant || msg.participant;
+  const sender = normalizeJid(msg.key.participant || msg.participant);
   const lowerText = text.toLowerCase();
   const isNA = lowerText.startsWith('.na');   // promote
   const isUNA = lowerText.startsWith('.una'); // demote
   if (!isNA && !isUNA) return false;
 
+  // Ambil metadata grup dan list admin
   const metadata = await sock.groupMetadata(from);
   const groupAdmins = metadata.participants
     .filter(p => p.admin === 'admin' || p.admin === 'superadmin')
     .map(p => normalizeJid(p.id));
 
-  if (!groupAdmins.includes(normalizeJid(sender))) {
+  if (!groupAdmins.includes(sender)) {
     return sock.sendMessage(from, {
       text: '🚫 Perintah ini hanya bisa digunakan oleh *admin grup*!',
     }, { quoted: msg });
   }
 
-  // Extract target JID
+  // Extract target JID: tag, reply, atau nomor manual
   let target = null;
   const contextInfo = msg.message?.extendedTextMessage?.contextInfo;
-  if (contextInfo?.mentionedJid?.length) target = contextInfo.mentionedJid[0];
-  else if (contextInfo?.participant && contextInfo?.quotedMessage) target = contextInfo.participant;
+  if (contextInfo?.mentionedJid?.length) target = normalizeJid(contextInfo.mentionedJid[0]);
+  else if (contextInfo?.participant && contextInfo?.quotedMessage) target = normalizeJid(contextInfo.participant);
   else {
     const parts = text.trim().split(/\s+/);
     let number = parts[1]?.replace(/[^+\d]/g, '');
     if (number?.startsWith('0')) number = '62' + number.slice(1);
     if (number) target = `${number}@s.whatsapp.net`;
+    target = normalizeJid(target);
   }
 
   if (!target || typeof target !== 'string' || !target.endsWith('@s.whatsapp.net')) {
@@ -50,8 +52,8 @@ module.exports = async function admin(sock, msg, text) {
     }, { quoted: msg });
   }
 
-  const targetIsAdmin = groupAdmins.includes(normalizeJid(target));
-  const botId = sock.user.id;
+  const targetIsAdmin = groupAdmins.includes(target);
+  const botId = normalizeJid(sock.user.id);
 
   // PROMOTE
   if (isNA) {
@@ -76,7 +78,7 @@ module.exports = async function admin(sock, msg, text) {
 
   // DEMOTE
   if (isUNA) {
-    if (normalizeJid(target) === normalizeJid(botId)) {
+    if (target === botId) {
       return sock.sendMessage(from, { text: '❌ Bot tidak bisa demote sendiri!' }, { quoted: msg });
     }
 
