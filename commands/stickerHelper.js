@@ -7,7 +7,7 @@ const { v4: uuidv4 } = require('uuid');
 const sharp = require('sharp');
 const { downloadMediaMessage } = require('@whiskeysockets/baileys');
 const { createCanvas, loadImage, registerFont } = require('@napi-rs/canvas');
-const fontPathImpact = '/usr/share/fonts/truetype/msttcorefonts/Impact.ttf';
+const fontPathImpact = path.join(__dirname, '..', 'media', 'fonts', 'Impact.ttf');
 const fontPathArialNarrow = path.join(__dirname, '..', 'media', 'fonts', 'ArialNarrow.ttf');
 
 registerFont(fontPathImpact, { family: 'Impact' });
