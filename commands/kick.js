@@ -1,11 +1,6 @@
-// kick.js
-
-// 🔧 Normalizer biar semua jadi @s.whatsapp.net
-function normalizeJid(jid) {
-  if (!jid) return '';
-  return jid
-    .split(':')[0]               // buang device tag
-    .replace('@lid', '@s.whatsapp.net');
+// utils biar gampang
+function normalizeJid(jid = '') {
+  return jid.replace(/:.*@/, '@').replace('@lid', '@s.whatsapp.net');
 }
 
 module.exports = async function kick(sock, msg, text, isGroup) {
@@ -27,7 +22,12 @@ module.exports = async function kick(sock, msg, text, isGroup) {
       }, { quoted: msg });
     }
 
-    // cek admin pakai normalisasi
+    // DEBUG INFO
+    console.log("👤 Sender:", senderId);
+    console.log("🤖 BotId :", botId);
+    console.log("👑 Admins:", metadata.participants.filter(p => p.admin).map(p => normalizeJid(p.id)));
+
+    // Cek admin dengan normalisasi
     const isSenderAdmin = metadata.participants.some(p =>
       normalizeJid(p.id) === senderId && (p.admin === 'admin' || p.admin === 'superadmin')
     );
@@ -48,18 +48,18 @@ module.exports = async function kick(sock, msg, text, isGroup) {
       }, { quoted: msg });
     }
 
-    // 🔎 Tangkap reply & tag
+    // Tangkap reply & tag
     const quotedInfo = msg.message?.extendedTextMessage?.contextInfo;
-    const repliedUser = quotedInfo?.participant;
-    const mentionedJids = quotedInfo?.mentionedJid || [];
+    const repliedUser = normalizeJid(quotedInfo?.participant || '');
+    const mentionedJids = (quotedInfo?.mentionedJid || []).map(j => normalizeJid(j));
 
     const rawInput = text.split(' ').slice(1).join(' ');
     let targets = [];
 
     if (repliedUser) {
-      targets.push(normalizeJid(repliedUser));
+      targets.push(repliedUser);
     } else if (mentionedJids.length > 0) {
-      targets = mentionedJids.map(j => normalizeJid(j));
+      targets = mentionedJids;
     } else if (rawInput) {
       targets = rawInput.split(',').map(n => {
         let num = n.trim().replace(/[^0-9]/g, '');
@@ -72,7 +72,6 @@ module.exports = async function kick(sock, msg, text, isGroup) {
       }, { quoted: msg });
     }
 
-    // filter biar ga kick diri sendiri
     const filteredTargets = targets.filter(t => t !== botId && t !== senderId);
 
     if (filteredTargets.length === 0) {
@@ -89,6 +88,7 @@ module.exports = async function kick(sock, msg, text, isGroup) {
         await sock.groupParticipantsUpdate(groupId, [target], 'remove');
         success.push(target);
       } catch (err) {
+        console.error('❌ Gagal kick:', target, err);
         failed.push(target);
       }
     }
