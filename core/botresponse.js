@@ -9,17 +9,10 @@ const spamTracker = new Map()
 const mutedUsers = new Map()
 const muteDuration = 2 * 60 * 1000
 
-// 🔹 Fungsi normalisasi JID agar @lid atau :1 jadi @s.whatsapp.net
+// 🔹 Fungsi normalisasi JID agar @lid jadi @s.whatsapp.net
 function normalizeJid(jid) {
-  if (!jid) return jid
-  return jid
-    .replace(/:\d+/, '')              // hapus akhiran :1, :2, dll
-    .replace('@lid', '@s.whatsapp.net')
-    .replace(/@[^@]+$/, '@s.whatsapp.net') // force domain jadi s.whatsapp.net
+  return jid?.replace(/:\d+/, '')?.replace('@lid', '@s.whatsapp.net');
 }
-
-// Pastikan adminList juga dinormalisasi biar cocok sama metadata
-const normalizedAdminList = adminList.map(j => normalizeJid(j))
 
 async function handleResponder(sock, msg) {
   try {
@@ -50,8 +43,7 @@ async function handleResponder(sock, msg) {
       const filtered = userSpam.filter(t => now - t < 10000);
       filtered.push(now);
       spamTracker.set(userId, filtered);
-
-      if (filtered.length > 5 && !normalizedAdminList.includes(userId)) {
+      if (filtered.length > 5 && !adminList.includes(userId)) {
         mutedUsers.set(userId, now + muteDuration);
         return sock.sendMessage(sender, {
           text: '🔇 Kamu terlalu banyak mengirim command! Bot diam 2 menit.'
@@ -117,6 +109,5 @@ function registerGroupUpdateListener(sock) {
 
 module.exports = {
   handleResponder,
-  registerGroupUpdateListener,
-  normalizeJid // biar bisa dipakai di file lain juga
+  registerGroupUpdateListener
 }
