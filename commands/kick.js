@@ -17,7 +17,7 @@ function getSenderId(msg) {
 module.exports = async function kick(sock, msg, text, isGroup) {
   const groupId = msg.key.remoteJid;
   const senderId = normalizeJid(getSenderId(msg));
-  const botId = normalizeJid(sock.user.id);
+  const botId = normalizeJid(sock.user.id.split(':')[0] + '@s.whatsapp.net');
 
   if (!isGroup) {
     return sock.sendMessage(groupId, {
