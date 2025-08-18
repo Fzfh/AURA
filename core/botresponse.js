@@ -9,19 +9,14 @@ const spamTracker = new Map()
 const mutedUsers = new Map()
 const muteDuration = 2 * 60 * 1000
 
-// 🔹 Fungsi normalisasi JID agar @lid jadi @s.whatsapp.net
-function normalizeJid(jid) {
-  return jid?.replace(/:\d+/, '')?.replace('@lid', '@s.whatsapp.net');
-}
-
 async function handleResponder(sock, msg) {
   try {
     if (!msg.message) return;
 
-    // Normalisasi ID pengirim & peserta
-    const sender = normalizeJid(msg.key.remoteJid);
+    // Pakai JID mentah langsung dari WhatsApp
+    const sender = msg.key.remoteJid;
     const userId = sender;
-    const actualUserId = normalizeJid(msg.key.participant || sender);
+    const actualUserId = msg.key.participant || sender;
     const isGroup = sender.endsWith('@g.us');
 
     const content = msg.message?.viewOnceMessageV2?.message || msg.message;
@@ -60,9 +55,9 @@ async function handleResponder(sock, msg) {
     if (handledMenfess) return
 
     // 📣 Deteksi mention bot
-    const botJid = normalizeJid(sock.user?.id);
+    const botJid = sock.user?.id;
     const mentionedJidListRaw = content?.extendedTextMessage?.contextInfo?.mentionedJid || [];
-    const mentionedJidList = mentionedJidListRaw.map(j => normalizeJid(j));
+    const mentionedJidList = mentionedJidListRaw;
     const isMentioned = mentionedJidList.includes(botJid);
 
     // 🔄 Loop pattern command
