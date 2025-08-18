@@ -1,119 +1,58 @@
-// utils biar gampang
-function normalizeJid(jid = '') {
-  return jid.replace(/:.*@/, '@').replace('@lid', '@s.whatsapp.net');
-}
-
 module.exports = async function kick(sock, msg, text, isGroup) {
-  const groupId = msg.key.remoteJid;
-  const senderId = normalizeJid(msg.key.participant || msg.participant || msg.key.remoteJid);
-  const botId = normalizeJid(sock.user?.id);
+  const groupId = msg.key.remoteJid
+  const userId = msg.key.participant
 
   if (!isGroup) {
     return sock.sendMessage(groupId, {
       text: '❌ Perintah ini hanya bisa digunakan di grup yaa~'
-    }, { quoted: msg });
+    }, { quoted: msg })
   }
 
   try {
-    const metadata = await sock.groupMetadata(groupId);
+    const metadata = await sock.groupMetadata(groupId)
+
     if (!metadata || !Array.isArray(metadata.participants)) {
       return sock.sendMessage(groupId, {
         text: '❌ Gagal mengambil data grup.'
-      }, { quoted: msg });
+      }, { quoted: msg })
     }
 
-    // DEBUG INFO
-    console.log("👤 Sender:", senderId);
-    console.log("🤖 BotId :", botId);
-    console.log("👑 Admins:", metadata.participants.filter(p => p.admin).map(p => normalizeJid(p.id)));
-
-    // Cek admin dengan normalisasi
     const isSenderAdmin = metadata.participants.some(p =>
-      normalizeJid(p.id) === senderId && (p.admin === 'admin' || p.admin === 'superadmin')
-    );
-
-    const isBotAdmin = metadata.participants.some(p =>
-      normalizeJid(p.id) === botId && (p.admin === 'admin' || p.admin === 'superadmin')
-    );
+      p.id === userId && (p.admin === 'admin' || p.admin === 'superadmin')
+    )
 
     if (!isSenderAdmin) {
       return sock.sendMessage(groupId, {
         text: '❌ Hanya admin grup yang boleh mengeluarkan member yaa~'
-      }, { quoted: msg });
+      }, { quoted: msg })
     }
 
-    if (!isBotAdmin) {
-      return sock.sendMessage(groupId, {
-        text: '❌ Aku belum dijadikan admin grup ini, jadi gak bisa kick siapa-siapa 😥'
-      }, { quoted: msg });
-    }
+    // Cek apakah reply ke pesan user gey
+    const quotedInfo = msg.message?.extendedTextMessage?.contextInfo
+    const repliedUser = quotedInfo?.participant
+    let target = repliedUser
 
-    // Tangkap reply & tag
-    const quotedInfo = msg.message?.extendedTextMessage?.contextInfo;
-    const repliedUser = normalizeJid(quotedInfo?.participant || '');
-    const mentionedJids = (quotedInfo?.mentionedJid || []).map(j => normalizeJid(j));
-
-    const rawInput = text.split(' ').slice(1).join(' ');
-    let targets = [];
-
-    if (repliedUser) {
-      targets.push(repliedUser);
-    } else if (mentionedJids.length > 0) {
-      targets = mentionedJids;
-    } else if (rawInput) {
-      targets = rawInput.split(',').map(n => {
-        let num = n.trim().replace(/[^0-9]/g, '');
-        if (num.startsWith('0')) num = '62' + num.slice(1);
-        return num + '@s.whatsapp.net';
-      });
-    } else {
-      return sock.sendMessage(groupId, {
-        text: '❗ Gunakan dengan *reply pesan*, *tag user*, atau ketik: `.kick 628xxxx` / `.kick 628xxxx, 62xxxxx`'
-      }, { quoted: msg });
-    }
-
-    const filteredTargets = targets.filter(t => t !== botId && t !== senderId);
-
-    if (filteredTargets.length === 0) {
-      return sock.sendMessage(groupId, {
-        text: '❌ Tidak ada target valid untuk dikeluarkan. Jangan suruh aku ngeluarin diriku sendiri dong 😢',
-      }, { quoted: msg });
-    }
-
-    const success = [];
-    const failed = [];
-
-    for (const target of filteredTargets) {
-      try {
-        await sock.groupParticipantsUpdate(groupId, [target], 'remove');
-        success.push(target);
-      } catch (err) {
-        console.error('❌ Gagal kick:', target, err);
-        failed.push(target);
+    if (!target) {
+      const nomor = text.split(' ')[1]
+      if (!nomor) {
+        return sock.sendMessage(groupId, {
+          text: '❗ Gunakan dengan reply pesan *atau* ketik manual: .kick 628xxxx'
+        }, { quoted: msg })
       }
+      target = nomor.replace(/[^0-9]/g, '') + '@s.whatsapp.net'
     }
 
-    let responseText = '';
-
-    if (success.length > 0) {
-      responseText += `✅ Berhasil mengeluarkan:\n`;
-      responseText += success.map(jid => `@${jid.split('@')[0]}`).join('\n') + '\n\n';
-    }
-
-    if (failed.length > 0) {
-      responseText += `❌ Gagal mengeluarkan:\n`;
-      responseText += failed.map(jid => `@${jid.split('@')[0]}`).join('\n');
-    }
+    await sock.groupParticipantsUpdate(groupId, [target], 'remove')
 
     return sock.sendMessage(groupId, {
-      text: responseText.trim(),
-      mentions: [...success, ...failed],
-    }, { quoted: msg });
+      text: `👋 @${target.split('@')[0]} telah dikeluarkan dari grup!`,
+      mentions: [target]
+    }, { quoted: msg })
 
   } catch (err) {
-    console.error('❌ Gagal kick member:', err);
+    console.error('❌ Gagal kick member:', err)
     return sock.sendMessage(groupId, {
-      text: '❌ Gagal mengeluarkan anggota. Pastikan bot adalah admin dan ID valid ya!',
-    }, { quoted: msg });
+      text: '❌ Gagal mengeluarkan anggota. Pastikan bot adalah admin!'
+    }, { quoted: msg })
   }
-};
+}
