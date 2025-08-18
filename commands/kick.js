@@ -1,13 +1,19 @@
-const chalk = require("chalk");
+// utils: normalisasi JID biar rapi
+function normalizeJid(jid) {
+  if (!jid) return null;
+  return jid.replace(/[^0-9]/g, '') + '@s.whatsapp.net';
+}
 
-// Fungsi normalize JID biar konsisten
-function normalizeJid(jid = '') {
-  return jid.replace(/:.*@/g, '@').replace('@lid', '@s.whatsapp.net');
+// utils: ambil sender id dari msg
+function getSenderId(msg) {
+  if (msg.key.participant) return normalizeJid(msg.key.participant);
+  if (msg.participant) return normalizeJid(msg.participant);
+  return normalizeJid(msg.key.remoteJid); // fallback kalau bukan group
 }
 
 module.exports = async function kick(sock, msg, text, isGroup) {
   const groupId = msg.key.remoteJid;
-  const senderId = normalizeJid(msg.key.participant || msg.participant || msg.key.remoteJid);
+  const senderId = getSenderId(msg);
   const botId = normalizeJid(sock.user.id);
 
   if (!isGroup) {
@@ -24,15 +30,17 @@ module.exports = async function kick(sock, msg, text, isGroup) {
       }, { quoted: msg });
     }
 
-    // Ambil list admin grup (dinormalisasi)
+    // daftar admin group
     const adminList = metadata.participants
-      .filter(p => p.admin)
+      .filter(p => p.admin === 'admin' || p.admin === 'superadmin')
       .map(p => normalizeJid(p.id));
-
-    console.log(chalk.blue("👑 Admins:"), adminList);
 
     const isSenderAdmin = adminList.includes(senderId);
     const isBotAdmin = adminList.includes(botId);
+
+    console.log("👤 Sender:", senderId);
+    console.log("🤖 BotId :", botId);
+    console.log("👑 Admins:", adminList);
 
     if (!isSenderAdmin) {
       return sock.sendMessage(groupId, {
@@ -48,8 +56,8 @@ module.exports = async function kick(sock, msg, text, isGroup) {
 
     // Tangkap reply & tag
     const quotedInfo = msg.message?.extendedTextMessage?.contextInfo;
-    const repliedUser = normalizeJid(quotedInfo?.participant || '');
-    const mentionedJids = (quotedInfo?.mentionedJid || []).map(normalizeJid);
+    const repliedUser = quotedInfo?.participant ? normalizeJid(quotedInfo.participant) : null;
+    const mentionedJids = (quotedInfo?.mentionedJid || []).map(j => normalizeJid(j));
 
     const rawInput = text.split(' ').slice(1).join(' ');
     let targets = [];
@@ -62,15 +70,14 @@ module.exports = async function kick(sock, msg, text, isGroup) {
       targets = rawInput.split(',').map(n => {
         let num = n.trim().replace(/[^0-9]/g, '');
         if (num.startsWith('0')) num = '62' + num.slice(1);
-        return `${num}@s.whatsapp.net`;
+        return num + '@s.whatsapp.net';
       });
     } else {
       return sock.sendMessage(groupId, {
         text: '❗ Gunakan dengan *reply pesan*, *tag user*, atau ketik: `.kick 628xxxx` / `.kick 628xxxx, 62xxxxx`'
       }, { quoted: msg });
     }
-    
-    // Jangan sampai ngekick bot atau dirinya sendiri
+
     const filteredTargets = targets.filter(t => t !== botId && t !== senderId);
 
     if (filteredTargets.length === 0) {
