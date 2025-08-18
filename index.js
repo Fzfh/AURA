@@ -30,6 +30,12 @@ let qrRetryInterval = null;
 let pairingRetryTimeout = null;
 let pairingRequested = false;
 
+// 🔧 Helper normalisasi jid → selalu @s.whatsapp.net
+function normalizeJid(jid = '') {
+  if (!jid) return jid;
+  return jid.replace(/:.*@/g, '@').replace('@lid', '@s.whatsapp.net');
+}
+
 function extractMessageContent(msg) {
   let realMsg = msg.message;
   if (!realMsg) return { text: '', realMsg: null };
@@ -62,7 +68,7 @@ async function startBot() {
     const sock = makeWASocket({
       logger: P({ level: 'silent' }),
       version,
-      syncFullHistory: false, // MATIKAN full history sync
+      syncFullHistory: false,
       auth: {
         creds: state.creds,
         keys: makeCacheableSignalKeyStore(state.keys, P({ level: 'silent' })),
@@ -70,14 +76,15 @@ async function startBot() {
       printQRInTerminal: false,
     });
 
+    // 🔧 Simpan bot id ter-normalisasi
     global.sock = sock;
+    global.BOT_ID = normalizeJid(sock.user.id);
 
     sock.ev.on('creds.update', saveCreds);
 
     sock.ev.on('connection.update', async (update) => {
       const { connection, lastDisconnect, qr } = update;
 
-      // QR Mode
       if (qr && qrMode) {
         latestQR = qr;
         console.log(chalk.yellowBright('\n📸 Scan QR berikut ini:\n'));
@@ -92,7 +99,6 @@ async function startBot() {
         }, 60_000);
       }
 
-      // Pairing Mode
       if (qr && phoneNumber && !pairingRequested) {
         pairingRequested = true;
 
@@ -111,7 +117,6 @@ async function startBot() {
         requestPairing();
       }
 
-      // Koneksi sukses
       if (connection === 'open') {
         console.log(chalk.greenBright('\n✅ Bot berhasil terhubung ke WhatsApp!'));
         console.log(chalk.cyanBright('✨ AURABOT SIAP MELAYANI TUAN AURAA 😎\n'));
@@ -121,7 +126,6 @@ async function startBot() {
         setupAntiDelete(sock);
       }
 
-      // Koneksi mati → restart aman
       if (connection === 'close') {
         const reason = lastDisconnect?.error?.output?.statusCode || lastDisconnect?.error?.output?.payload?.statusCode;
         if (reason === DisconnectReason.loggedOut) {
@@ -137,17 +141,30 @@ async function startBot() {
 
     // Pesan masuk
     sock.ev.on('messages.upsert', async ({ messages, type }) => {
-      console.log('🔔 Pesan baru masuk:', {
-        type,
-        from: messages?.[0]?.key?.remoteJid,
-        isGroup: messages?.[0]?.key?.remoteJid?.endsWith('@g.us'),
-        contentPreview: JSON.stringify(messages?.[0]?.message)?.slice(0, 100)
-      });
-
       if (!messages || type !== 'notify') return;
       const msg = messages[0];
       if (!msg.message) return;
-      console.log('🧩 ContextInfo:', JSON.stringify(msg.message?.extendedTextMessage?.contextInfo, null, 2));
+
+      // 🔧 Normalisasi ID langsung
+      msg.key.remoteJid = normalizeJid(msg.key.remoteJid);
+      msg.key.participant = normalizeJid(msg.key.participant);
+      if (msg.participant) msg.participant = normalizeJid(msg.participant);
+      if (msg.message?.extendedTextMessage?.contextInfo?.participant) {
+        msg.message.extendedTextMessage.contextInfo.participant =
+          normalizeJid(msg.message.extendedTextMessage.contextInfo.participant);
+      }
+      if (Array.isArray(msg.message?.extendedTextMessage?.contextInfo?.mentionedJid)) {
+        msg.message.extendedTextMessage.contextInfo.mentionedJid =
+          msg.message.extendedTextMessage.contextInfo.mentionedJid.map(j => normalizeJid(j));
+      }
+
+      console.log('🔔 Pesan baru masuk:', {
+        type,
+        from: msg.key.remoteJid,
+        sender: msg.key.participant,
+        isGroup: msg.key.remoteJid?.endsWith('@g.us'),
+        contentPreview: JSON.stringify(msg.message)?.slice(0, 120)
+      });
       console.log('📣 MentionedJid:', msg.message?.extendedTextMessage?.contextInfo?.mentionedJid);
 
       const { text, realMsg } = extractMessageContent(msg);
@@ -163,11 +180,10 @@ async function startBot() {
 
   } catch (err) {
     console.error(chalk.bgRed('🔥 Gagal memulai bot:'), err);
-    setTimeout(startBot, 5000); // retry otomatis kalau gagal start
+    setTimeout(startBot, 5000);
   }
 }
 
-// Web server kecil
 app.get('/qr', (req, res) => {
   res.send('🛑 QR ditampilkan langsung di terminal.');
 });
