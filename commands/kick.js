@@ -1,7 +1,17 @@
+// kick.js
+
+// 🔧 Normalizer biar semua jadi @s.whatsapp.net
+function normalizeJid(jid) {
+  if (!jid) return '';
+  return jid
+    .split(':')[0]               // buang device tag
+    .replace('@lid', '@s.whatsapp.net');
+}
+
 module.exports = async function kick(sock, msg, text, isGroup) {
   const groupId = msg.key.remoteJid;
-  const senderId = msg.key.participant || msg.participant || msg.key.remoteJid;
-  const botId = sock.user?.id?.split(':')[0] + '@s.whatsapp.net';
+  const senderId = normalizeJid(msg.key.participant || msg.participant || msg.key.remoteJid);
+  const botId = normalizeJid(sock.user?.id);
 
   if (!isGroup) {
     return sock.sendMessage(groupId, {
@@ -17,12 +27,13 @@ module.exports = async function kick(sock, msg, text, isGroup) {
       }, { quoted: msg });
     }
 
+    // cek admin pakai normalisasi
     const isSenderAdmin = metadata.participants.some(p =>
-      p.id === senderId && (p.admin === 'admin' || p.admin === 'superadmin')
+      normalizeJid(p.id) === senderId && (p.admin === 'admin' || p.admin === 'superadmin')
     );
 
     const isBotAdmin = metadata.participants.some(p =>
-      p.id === botId && (p.admin === 'admin' || p.admin === 'superadmin')
+      normalizeJid(p.id) === botId && (p.admin === 'admin' || p.admin === 'superadmin')
     );
 
     if (!isSenderAdmin) {
@@ -37,7 +48,7 @@ module.exports = async function kick(sock, msg, text, isGroup) {
       }, { quoted: msg });
     }
 
-    // Tangkap reply & tag
+    // 🔎 Tangkap reply & tag
     const quotedInfo = msg.message?.extendedTextMessage?.contextInfo;
     const repliedUser = quotedInfo?.participant;
     const mentionedJids = quotedInfo?.mentionedJid || [];
@@ -46,9 +57,9 @@ module.exports = async function kick(sock, msg, text, isGroup) {
     let targets = [];
 
     if (repliedUser) {
-      targets.push(repliedUser);
+      targets.push(normalizeJid(repliedUser));
     } else if (mentionedJids.length > 0) {
-      targets = mentionedJids;
+      targets = mentionedJids.map(j => normalizeJid(j));
     } else if (rawInput) {
       targets = rawInput.split(',').map(n => {
         let num = n.trim().replace(/[^0-9]/g, '');
@@ -60,7 +71,8 @@ module.exports = async function kick(sock, msg, text, isGroup) {
         text: '❗ Gunakan dengan *reply pesan*, *tag user*, atau ketik: `.kick 628xxxx` / `.kick 628xxxx, 62xxxxx`'
       }, { quoted: msg });
     }
-    
+
+    // filter biar ga kick diri sendiri
     const filteredTargets = targets.filter(t => t !== botId && t !== senderId);
 
     if (filteredTargets.length === 0) {
