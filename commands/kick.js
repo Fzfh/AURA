@@ -1,7 +1,14 @@
+const chalk = require("chalk");
+
+// Fungsi normalize JID biar konsisten
+function normalizeJid(jid = '') {
+  return jid.replace(/:.*@/g, '@').replace('@lid', '@s.whatsapp.net');
+}
+
 module.exports = async function kick(sock, msg, text, isGroup) {
   const groupId = msg.key.remoteJid;
-  const senderId = msg.key.participant || msg.participant || msg.key.remoteJid;
-  const botId = sock.user.id;
+  const senderId = normalizeJid(msg.key.participant || msg.participant || msg.key.remoteJid);
+  const botId = normalizeJid(sock.user.id);
 
   if (!isGroup) {
     return sock.sendMessage(groupId, {
@@ -17,13 +24,15 @@ module.exports = async function kick(sock, msg, text, isGroup) {
       }, { quoted: msg });
     }
 
-    const isSenderAdmin = metadata.participants.some(p =>
-      p.id === senderId && (p.admin === 'admin' || p.admin === 'superadmin')
-    );
+    // Ambil list admin grup (dinormalisasi)
+    const adminList = metadata.participants
+      .filter(p => p.admin)
+      .map(p => normalizeJid(p.id));
 
-    const isBotAdmin = metadata.participants.some(p =>
-      p.id === botId && (p.admin === 'admin' || p.admin === 'superadmin')
-    );
+    console.log(chalk.blue("👑 Admins:"), adminList);
+
+    const isSenderAdmin = adminList.includes(senderId);
+    const isBotAdmin = adminList.includes(botId);
 
     if (!isSenderAdmin) {
       return sock.sendMessage(groupId, {
@@ -39,8 +48,8 @@ module.exports = async function kick(sock, msg, text, isGroup) {
 
     // Tangkap reply & tag
     const quotedInfo = msg.message?.extendedTextMessage?.contextInfo;
-    const repliedUser = quotedInfo?.participant;
-    const mentionedJids = quotedInfo?.mentionedJid || [];
+    const repliedUser = normalizeJid(quotedInfo?.participant || '');
+    const mentionedJids = (quotedInfo?.mentionedJid || []).map(normalizeJid);
 
     const rawInput = text.split(' ').slice(1).join(' ');
     let targets = [];
@@ -53,7 +62,7 @@ module.exports = async function kick(sock, msg, text, isGroup) {
       targets = rawInput.split(',').map(n => {
         let num = n.trim().replace(/[^0-9]/g, '');
         if (num.startsWith('0')) num = '62' + num.slice(1);
-        return num + '@s.whatsapp.net';
+        return `${num}@s.whatsapp.net`;
       });
     } else {
       return sock.sendMessage(groupId, {
@@ -61,6 +70,7 @@ module.exports = async function kick(sock, msg, text, isGroup) {
       }, { quoted: msg });
     }
     
+    // Jangan sampai ngekick bot atau dirinya sendiri
     const filteredTargets = targets.filter(t => t !== botId && t !== senderId);
 
     if (filteredTargets.length === 0) {
