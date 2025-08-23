@@ -13,8 +13,25 @@ function jidToNumber(jid) {
 function getSenderId(msg) {
   const from = msg.key.remoteJid;
   const isGroup = from.endsWith('@g.us');
-  return isGroup ? msg.key.participant : from;
+
+  if (isGroup) {
+    const part = msg.key.participant || msg.participant;
+    // ✅ Kalau participant ada & mulai dengan 62 → nomor asli
+    if (part && part.startsWith('62')) {
+      return part;
+    }
+    // ✅ Kalau participant aneh (137xxx) → fallback ke msg.sender
+    if (msg.sender && msg.sender.startsWith('62')) {
+      return msg.sender;
+    }
+  }
+
+  // ✅ Fallback terakhir (private chat dll)
+  return msg.key.fromMe
+    ? msg.key.remoteJid
+    : (msg.sender || msg.key.participant || msg.key.remoteJid);
 }
+
 
 async function handleStaticCommand(sock, msg, lowerText, userId, body) {
   const from = msg.key.remoteJid;
