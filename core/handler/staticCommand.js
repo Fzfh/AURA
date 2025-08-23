@@ -10,13 +10,25 @@ function jidToNumber(jid) {
 
 async function handleStaticCommand(sock, msg, lowerText, userId, body) {
   const from = msg.key.remoteJid;
-  const isGroup = from.endsWith('@g.us');
+const isGroup = from.endsWith('@g.us');
 
-  // ✅ Bedain group vs private
- const actualUserId = 
-      (isGroup && msg.key.participant) ? msg.key.participant
-    : (isGroup && msg.sender) ? msg.sender
-    : userId || from;
+// 🔍 Debug lengkap
+console.log('========================');
+console.log('📩 Pesan baru diterima');
+console.log('📌 isGroup:', isGroup);
+console.log('📌 msg.key.participant:', msg.key?.participant);
+console.log('📌 msg.sender:', msg.sender);
+console.log('📌 userId (fallback):', userId);
+console.log('📌 from:', from);
+
+// 🧩 Hasil final
+const actualUserId =
+    (isGroup && msg.key.participant) ? msg.key.participant
+  : (isGroup && msg.sender) ? msg.sender
+  : userId || from;
+
+console.log('✅ actualUserId:', actualUserId);
+console.log('========================');
 
   const niceNumber = jidToNumber(actualUserId);
 
