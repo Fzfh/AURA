@@ -8,6 +8,18 @@ const spamTracker = new Map()
 const mutedUsers = new Map()
 const muteDuration = 2 * 60 * 1000
 
+function jidToNumber(jid) {
+  if (!jid) return '';
+  const number = jid.split('@')[0]; // ambil angka sebelum @
+  
+  // kalau diawali 62 → +62xxx
+  if (number.startsWith('62')) return `+${number}`;
+  // kalau diawali 8 → +62xxx
+  if (number.startsWith('8')) return `+62${number}`;
+  // fallback: tetap kasih + depan
+  return `+${number}`;
+}
+
 async function handleResponder(sock, msg) {
   try {
     if (!msg.message) return;
