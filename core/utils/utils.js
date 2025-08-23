@@ -43,22 +43,20 @@ function normalizeNumber(jid) {
 function normalizeJid(jid = "") {
   if (!jid) return "";
 
-  // Kalau group tetap @g.us
-  if (jid.includes("@g.us")) return jid;
+  // Group JID biarin apa adanya
+  if (jid.endsWith("@g.us")) return jid;
 
-  // Buang jid aneh kayak @lid, @broadcast
-  if (jid.includes("@lid") || jid.includes("@broadcast")) {
-    const num = jid.split("@")[0].split(":")[0];
-    return num + "@s.whatsapp.net";
+  // Kalau broadcast biarin aja (buat status WA)
+  if (jid === "status@broadcast") return jid;
+
+  // Kalau private user JID (biasanya xxx@s.whatsapp.net atau xxx:1@s.whatsapp.net)
+  if (jid.includes("@s.whatsapp.net")) {
+    // buang tambahan setelah ":"
+    return jid.split(":")[0] + "@s.whatsapp.net";
   }
 
-  // Kalau private tapi format salah -> balikin ke @s.whatsapp.net
-  if (!jid.includes("@s.whatsapp.net")) {
-    const num = jid.split("@")[0].split(":")[0];
-    return num + "@s.whatsapp.net";
-  }
-
-  return jid;
+  // fallback: kasih suffix s.whatsapp.net
+  return jid + "@s.whatsapp.net";
 }
 
 function formatTime() {
