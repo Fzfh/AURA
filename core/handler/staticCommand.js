@@ -1,4 +1,5 @@
 const { adminList } = require('../../setting/setting');
+
 function jidToNumber(jid) {
   if (!jid) return '';
   const num = jid.split('@')[0];
@@ -8,18 +9,23 @@ function jidToNumber(jid) {
 }
 
 async function handleStaticCommand(sock, msg, lowerText, userId, body) {
-  const from = msg.key.remoteJid
-  const sender = from
-  const actualUserId = msg.key.participant || msg.participant || userId;
-  const userName = msg.pushName || actualUserId.split('@')[0];
-  
+  const from = msg.key.remoteJid;
+  const isGroup = from.endsWith('@g.us');
+
+  // ✅ Bedain group vs private
+  const actualUserId = isGroup 
+    ? (msg.key.participant || userId)   // grup → pakai participant
+    : from;                             // private → langsung remoteJid
+
+  const userName = msg.pushName || jidToNumber(actualUserId);
+  const niceNumber = jidToNumber(actualUserId);
+
   switch (lowerText) {
     case '/menu':
-case 'menu':
-case '.menu':
-  const niceNumber = jidToNumber(actualUserId);
-  await sock.sendMessage(sender, {
-    text: `╭──〔 ✨ MENU AURABOT ✨ 〕──╮
+    case 'menu':
+    case '.menu':
+      await sock.sendMessage(from, {
+        text: `╭──〔 ✨ MENU AURABOT ✨ 〕──╮
 ┃ 👋 Hai @${actualUserId.split('@')[0]}
 ┃ ( ${niceNumber} )
 ┃ Yuk cobain fitur-fitur bot ini:
@@ -56,9 +62,9 @@ case '.menu':
 ┃ ❓ *Bantuan*: \`tutorial\` / \`tutor\`
 ╰──────────────────────╯
 `,
-    mentions: [actualUserId]   // << ini wajib biar tag bener2 jalan
-  }, { quoted: msg })
-  return true
+        mentions: [actualUserId]   // ✅ tag nya sesuai userId yang bener
+      }, { quoted: msg })
+      return true
 
     case 'tutorial':
     case 'tutor':
