@@ -14,9 +14,9 @@ async function handleResponder(sock, msg) {
     if (!msg.message) return;
 
     // Pakai JID mentah langsung dari WhatsApp
-    const sender = msg.key.remoteJid;
+    const sender = normalizeJid(msg.key.remoteJid);
     const userId = sender;
-    const actualUserId = msg.key.participant || sender;
+    const actualUserId = normalizeJid(msg.key.participant || sender);
     const isGroup = sender.endsWith('@g.us');
 
     const content = msg.message?.viewOnceMessageV2?.message || msg.message;
@@ -57,7 +57,8 @@ async function handleResponder(sock, msg) {
     // 📣 Deteksi mention bot
     const botJid = sock.user?.id;
     const mentionedJidListRaw = content?.extendedTextMessage?.contextInfo?.mentionedJid || [];
-    const mentionedJidList = mentionedJidListRaw;
+    const mentionedJidList = mentionedJidListRaw.map(jid => normalizeJid(jid));
+
     const isMentioned = mentionedJidList.includes(botJid);
 
     // 🔄 Loop pattern command
