@@ -33,9 +33,32 @@ function extractQuotedMessage(msg) {
   );
 }
 
+// 🔹 Normalize nomor ke format +62xxxx
 function normalizeNumber(jid) {
   if (!jid) return '';
   return `+${jid.replace(/@s\.whatsapp\.net$/, '')}`;
+}
+
+// 🔹 Normalize JID biar ga jadi @lid lagi
+function normalizeJid(jid = "") {
+  if (!jid) return "";
+
+  // Kalau group tetap @g.us
+  if (jid.includes("@g.us")) return jid;
+
+  // Buang jid aneh kayak @lid, @broadcast
+  if (jid.includes("@lid") || jid.includes("@broadcast")) {
+    const num = jid.split("@")[0].split(":")[0];
+    return num + "@s.whatsapp.net";
+  }
+
+  // Kalau private tapi format salah -> balikin ke @s.whatsapp.net
+  if (!jid.includes("@s.whatsapp.net")) {
+    const num = jid.split("@")[0].split(":")[0];
+    return num + "@s.whatsapp.net";
+  }
+
+  return jid;
 }
 
 function formatTime() {
@@ -77,12 +100,12 @@ function loadCommands(...dirs) {
   return commands;
 }
 
-
 module.exports = {
   extractText,
   extractContextInfo,
   extractQuotedMessage,
   normalizeNumber,
+  normalizeJid, // 🟢 export fungsi baru
   formatTime,
   delay,
   botLabel,
