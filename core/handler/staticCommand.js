@@ -1,5 +1,6 @@
 const { adminList } = require('../../setting/setting');
 
+// 🛠️ Convert JID ke format +62
 function jidToNumber(jid) {
   if (!jid) return '';
   const num = jid.split('@')[0];
@@ -8,28 +9,29 @@ function jidToNumber(jid) {
   return `+${num}`;
 }
 
+// 🛠️ Ambil pengirim asli (aman buat grup & private)
+function getSenderId(msg) {
+  const from = msg.key.remoteJid;
+  const isGroup = from.endsWith('@g.us');
+  return isGroup ? msg.key.participant : from;
+}
+
 async function handleStaticCommand(sock, msg, lowerText, userId, body) {
   const from = msg.key.remoteJid;
-const isGroup = from.endsWith('@g.us');
-
-// 🔍 Debug lengkap
-console.log('========================');
-console.log('📩 Pesan baru diterima');
-console.log('📌 isGroup:', isGroup);
-console.log('📌 msg.key.participant:', msg.key?.participant);
-console.log('📌 msg.sender:', msg.sender);
-console.log('📌 userId (fallback):', userId);
-console.log('📌 from:', from);
-
-// 🧩 Hasil final
-const actualUserId =
-    isGroup ? msg.key.participant
-    : msg.key.remoteJid;
-
-console.log('✅ actualUserId:', actualUserId);
-console.log('========================');
-
+  const isGroup = from.endsWith('@g.us');
+  const actualUserId = getSenderId(msg);
   const niceNumber = jidToNumber(actualUserId);
+
+  // 🔍 Debug lengkap
+  console.log('========================');
+  console.log('📩 Pesan baru diterima');
+  console.log('📌 isGroup:', isGroup);
+  console.log('📌 msg.key.participant:', msg.key?.participant);
+  console.log('📌 msg.sender:', msg.sender); // biasanya undefined di grup
+  console.log('📌 userId (fallback):', userId);
+  console.log('📌 from:', from);
+  console.log('✅ actualUserId:', actualUserId);
+  console.log('========================');
 
   switch (lowerText) {
     case '/menu':
@@ -73,9 +75,9 @@ console.log('========================');
 ┃ ❓ *Bantuan*: \`tutorial\` / \`tutor\`
 ╰──────────────────────╯
 `,
-        mentions: [actualUserId]   // ✅ tag nya sesuai userId yang bener
-      }, { quoted: msg })
-      return true
+        mentions: [actualUserId]   // ✅ tag user yg bener
+      }, { quoted: msg });
+      return true;
 
     case 'tutorial':
     case 'tutor':
