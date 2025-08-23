@@ -25,13 +25,22 @@ async function handleResponder(sock, msg) {
     if (!msg.message) return;
 
     const remoteJid = msg.key.remoteJid;      // JID chat (grup / pribadi)
-    const participant = msg.key.participant;  // JID pengirim (kalau grup)
-    const isGroup = remoteJid.endsWith('@g.us');
+const isGroup = remoteJid.endsWith('@g.us');
 
-    // Kalau grup, sender = participant, kalau private sender = remoteJid
-    const sender = isGroup ? participant : remoteJid;
-    const userId = sender;
-    const actualUserId = sender;
+// Ambil sender dengan aman
+let sender;
+if (isGroup) {
+  sender = msg.key.participant || msg.participant || null;
+} else {
+  sender = remoteJid;
+}
+
+// Kalau masih null, fallback ke user bot aja biar ga error
+if (!sender) sender = sock.user?.id || "unknown@s.whatsapp.net";
+
+const userId = sender;
+const actualUserId = sender;
+
 
     const content = msg.message?.viewOnceMessageV2?.message || msg.message;
     const text = content?.conversation ||
