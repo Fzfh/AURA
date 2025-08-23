@@ -12,7 +12,6 @@ const muteDuration = 2 * 60 * 1000
 async function handleResponder(sock, msg) {
   try {
     if (!msg.message) return;
-
     // Pakai JID mentah langsung dari WhatsApp
     const sender = normalizeJid(msg.key.remoteJid);
     const userId = sender;
