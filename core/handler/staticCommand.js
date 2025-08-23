@@ -23,9 +23,8 @@ console.log('📌 from:', from);
 
 // 🧩 Hasil final
 const actualUserId =
-    (isGroup && msg.key.participant) ? msg.key.participant
-  : (isGroup && msg.sender) ? msg.sender
-  : userId || from;
+    isGroup ? msg.key.participant
+    : msg.key.remoteJid;
 
 console.log('✅ actualUserId:', actualUserId);
 console.log('========================');
