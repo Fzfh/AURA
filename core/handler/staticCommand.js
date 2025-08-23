@@ -1,4 +1,12 @@
 const { adminList } = require('../../setting/setting');
+function jidToNumber(jid) {
+  if (!jid) return '';
+  const num = jid.split('@')[0];
+  if (num.startsWith('62')) return `+${num}`;
+  if (num.startsWith('8')) return `+62${num}`;
+  return `+${num}`;
+}
+
 async function handleStaticCommand(sock, msg, lowerText, userId, body) {
   const from = msg.key.remoteJid
   const sender = from
@@ -7,11 +15,13 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
   
   switch (lowerText) {
     case '/menu':
-    case 'menu':
-    case '.menu':
-      await sock.sendMessage(sender, {
-       text: `╭──〔 ✨ MENU AURABOT ✨ 〕──╮
+case 'menu':
+case '.menu':
+  const niceNumber = jidToNumber(actualUserId);
+  await sock.sendMessage(sender, {
+    text: `╭──〔 ✨ MENU AURABOT ✨ 〕──╮
 ┃ 👋 Hai @${actualUserId.split('@')[0]}!
+┃ ( ${niceNumber} )
 ┃ Yuk cobain fitur-fitur bot ini:
 ┃
 ┃ 🎨 *Sticker*
@@ -45,33 +55,10 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
 ┃ 🤖 *Info Bot*: \`beli bot\` / \`admin\`
 ┃ ❓ *Bantuan*: \`tutorial\` / \`tutor\`
 ╰──────────────────────╯
-
-╭──〔 🔒 ADMIN GRUP 〕──╮
-┃ 👥 *Member & Tag*
-┃  ⤷ Promote/Demote: \`.na\` / \`.una\`
-┃  ⤷ Tambah member: \`.add 628xxx\`
-┃  ⤷ Tag semua: \`.t\`
-┃
-┃  🔊 Text ke suara
-┃  ⤷ \`sp\` teks
-┃  ⤷ Contoh = \`sp\` Aku... sayang kamu.
-┃
-┃ 🔐 *Kelola Grup*
-┃  ⤷ Buka/Tutup: \`.open\` / \`.close\`
-┃  ⤷ Hapus pesan: \`.del\`
-┃  ⤷ Lihat 1x View: \`.1\`
-┃
-┃ 🏗️ *Buat Grup*
-┃  ⤷ Tanpa member: \`.bg Nama\`
-┃  ⤷ Dengan member: \`.bg Nama add 628xx,...\`
-╰────────────────────╯
-
-💡 *Tips:* Admin grup langsung bisa akses fitur admin!  
-✨ Selamat mencoba Fitur Kami
 `,
-       mentions: [actualUserId]
-      }, { quoted: msg })
-      return true
+    mentions: [actualUserId]   // << ini wajib biar tag bener2 jalan
+  }, { quoted: msg })
+  return true
 
     case 'tutorial':
     case 'tutor':
