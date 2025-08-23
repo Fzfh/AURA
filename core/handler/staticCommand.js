@@ -75,7 +75,7 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
     case 'Tytor':
     case 'caranya':
     case 'cara nya':
-      await sock.sendMessage(sender, {
+      await sock.sendMessage(from, {
         text: `╭━━━〔 PANDUAN PENGGUNAAN 〕━━━╮
 
 Halo  @${actualUserId.split('@')[0]}! 👋  
@@ -203,7 +203,7 @@ Bot ini terus berkembang, jadi pantau terus update-nya ya!
       return true
 
     case 'beli bot':
-      await sock.sendMessage(sender, {
+      await sock.sendMessage(from, {
         text: `🤖 *Daftar Harga Bot AURA:*
 
 🔹 *Bot Premium (AI)* – Rp100.000  
