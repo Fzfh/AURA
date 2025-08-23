@@ -20,21 +20,13 @@ function getSenderId(msg) {
     : (msg.sender || msg.key.participant || msg.key.remoteJid);
 }
 
-// 🛠️ Format nomor jadi +62xxx
-function formatNumber(jid) {
-  if (!jid) return '';
-  const num = jid.replace('@s.whatsapp.net', '');
-
-  if (num.startsWith('62')) return `+${num}`;
-  if (num.startsWith('8')) return `+62${num}`;
-  return `+${num}`;
-}
-
 async function handleStaticCommand(sock, msg, lowerText, userId, body) {
   const from = msg.key.remoteJid;
   const isGroup = from.endsWith('@g.us');
   const actualUserId = getSenderId(msg);
-  const niceNumber = formatNumber(actualUserId); // 🎯 langsung rapihin
+
+  // 🧹 Untuk ditampilkan: buang "@s.whatsapp.net"
+  const displayNumber = actualUserId.replace('@s.whatsapp.net', '');
 
   // 🔍 Debug lengkap
   console.log('========================');
@@ -45,7 +37,7 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
   console.log('📌 userId (fallback):', userId);
   console.log('📌 from:', from);
   console.log('✅ actualUserId:', actualUserId);
-  console.log('✅ niceNumber:', niceNumber);
+  console.log('✅ displayNumber:', displayNumber);
   console.log('========================');
 
   switch (lowerText) {
@@ -54,8 +46,8 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
     case '.menu':
       await sock.sendMessage(from, {
         text: `╭──〔 ✨ MENU AURABOT ✨ 〕──╮
-┃ 👋 Hai @${actualUserId.split('@')[0]}
-┃ ( ${niceNumber} )
+┃ 👋 Hai @${displayNumber}
+┃ ( +${displayNumber} )
 ┃ Yuk cobain fitur-fitur bot ini:
 ┃
 ┃ 🎨 *Sticker*
@@ -90,7 +82,7 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
 ┃ ❓ *Bantuan*: \`tutorial\` / \`tutor\`
 ╰──────────────────────╯
 `,
-        mentions: [actualUserId]
+        mentions: [actualUserId]  // ✅ mentions tetap JID asli
       }, { quoted: msg });
       return true;
 
