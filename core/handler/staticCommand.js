@@ -1,14 +1,5 @@
 const { adminList } = require('../../setting/setting');
 
-// 🛠️ Convert JID ke format +62
-// function jidToNumber(jid) {
-//   if (!jid) return '';
-//   const num = jid.split('@')[0];
-//   if (num.startsWith('62')) return `+${num}`;
-//   if (num.startsWith('8')) return `+62${num}`;
-//   return `+${num}`;
-// }
-
 // 🛠️ Ambil pengirim asli (aman buat grup & private)
 function getSenderId(msg) {
   const from = msg.key.remoteJid;
@@ -16,38 +7,45 @@ function getSenderId(msg) {
 
   if (isGroup) {
     const part = msg.key.participant || msg.participant;
-    // ✅ Kalau participant ada & mulai dengan 62 → nomor asli
     if (part && part.startsWith('62')) {
-      return part;
+      return part; // udah nomor asli
     }
-    // ✅ Kalau participant aneh (137xxx) → fallback ke msg.sender
     if (msg.sender && msg.sender.startsWith('62')) {
-      return msg.sender;
+      return msg.sender; // fallback
     }
   }
 
-  // ✅ Fallback terakhir (private chat dll)
   return msg.key.fromMe
     ? msg.key.remoteJid
     : (msg.sender || msg.key.participant || msg.key.remoteJid);
 }
 
+// 🛠️ Format nomor jadi +62xxx
+function formatNumber(jid) {
+  if (!jid) return '';
+  const num = jid.replace('@s.whatsapp.net', '');
+
+  if (num.startsWith('62')) return `+${num}`;
+  if (num.startsWith('8')) return `+62${num}`;
+  return `+${num}`;
+}
 
 async function handleStaticCommand(sock, msg, lowerText, userId, body) {
   const from = msg.key.remoteJid;
   const isGroup = from.endsWith('@g.us');
   const actualUserId = getSenderId(msg);
-  const niceNumber = jidToNumber(actualUserId);
+  const niceNumber = formatNumber(actualUserId); // 🎯 langsung rapihin
 
   // 🔍 Debug lengkap
   console.log('========================');
   console.log('📩 Pesan baru diterima');
   console.log('📌 isGroup:', isGroup);
   console.log('📌 msg.key.participant:', msg.key?.participant);
-  console.log('📌 msg.sender:', msg.sender); // biasanya undefined di grup
+  console.log('📌 msg.sender:', msg.sender);
   console.log('📌 userId (fallback):', userId);
   console.log('📌 from:', from);
   console.log('✅ actualUserId:', actualUserId);
+  console.log('✅ niceNumber:', niceNumber);
   console.log('========================');
 
   switch (lowerText) {
@@ -92,7 +90,7 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
 ┃ ❓ *Bantuan*: \`tutorial\` / \`tutor\`
 ╰──────────────────────╯
 `,
-        mentions: [actualUserId]   // ✅ tag user yg bener
+        mentions: [actualUserId]
       }, { quoted: msg });
       return true;
 
