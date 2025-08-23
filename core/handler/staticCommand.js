@@ -13,11 +13,11 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
   const isGroup = from.endsWith('@g.us');
 
   // ✅ Bedain group vs private
-  const actualUserId = isGroup 
-    ? (msg.key.participant || userId)   // grup → pakai participant
-    : from;                             // private → langsung remoteJid
+ const actualUserId = 
+      (isGroup && msg.key.participant) ? msg.key.participant
+    : (isGroup && msg.sender) ? msg.sender
+    : userId || from;
 
-  const userName = msg.pushName || jidToNumber(actualUserId);
   const niceNumber = jidToNumber(actualUserId);
 
   switch (lowerText) {
