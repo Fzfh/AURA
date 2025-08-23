@@ -1,13 +1,13 @@
 const { adminList } = require('../../setting/setting');
 
 // 🛠️ Convert JID ke format +62
-function jidToNumber(jid) {
-  if (!jid) return '';
-  const num = jid.split('@')[0];
-  if (num.startsWith('62')) return `+${num}`;
-  if (num.startsWith('8')) return `+62${num}`;
-  return `+${num}`;
-}
+// function jidToNumber(jid) {
+//   if (!jid) return '';
+//   const num = jid.split('@')[0];
+//   if (num.startsWith('62')) return `+${num}`;
+//   if (num.startsWith('8')) return `+62${num}`;
+//   return `+${num}`;
+// }
 
 // 🛠️ Ambil pengirim asli (aman buat grup & private)
 function getSenderId(msg) {
