@@ -1,8 +1,7 @@
-const path = require('path');
 const { adminList } = require('../setting/setting')
 const { botResponsePatterns } = require('../setting/botconfig')
 const { handleStaticCommand } = require('../core/handler/staticCommand')
-const { handleOpenAIResponder, memoryMap } = require('../core/utils/openai')
+const { handleOpenAIResponder } = require('../core/utils/openai')
 const menfess = require('../commands/menfess')
 
 const spamTracker = new Map()
@@ -13,11 +12,14 @@ async function handleResponder(sock, msg) {
   try {
     if (!msg.message) return;
 
-    // Pakai JID mentah langsung dari WhatsApp
-    const sender = normalizeJid(msg.key.remoteJid);
+    const remoteJid = msg.key.remoteJid;      // JID chat (grup / pribadi)
+    const participant = msg.key.participant;  // JID pengirim (kalau grup)
+    const isGroup = remoteJid.endsWith('@g.us');
+
+    // Kalau grup, sender = participant, kalau private sender = remoteJid
+    const sender = isGroup ? participant : remoteJid;
     const userId = sender;
-    const actualUserId = normalizeJid(msg.key.participant || sender);
-    const isGroup = sender.endsWith('@g.us');
+    const actualUserId = sender;
 
     const content = msg.message?.viewOnceMessageV2?.message || msg.message;
     const text = content?.conversation ||
@@ -27,20 +29,21 @@ async function handleResponder(sock, msg) {
     if (!text) return;
 
     const body = text;
-    const lowerText = text.toLowerCase();
+    const lowerText = body.toLowerCase();
     const commandName = body.trim().split(' ')[0].toLowerCase().replace(/^\.|\//, '');
     const args = body.trim().split(' ').slice(1);
 
     // 🚫 Anti spam
-    if (text.startsWith('/') || text.startsWith('.')) {
+    if (body.startsWith('/') || body.startsWith('.')) {
       const now = Date.now();
       const userSpam = spamTracker.get(userId) || [];
       const filtered = userSpam.filter(t => now - t < 10000);
       filtered.push(now);
       spamTracker.set(userId, filtered);
+
       if (filtered.length > 5 && !adminList.includes(userId)) {
         mutedUsers.set(userId, now + muteDuration);
-        return sock.sendMessage(sender, {
+        return sock.sendMessage(remoteJid, {
           text: '🔇 Kamu terlalu banyak mengirim command! Bot diam 2 menit.'
         }, { quoted: msg });
       }
@@ -51,14 +54,12 @@ async function handleResponder(sock, msg) {
     if (handledStatic) return;
 
     // 💌 Menfess
-    const handledMenfess = await menfess(sock, msg, text)
-    if (handledMenfess) return
+    const handledMenfess = await menfess(sock, msg, text);
+    if (handledMenfess) return;
 
     // 📣 Deteksi mention bot
     const botJid = sock.user?.id;
-    const mentionedJidListRaw = content?.extendedTextMessage?.contextInfo?.mentionedJid || [];
-    const mentionedJidList = mentionedJidListRaw.map(jid => normalizeJid(jid));
-
+    const mentionedJidList = content?.extendedTextMessage?.contextInfo?.mentionedJid || [];
     const isMentioned = mentionedJidList.includes(botJid);
 
     // 🔄 Loop pattern command
@@ -66,11 +67,7 @@ async function handleResponder(sock, msg) {
       if (commandName !== pattern.command) continue;
 
       if (['waifu', 'waifuhen'].includes(pattern.command)) {
-        if (args.length === 0) {
-          return await pattern.handler(sock, msg, '', [], pattern.command);
-        } else {
-          return await pattern.handler(sock, msg, body, args, pattern.command);
-        }
+        return await pattern.handler(sock, msg, body, args, pattern.command);
       }
 
       if (['na', 'una', 'admin'].includes(pattern.command)) {
