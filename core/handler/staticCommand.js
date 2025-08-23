@@ -20,7 +20,7 @@ case '.menu':
   const niceNumber = jidToNumber(actualUserId);
   await sock.sendMessage(sender, {
     text: `╭──〔 ✨ MENU AURABOT ✨ 〕──╮
-┃ 👋 Hai @${actualUserId.split('@')[0]}!
+┃ 👋 Hai @${actualUserId.split('@')[0]}
 ┃ ( ${niceNumber} )
 ┃ Yuk cobain fitur-fitur bot ini:
 ┃
