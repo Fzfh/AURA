@@ -8,20 +8,38 @@ const spamTracker = new Map()
 const mutedUsers = new Map()
 const muteDuration = 2 * 60 * 1000
 
+// 🔹 Convert JID ke nomor +62
+function jidToNumber(jid) {
+  if (!jid) return ''
+  const number = jid.split('@')[0]
+
+  // Long JID (137xxx) → return mentah biar ga nyasar ke +1xxx
+  if (!/^\d+$/.test(number)) return jid
+
+  if (number.startsWith('62')) return `+${number}`
+  if (number.startsWith('8')) return `+62${number}`
+  return `+${number}`
+}
+
 async function handleResponder(sock, msg) {
   try {
-    if (!msg.message) retur
-    
-   const sender = msg.key.remoteJid
-    const userId = sender
-    const from = sender
-    const actualUserId =
-    msg.key.participant ||
-    msg.participant ||
-    msg.message?.extendedTextMessage?.contextInfo?.participant ||
-    sender
-    const isGroup = sender.endsWith('@g.us')
+    if (!msg.message) return
 
+    const remoteJid = msg.key.remoteJid // chat ID (grup/privat)
+    const isGroup = remoteJid.endsWith('@g.us')
+
+    // 🔹 Ambil pengirim asli
+    const senderJid =
+      msg.key.participant || // kalau grup
+      msg.participant ||
+      msg.message?.extendedTextMessage?.contextInfo?.participant ||
+      remoteJid
+
+    const userId = senderJid
+    const actualUserId = senderJid
+    const displayNumber = jidToNumber(senderJid)
+
+    // 🔹 Ambil isi pesan
     const content = msg.message?.viewOnceMessageV2?.message || msg.message
     const text =
       content?.conversation ||
@@ -29,8 +47,10 @@ async function handleResponder(sock, msg) {
       content?.imageMessage?.caption ||
       content?.videoMessage?.caption || ''
 
+    if (!text) return
+
     const body = text
-    const command = body.trim().split(' ')[0].toLowerCase()
+    const commandName = body.trim().split(' ')[0].toLowerCase().replace(/^\.|\//, '')
     const args = body.trim().split(' ').slice(1)
     const lowerText = text.toLowerCase()
 
