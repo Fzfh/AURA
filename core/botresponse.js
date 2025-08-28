@@ -21,6 +21,27 @@ function jidToNumber(jid) {
   return `+${number}`
 }
 
+// 🔹 Normalisasi JID biar gak jadi long JID (137xxx)
+async function normalizeJid(sock, jid) {
+  if (!jid) return ''
+
+  // Kalau sudah format normal (62xxx@s.whatsapp.net) → langsung return
+  if (jid.startsWith('62') && jid.endsWith('@s.whatsapp.net')) {
+    return jid
+  }
+
+  try {
+    const [result] = await sock.onWhatsApp(jid)
+    if (result && result.jid) {
+      return result.jid // contoh: 6289532xxxx@s.whatsapp.net
+    }
+  } catch (e) {
+    console.error("❌ Gagal resolve JID:", e)
+  }
+
+  return jid // fallback kalau gagal
+}
+
 async function handleResponder(sock, msg) {
   try {
     if (!msg.message) return
@@ -29,12 +50,13 @@ async function handleResponder(sock, msg) {
     const isGroup = remoteJid.endsWith('@g.us')
 
     // 🔹 Ambil pengirim asli
-    const senderJid =
-      msg.key.participant || // kalau grup
+    let rawSender =
+      msg.key.participant ||
       msg.participant ||
       msg.message?.extendedTextMessage?.contextInfo?.participant ||
       remoteJid
-
+    
+    const senderJid = await normalizeJid(sock, rawSender)
     const userId = senderJid
     const actualUserId = senderJid
     const displayNumber = jidToNumber(senderJid)
