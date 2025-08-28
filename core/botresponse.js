@@ -8,49 +8,31 @@ const spamTracker = new Map()
 const mutedUsers = new Map()
 const muteDuration = 2 * 60 * 1000
 
-// 🔹 Convert JID ke nomor +62
-function jidToNumber(jid) {
-  if (!jid) return ''
-  const number = jid.split('@')[0]
-
-  if (number.startsWith('62')) return `+${number}`
-  if (number.startsWith('8')) return `+62${number}`
-  return `+${number}`
-}
-
 async function handleResponder(sock, msg) {
   try {
-    if (!msg.message) return
-
-    const remoteJid = msg.key.remoteJid // ✅ tambahin ini
-    const isGroup = remoteJid.endsWith('@g.us')
-    let sender = remoteJid
-    if (!sender) sender = sock.user?.id || "unknown@s.whatsapp.net"
-
-    const userId = msg.key.participant || sender // asli, format jid
-    const actualUserId = sender
-    const displayNumber = jidToNumber(sender) // 🔹 untuk log / admin
-
-
-    // 🔹 Log detail
-    console.log("📩 Pesan baru diterima")
-    console.log("📌 isGroup:", isGroup)
-    console.log("📌 sender (jid):", sender)
-    console.log("📌 sender (no):", displayNumber)
-    console.log("📌 from:", remoteJid)
-    console.log("✅ actualUserId:", actualUserId)
+    if (!msg.message) retur
+    
+   const sender = msg.key.remoteJid
+    const userId = sender
+    const from = sender
+    const actualUserId =
+    msg.key.participant ||
+    msg.participant ||
+    msg.message?.extendedTextMessage?.contextInfo?.participant ||
+    sender
+    const isGroup = sender.endsWith('@g.us')
 
     const content = msg.message?.viewOnceMessageV2?.message || msg.message
-    const text = content?.conversation ||
+    const text =
+      content?.conversation ||
       content?.extendedTextMessage?.text ||
       content?.imageMessage?.caption ||
       content?.videoMessage?.caption || ''
-    if (!text) return
 
     const body = text
-    const lowerText = body.toLowerCase()
-    const commandName = body.trim().split(' ')[0].toLowerCase().replace(/^\.|\//, '')
+    const command = body.trim().split(' ')[0].toLowerCase()
     const args = body.trim().split(' ').slice(1)
+    const lowerText = text.toLowerCase()
 
     // 🚫 Anti spam
     if (body.startsWith('/') || body.startsWith('.')) {
