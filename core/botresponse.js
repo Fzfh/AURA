@@ -22,13 +22,15 @@ async function handleResponder(sock, msg) {
   try {
     if (!msg.message) return
 
+    const remoteJid = msg.key.remoteJid // ✅ tambahin ini
     const isGroup = remoteJid.endsWith('@g.us')
-    const sender = msg.key.remoteJid
+    let sender = remoteJid
     if (!sender) sender = sock.user?.id || "unknown@s.whatsapp.net"
 
     const userId = msg.key.participant || sender // asli, format jid
     const actualUserId = sender
     const displayNumber = jidToNumber(sender) // 🔹 untuk log / admin
+
 
     // 🔹 Log detail
     console.log("📩 Pesan baru diterima")
