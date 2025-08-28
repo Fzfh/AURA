@@ -23,11 +23,11 @@ module.exports = async function tagall(sock, msg, text, isGroup) {
       p.id === userId && (p.admin === 'admin' || p.admin === 'superadmin')
     );
 
-    if (!isSenderAdmin) {
-      return sock.sendMessage(groupId, {
-        text: '❌ Hanya admin grup WhatsApp yang bisa pakai perintah ini yaa~'
-      }, { quoted: msg });
-    }
+    // if (!isSenderAdmin) {
+    //   return sock.sendMessage(groupId, {
+    //     text: '❌ Hanya admin grup WhatsApp yang bisa pakai perintah ini yaa~'
+    //   }, { quoted: msg });
+    // }
 
     const mentions = metadata.participants.map(p => p.id);
     const tagger = '@' + userId.split('@')[0];
