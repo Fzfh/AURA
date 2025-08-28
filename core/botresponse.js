@@ -22,20 +22,11 @@ async function handleResponder(sock, msg) {
   try {
     if (!msg.message) return
 
-    const remoteJid = msg.key.remoteJid // JID chat (grup / pribadi)
     const isGroup = remoteJid.endsWith('@g.us')
-
-    // 🔹 Ambil sender dengan aman
-    let sender
-    if (isGroup) {
-      sender = msg.key.participant || msg.participant || null
-    } else {
-      sender = remoteJid
-    }
-
+    const sender = msg.key.remoteJid
     if (!sender) sender = sock.user?.id || "unknown@s.whatsapp.net"
 
-    const userId = sender // asli, format jid
+    const userId = msg.key.participant || sender // asli, format jid
     const actualUserId = sender
     const displayNumber = jidToNumber(sender) // 🔹 untuk log / admin
 
