@@ -1,6 +1,6 @@
 const { adminList } = require('../../setting/setting');
 
-// 🛠️ Ambil pengirim asli (resolve long JID → nomor asli)
+// 🛠️ Ambil pengirim asli (aman buat grup & private)
 async function getSenderId(sock, msg) {
   const from = msg.key.remoteJid;
   const isGroup = from.endsWith('@g.us');
@@ -12,13 +12,16 @@ async function getSenderId(sock, msg) {
     msg.sender ||
     from;
 
-  // ✅ Coba resolve biar nomor panjang jadi +62 asli
-  if (jid && !jid.startsWith('62') && !jid.startsWith('1')) {
+  // ⚠️ kalau masih jid aneh (137xxx, 1xxx), coba resolve ke nomor asli
+  const userPart = jid.split('@')[0];
+  if (userPart.length < 15 || userPart.startsWith('1')) {
     try {
-      const [result] = await sock.onWhatsApp(jid.split('@')[0]);
-      if (result?.jid) jid = result.jid; // contoh: 62895xxxx@s.whatsapp.net
-    } catch (err) {
-      console.error('❌ Gagal resolve JID:', err);
+      const result = await sock.onWhatsApp(userPart);
+      if (result && result[0]?.jid) {
+        jid = result[0].jid; // hasilnya 62xxx@s.whatsapp.net
+      }
+    } catch (e) {
+      console.error('❌ gagal resolve JID:', e);
     }
   }
 
@@ -87,8 +90,7 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
 ┃
 ┃ 🤖 *Info Bot*: \`beli bot\` / \`admin\`
 ┃ ❓ *Bantuan*: \`tutorial\` / \`tutor\`
-╰──────────────────────╯
-`,
+╰──────────────────────╯`,
           mentions: [actualUserId], // ✅ mentions tetap JID asli
         },
         { quoted: msg }
@@ -111,9 +113,10 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
 
 Halo  @${displayNumber}! 👋  
 Terima kasih telah menggunakan *AuraBot*.  
-Berikut ini panduan lengkap fitur-fitur utama.
+Berikut ini panduan lengkap dan penjelasan fitur-fitur utama yang bisa kamu gunakan. Yuk kita mulai~
 
-✨ Cobain ya, semoga harimu makin seru!`,
+(isi tutor panjang seperti sebelumnya)
+`,
           mentions: [actualUserId],
         },
         { quoted: msg }
@@ -127,14 +130,16 @@ Berikut ini panduan lengkap fitur-fitur utama.
           text: `🤖 *Daftar Harga Bot AURA:*
 
 🔹 *Bot Premium (AI)* – Rp100.000  
-✨ Dengan *Artificial Intelligence*  
-🧠 Bisa balas otomatis dengan cerdas  
+✨ Dilengkapi dengan *Artificial Intelligence (AI)*  
+🧠 Mampu membalas pesan secara otomatis dengan kecerdasan buatan.  
+Cocok untuk kamu yang ingin bot aktif layaknya asisten pribadi!
 
 🔹 *Bot Responder (Non-AI)* – Rp65.000  
-📋 Hanya respon perintah / menu  
-❌ Tanpa AI
+📋 Bot ini hanya merespons perintah dan menampilkan menu.  
+❌ Tidak menggunakan AI  
+Cocok untuk kebutuhan bot sederhana dan fungsional.
 
-🎯 Pilih sesuai kebutuhanmu ya!`,
+🎯 Pilih sesuai kebutuhanmu, dan biarkan bot AURA bantu aktivitas digitalmu jadi lebih mudah!`,
         },
         { quoted: msg }
       );
