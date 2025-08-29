@@ -1,40 +1,12 @@
 const { adminList } = require('../../setting/setting');
 
-// 🛠️ Ambil pengirim asli (aman buat grup & private)
-async function getSenderId(sock, msg) {
-  const from = msg.key.remoteJid;
-  const isGroup = from.endsWith('@g.us');
-
-  let jid =
-    msg.key.participant ||
-    msg.participant ||
-    msg.message?.extendedTextMessage?.contextInfo?.participant ||
-    msg.sender ||
-    from;
-
-  // ⚠️ kalau masih jid aneh (137xxx, 1xxx), coba resolve ke nomor asli
-  const userPart = jid.split('@')[0];
-  if (userPart.length < 15 || userPart.startsWith('1')) {
-    try {
-      const result = await sock.onWhatsApp(userPart);
-      if (result && result[0]?.jid) {
-        jid = result[0].jid; // hasilnya 62xxx@s.whatsapp.net
-      }
-    } catch (e) {
-      console.error('❌ gagal resolve JID:', e);
-    }
-  }
-
-  return jid;
-}
-
 async function handleStaticCommand(sock, msg, lowerText, userId, body) {
   const from = msg.key.remoteJid;
+  const userId = msg.key.participant || msg.key.remoteJid;
   const isGroup = from.endsWith('@g.us');
-  const actualUserId = await getSenderId(sock, msg);
 
   // 🧹 Untuk ditampilkan: buang "@s.whatsapp.net"
-  const displayNumber = actualUserId.replace('@s.whatsapp.net', '');
+  const displayNumber = userId;
 
   // 🔍 Debug lengkap
   console.log('========================');
@@ -44,7 +16,7 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
   console.log('📌 msg.sender:', msg.sender);
   console.log('📌 userId (fallback):', userId);
   console.log('📌 from:', from);
-  console.log('✅ actualUserId:', actualUserId);
+  console.log('✅ actualUserId:', userId);
   console.log('✅ displayNumber:', displayNumber);
   console.log('========================');
 
@@ -91,7 +63,7 @@ async function handleStaticCommand(sock, msg, lowerText, userId, body) {
 ┃ 🤖 *Info Bot*: \`beli bot\` / \`admin\`
 ┃ ❓ *Bantuan*: \`tutorial\` / \`tutor\`
 ╰──────────────────────╯`,
-          mentions: [actualUserId], // ✅ mentions tetap JID asli
+          mentions: [userId], // ✅ mentions tetap JID asli
         },
         { quoted: msg }
       );
@@ -117,7 +89,7 @@ Berikut ini panduan lengkap dan penjelasan fitur-fitur utama yang bisa kamu guna
 
 (isi tutor panjang seperti sebelumnya)
 `,
-          mentions: [actualUserId],
+          mentions: [userId],
         },
         { quoted: msg }
       );
