@@ -1,6 +1,6 @@
 const { adminList } = require('../../setting/setting');
 
-async function handleStaticCommand(sock, msg, lowerText, userId, body) {
+async function handleStaticCommand(sock, msg, lowerText, body) {
   const from = msg.key.remoteJid;
   const userId = msg.key.participant || msg.key.remoteJid;
   const isGroup = from.endsWith('@g.us');
