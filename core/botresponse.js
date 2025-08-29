@@ -45,23 +45,16 @@ async function normalizeJid(sock, jid) {
 async function handleResponder(sock, msg) {
   try {
     if (!msg.message) return
+    const sender = msg.key.remoteJid
+    const userId = sender
+    const from = sender
+    const actualUserId =
+    msg.key.participant ||
+    msg.participant ||
+    msg.message?.extendedTextMessage?.contextInfo?.participant ||
+    sender
+    const isGroup = sender.endsWith('@g.us')
 
-    const remoteJid = msg.key.remoteJid // chat ID (grup/privat)
-    const isGroup = remoteJid.endsWith('@g.us')
-
-    // 🔹 Ambil pengirim asli
-    let rawSender =
-      msg.key.participant ||
-      msg.participant ||
-      msg.message?.extendedTextMessage?.contextInfo?.participant ||
-      remoteJid
-    
-    const senderJid = await normalizeJid(sock, rawSender)
-    const userId = senderJid
-    const actualUserId = senderJid
-    const displayNumber = jidToNumber(senderJid)
-
-    // 🔹 Ambil isi pesan
     const content = msg.message?.viewOnceMessageV2?.message || msg.message
     const text =
       content?.conversation ||
@@ -69,10 +62,8 @@ async function handleResponder(sock, msg) {
       content?.imageMessage?.caption ||
       content?.videoMessage?.caption || ''
 
-    if (!text) return
-
     const body = text
-    const commandName = body.trim().split(' ')[0].toLowerCase().replace(/^\.|\//, '')
+    const command = body.trim().split(' ')[0].toLowerCase()
     const args = body.trim().split(' ').slice(1)
     const lowerText = text.toLowerCase()
 
