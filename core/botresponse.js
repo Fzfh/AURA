@@ -45,15 +45,18 @@ async function normalizeJid(sock, jid) {
 async function handleResponder(sock, msg) {
   try {
     if (!msg.message) return
+
     const sender = msg.key.remoteJid
-    const userId = sender
     const from = sender
+    const userId = sender
     const actualUserId =
-    msg.key.participant ||
-    msg.participant ||
-    msg.message?.extendedTextMessage?.contextInfo?.participant ||
-    sender
+      msg.key.participant ||
+      msg.participant ||
+      msg.message?.extendedTextMessage?.contextInfo?.participant ||
+      sender
+
     const isGroup = sender.endsWith('@g.us')
+    const displayNumber = jidToNumber(actualUserId)
 
     const content = msg.message?.viewOnceMessageV2?.message || msg.message
     const text =
@@ -66,6 +69,7 @@ async function handleResponder(sock, msg) {
     const command = body.trim().split(' ')[0].toLowerCase()
     const args = body.trim().split(' ').slice(1)
     const lowerText = text.toLowerCase()
+    const commandName = command // ✅ fix: biar konsisten
 
     // 🚫 Anti spam
     if (body.startsWith('/') || body.startsWith('.')) {
@@ -77,7 +81,7 @@ async function handleResponder(sock, msg) {
 
       if (filtered.length > 5 && !adminList.includes(userId)) {
         mutedUsers.set(userId, now + muteDuration)
-        return sock.sendMessage(remoteJid, {
+        return sock.sendMessage(from, {
           text: '🔇 Kamu terlalu banyak mengirim command! Bot diam 2 menit.'
         }, { quoted: msg })
       }
