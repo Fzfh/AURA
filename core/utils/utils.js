@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const { jidDecode } = require("@whiskeysockets/baileys"); // 🟢 decode bawaan Baileys
 
 function extractText(msg) {
   return (
@@ -43,20 +44,46 @@ function normalizeNumber(jid) {
 function normalizeJid(jid = "") {
   if (!jid) return "";
 
-  // Group JID biarin apa adanya
-  if (jid.endsWith("@g.us")) return jid;
+  if (jid.endsWith("@g.us")) return jid; // group
+  if (jid === "status@broadcast") return jid; // WA status
 
-  // Kalau broadcast biarin aja (buat status WA)
-  if (jid === "status@broadcast") return jid;
-
-  // Kalau private user JID (biasanya xxx@s.whatsapp.net atau xxx:1@s.whatsapp.net)
   if (jid.includes("@s.whatsapp.net")) {
-    // buang tambahan setelah ":"
-    return jid.split(":")[0] + "@s.whatsapp.net";
+    return jid.split(":")[0] + "@s.whatsapp.net"; // buang suffix aneh
   }
 
-  // fallback: kasih suffix s.whatsapp.net
-  return jid + "@s.whatsapp.net";
+  return jid + "@s.whatsapp.net"; // fallback
+}
+
+// 🟢 Resolve JID → nomor asli (decode dulu, kalau gagal pakai sock.onWhatsApp)
+async function resolveJid(jid, sock) {
+  if (!jid) return "";
+
+  // step 1: kalau group atau broadcast, return aja
+  if (jid.endsWith("@g.us") || jid === "status@broadcast") return jid;
+
+  // step 2: decode kalau bisa
+  const decoded = jidDecode(jid);
+  if (decoded?.user) {
+    return decoded.user + "@s.whatsapp.net";
+  }
+
+  // step 3: kalau masih LID → cek via onWhatsApp
+  try {
+    const res = await sock.onWhatsApp(jid);
+    if (res?.[0]?.jid) {
+      return res[0].jid;
+    }
+  } catch (e) {
+    console.error("resolveJid error:", e.message);
+  }
+
+  return jid; // fallback tetap jid awal
+}
+
+// 🟢 Ambil nomor display (contoh: 628xxx)
+async function getDisplayNumber(jid, sock) {
+  const realJid = await resolveJid(jid, sock);
+  return realJid.replace(/@s\.whatsapp\.net$/, "");
 }
 
 function formatTime() {
@@ -80,12 +107,12 @@ function loadCommands(...dirs) {
   const commands = {};
 
   dirs.forEach((dir) => {
-    const baseFolder = path.basename(dir); // ambil nama foldernya langsung
+    const baseFolder = path.basename(dir);
     const files = fs.readdirSync(dir).filter(file => file.endsWith('.js'));
 
     for (const file of files) {
       const name = path.parse(file).name;
-      const key = `${baseFolder}_${name}`; // contoh: core_stickerHelper
+      const key = `${baseFolder}_${name}`;
       const filePath = path.join(dir, file);
       try {
         commands[key] = require(filePath);
@@ -103,7 +130,9 @@ module.exports = {
   extractContextInfo,
   extractQuotedMessage,
   normalizeNumber,
-  normalizeJid, // 🟢 export fungsi baru
+  normalizeJid,
+  resolveJid,       // 🟢 export baru
+  getDisplayNumber, // 🟢 export baru
   formatTime,
   delay,
   botLabel,
