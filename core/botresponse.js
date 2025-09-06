@@ -4,7 +4,7 @@ const { botResponsePatterns } = require('../setting/botconfig')
 const { handleStaticCommand } = require('../core/handler/staticCommand')
 const { handleOpenAIResponder } = require('../core/utils/openai')
 const menfess = require('../commands/menfess')
-const { resolveJid, getDisplayNumber } = require("./core/utils");
+const { resolveJid, getDisplayNumber } = require("./utils/utils");
 
 const spamTracker = new Map()
 const mutedUsers = new Map()
