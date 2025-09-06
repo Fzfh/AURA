@@ -1,3 +1,4 @@
+// botresponse.js — FIX: tampilkan nomor 62… asli di grup
 const { adminList } = require('../setting/setting')
 const { botResponsePatterns } = require('../setting/botconfig')
 const { handleStaticCommand } = require('../core/handler/staticCommand')
@@ -8,87 +9,129 @@ const spamTracker = new Map()
 const mutedUsers = new Map()
 const muteDuration = 2 * 60 * 1000
 
-// 🔹 Convert JID ke nomor +62
-function jidToNumber(jid) {
-  if (!jid) return ''
-  const number = jid.split('@')[0]
+// —— Helpers ————————————————————————————————————————————
 
-  // Long JID (137xxx) → return mentah biar ga nyasar ke +1xxx
-  if (!/^\d+$/.test(number)) return jid
-
-  if (number.startsWith('62')) return `+${number}`
-  if (number.startsWith('8')) return `+62${number}`
-  return `+${number}`
+// Hapus suffix device (:1@), ubah @lid → @s.whatsapp.net
+function cleanJid(jid = '') {
+  return String(jid)
+    .replace(/:.*@/g, '@')
+    .replace('@lid', '@s.whatsapp.net')
 }
 
-// 🔹 Normalisasi JID biar gak jadi long JID (137xxx)
-async function normalizeJid(sock, jid) {
-  if (!jid) return ''
+// Resolve JID “aneh” (137xxx) → phone JID 62xxxx@s.whatsapp.net kalau bisa
+async function resolvePhoneJid(sock, rawJid = '') {
+  if (!rawJid) return ''
 
-  // Kalau sudah format normal (62xxx@s.whatsapp.net) → langsung return
-  if (jid.startsWith('62') && jid.endsWith('@s.whatsapp.net')) {
-    return jid
-  }
-
+  // 1) decode + clean
+  let jid = rawJid
   try {
-    const [result] = await sock.onWhatsApp(jid)
-    if (result && result.jid) {
-      return result.jid // contoh: 6289532xxxx@s.whatsapp.net
+    if (typeof sock.decodeJid === 'function') {
+      jid = sock.decodeJid(jid) || jid
     }
-  } catch (e) {
-    console.error("❌ Gagal resolve JID:", e)
-  }
+  } catch {}
+  jid = cleanJid(jid)
 
-  return jid // fallback kalau gagal
+  // 2) kalau sudah 62…@s.whatsapp.net, selesai
+  if (/^62\d+@s\.whatsapp\.net$/.test(jid)) return jid
+
+  // 3) coba tanya ke WA: kasih JID langsung
+  try {
+    const result = await sock.onWhatsApp(jid)
+    if (Array.isArray(result) && result[0]?.jid && /^62\d+@s\.whatsapp\.net$/.test(result[0].jid)) {
+      return cleanJid(result[0].jid)
+    }
+  } catch {}
+
+  // 4) coba lagi pakai bagian sebelum @ (angka mentah)
+  try {
+    const onlyNum = String(jid).split('@')[0]
+    const result2 = await sock.onWhatsApp(onlyNum)
+    if (Array.isArray(result2) && result2[0]?.jid && /^62\d+@s\.whatsapp\.net$/.test(result2[0].jid)) {
+      return cleanJid(result2[0].jid)
+    }
+  } catch {}
+
+  // 5) kalau masih gagal, ya sudah balikin yang ada (tetap bisa ke-mention)
+  return jid
 }
+
+// Ambil nomor display murni digit 62… dari phone JID
+function toDisplayNumber(phoneJid = '') {
+  // contoh input: 62812xxxx@s.whatsapp.net → output: 62812xxxx
+  return String(phoneJid).split('@')[0] || ''
+}
+
+// —— Handler utama —————————————————————————————————————
 
 async function handleResponder(sock, msg) {
   try {
-    if (!msg.message) return
+    if (!msg?.message) return
 
-    const sender = msg.key.remoteJid
-    const from = sender
-    const userId = sender
-    const actualUserId =
+    const from = msg.key.remoteJid // id chat (grup / private)
+    const isGroup = from.endsWith('@g.us')
+
+    // Cari pengirim sebenarnya (kalau grup pakai participant)
+    const rawParticipant =
       msg.key.participant ||
       msg.participant ||
       msg.message?.extendedTextMessage?.contextInfo?.participant ||
-      sender
+      from
 
-    const isGroup = sender.endsWith('@g.us')
-    const displayNumber = jidToNumber(actualUserId)
+    // Resolve ke JID nomor 62… kalau bisa
+    const resolvedPhoneJid = await resolvePhoneJid(sock, rawParticipant)
+    const displayNumber = toDisplayNumber(resolvedPhoneJid) // <= ini yang kamu mau: 62xxxx
+    const actualUserId = cleanJid(rawParticipant) // untuk mentions tetap pakai JID asli
 
+    // Ambil teks isi pesan
     const content = msg.message?.viewOnceMessageV2?.message || msg.message
     const text =
       content?.conversation ||
       content?.extendedTextMessage?.text ||
       content?.imageMessage?.caption ||
-      content?.videoMessage?.caption || ''
+      content?.videoMessage?.caption ||
+      ''
 
     const body = text
-    const command = body.trim().split(' ')[0].toLowerCase()
-    const args = body.trim().split(' ').slice(1)
+    const command = body.trim().split(/\s+/)[0]?.toLowerCase() || ''
+    const args = body.trim().split(/\s+/).slice(1)
     const lowerText = text.toLowerCase()
-    const commandName = command // ✅ fix: biar konsisten
+    const commandName = command
 
-    // 🚫 Anti spam
+    // Debug biar jelas
+    console.log('========================')
+    console.log('📩 Pesan baru diterima')
+    console.log('📌 isGroup:', isGroup)
+    console.log('📌 msg.key.participant (raw):', msg.key?.participant)
+    console.log('📌 rawParticipant:', rawParticipant)
+    console.log('📌 resolvedPhoneJid (if any):', resolvedPhoneJid)
+    console.log('✅ displayNumber (62…):', displayNumber)
+    console.log('✅ actualUserId (mention JID):', actualUserId)
+    console.log('========================')
+
+    // 🚫 Anti spam untuk command (., /)
     if (body.startsWith('/') || body.startsWith('.')) {
       const now = Date.now()
-      const userSpam = spamTracker.get(userId) || []
+      const userSpam = spamTracker.get(actualUserId) || []
       const filtered = userSpam.filter(t => now - t < 10000)
       filtered.push(now)
-      spamTracker.set(userId, filtered)
+      spamTracker.set(actualUserId, filtered)
 
-      if (filtered.length > 5 && !adminList.includes(userId)) {
-        mutedUsers.set(userId, now + muteDuration)
+      if (filtered.length > 5 && !adminList.includes(actualUserId)) {
+        mutedUsers.set(actualUserId, now + muteDuration)
         return sock.sendMessage(from, {
           text: '🔇 Kamu terlalu banyak mengirim command! Bot diam 2 menit.'
         }, { quoted: msg })
       }
     }
 
-    // 📌 Cek command static
-    const handledStatic = await handleStaticCommand(sock, msg, lowerText, userId, displayNumber, body)
+    // 📌 Cek command statis (kirim juga displayNumber & actualUserId biar bisa @mention + tampilan)
+    const handledStatic = await handleStaticCommand(
+      sock,
+      msg,
+      lowerText,
+      body,
+      { actualUserId, displayNumber }
+    )
     if (handledStatic) return
 
     // 💌 Menfess
@@ -96,11 +139,11 @@ async function handleResponder(sock, msg) {
     if (handledMenfess) return
 
     // 📣 Deteksi mention bot
-    const botJid = sock.user?.id
+    const botJid = cleanJid(sock.user?.id || '')
     const mentionedJidList = content?.extendedTextMessage?.contextInfo?.mentionedJid || []
     const isMentioned = mentionedJidList.includes(botJid)
 
-    // 🔄 Loop pattern command
+    // 🔄 Pola command lain
     for (const pattern of botResponsePatterns) {
       if (commandName !== pattern.command) continue
 
@@ -115,9 +158,10 @@ async function handleResponder(sock, msg) {
       return await pattern.handler(sock, msg, body, args, commandName, displayNumber)
     }
 
-    // 🤖 AI responder (skip untuk command tertentu)
+    // 🤖 AI responder (skip command tertentu)
     if (!['menu', 'reset', 'clear'].includes(commandName)) {
-      await handleOpenAIResponder(sock, msg, displayNumber)
+      // pakai actualUserId atau displayNumber sebagai key memory, bebas — aku pakai actualUserId
+      await handleOpenAIResponder(sock, msg, actualUserId)
     }
 
   } catch (err) {
