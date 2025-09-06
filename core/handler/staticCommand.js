@@ -13,24 +13,12 @@ function getDisplayNumber(jid = '') {
   return num;
 }
 
-async function handleStaticCommand(sock, msg, lowerText, body) {
-  const from = msg.key.remoteJid;
-  const userId = msg.key.participant || msg.key.remoteJid;
-  const isGroup = from.endsWith('@g.us');
+async function handleStaticCommand(sock, msg, lowerText, body, ctx = {}) {
+  const { actualUserId, displayNumber } = ctx
+  const from = msg.key.remoteJid
 
-  // ✅ Ubah jadi nomor normal
-  const displayNumber = getDisplayNumber(userId);
-
-  // 🔍 Debug lengkap
-  console.log('========================');
-  console.log('📩 Pesan baru diterima');
-  console.log('📌 isGroup:', isGroup);
-  console.log('📌 msg.key.participant:', msg.key?.participant);
-  console.log('📌 msg.sender:', msg.sender);
-  console.log('📌 userId (raw):', userId);
-  console.log('✅ displayNumber (fixed):', displayNumber);
-  console.log('========================');
-
+  // // ✅ Ubah jadi nomor normal
+  // const displayNumber = getDisplayNumber(userId);
   switch (lowerText) {
     case '/menu':
     case 'menu':
