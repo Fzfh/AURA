@@ -1,12 +1,25 @@
 const { adminList } = require('../../setting/setting');
 
+// 🛠️ Normalizer biar jid aneh jadi nomor asli
+function getDisplayNumber(jid = '') {
+  if (!jid) return 'unknown';
+  let num = jid.split('@')[0];
+
+  // kalau udah 62xxxxx → biarin
+  if (num.startsWith('62')) return num;
+  // kalau +62 ada tapi tanpa plus
+  if (num.startsWith('8')) return '62' + num;
+  // kalau jid random (kayak 137xxx), tampilkan apa adanya
+  return num;
+}
+
 async function handleStaticCommand(sock, msg, lowerText, body) {
   const from = msg.key.remoteJid;
   const userId = msg.key.participant || msg.key.remoteJid;
   const isGroup = from.endsWith('@g.us');
 
-  // 🧹 Untuk ditampilkan: buang "@s.whatsapp.net"
-  const displayNumber = userId;
+  // ✅ Ubah jadi nomor normal
+  const displayNumber = getDisplayNumber(userId);
 
   // 🔍 Debug lengkap
   console.log('========================');
@@ -14,10 +27,8 @@ async function handleStaticCommand(sock, msg, lowerText, body) {
   console.log('📌 isGroup:', isGroup);
   console.log('📌 msg.key.participant:', msg.key?.participant);
   console.log('📌 msg.sender:', msg.sender);
-  console.log('📌 userId (fallback):', userId);
-  console.log('📌 from:', from);
-  console.log('✅ actualUserId:', userId);
-  console.log('✅ displayNumber:', displayNumber);
+  console.log('📌 userId (raw):', userId);
+  console.log('✅ displayNumber (fixed):', displayNumber);
   console.log('========================');
 
   switch (lowerText) {
@@ -63,7 +74,7 @@ async function handleStaticCommand(sock, msg, lowerText, body) {
 ┃ 🤖 *Info Bot*: \`beli bot\` / \`admin\`
 ┃ ❓ *Bantuan*: \`tutorial\` / \`tutor\`
 ╰──────────────────────╯`,
-          mentions: [userId], // ✅ mentions tetap JID asli
+          mentions: [userId], // tetap JID asli buat mention
         },
         { quoted: msg }
       );
