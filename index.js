@@ -78,7 +78,6 @@ async function startBot() {
 
     // 🔧 Simpan bot id ter-normalisasi
     global.sock = sock;
-    global.BOT_ID = normalizeJid(sock.user.id);
 
     sock.ev.on('creds.update', saveCreds);
 
@@ -118,6 +117,7 @@ async function startBot() {
       }
 
       if (connection === 'open') {
+        global.BOT_ID = normalizeJid(sock.user.id);
         console.log(chalk.greenBright('\n✅ Bot berhasil terhubung ke WhatsApp!'));
         console.log(chalk.cyanBright('✨ AURABOT SIAP MELAYANI TUAN AURAA 😎\n'));
         if (qrRetryInterval) clearInterval(qrRetryInterval);
