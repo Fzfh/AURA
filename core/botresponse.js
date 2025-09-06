@@ -6,13 +6,6 @@ const { handleOpenAIResponder } = require('../core/utils/openai')
 const menfess = require('../commands/menfess')
 const { resolveJid, getDisplayNumber } = require("./core/utils");
 
-const rawJid = msg.key.participant;
-const userJid = await resolveJid(rawJid, sock);
-const displayNum = await getDisplayNumber(rawJid, sock);
-
-console.log("✅ Resolved JID:", userJid);
-console.log("✅ Display Number:", displayNum);
-
 const spamTracker = new Map()
 const mutedUsers = new Map()
 const muteDuration = 2 * 60 * 1000
@@ -74,7 +67,12 @@ function toDisplayNumber(phoneJid = '') {
 async function handleResponder(sock, msg) {
   try {
     if (!msg?.message) return
+    const rawJid = msg.key.participant;
+const userJid = await resolveJid(rawJid, sock);
+const displayNum = await getDisplayNumber(rawJid, sock);
 
+console.log("✅ Resolved JID:", userJid);
+console.log("✅ Display Number:", displayNum);
     const from = msg.key.remoteJid // id chat (grup / private)
     const isGroup = from.endsWith('@g.us')
 
