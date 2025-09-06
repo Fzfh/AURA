@@ -62,7 +62,7 @@ async function handleStaticCommand(sock, msg, lowerText, body, ctx = {}) {
 ┃ 🤖 *Info Bot*: \`beli bot\` / \`admin\`
 ┃ ❓ *Bantuan*: \`tutorial\` / \`tutor\`
 ╰──────────────────────╯`,
-          mentions: [userId], // tetap JID asli buat mention
+          mentions: [actualUserId], // tetap JID asli buat mention
         },
         { quoted: msg }
       );
@@ -88,7 +88,7 @@ Berikut ini panduan lengkap dan penjelasan fitur-fitur utama yang bisa kamu guna
 
 (isi tutor panjang seperti sebelumnya)
 `,
-          mentions: [userId],
+          mentions: [actualUserId],
         },
         { quoted: msg }
       );
