@@ -14,11 +14,11 @@ module.exports = async function openCloseGroup(sock, msg, text, args, commandNam
     .filter(p => p.admin === 'admin' || p.admin === 'superadmin')
     .map(p => p.id);
 
-  if (!groupAdmins.includes(sender)) {
-    return sock.sendMessage(from, {
-      text: '🚫 Perintah ini hanya bisa digunakan oleh *admin grup*!',
-    }, { quoted: msg });
-  }
+  // if (!groupAdmins.includes(sender)) {
+  //   return sock.sendMessage(from, {
+  //     text: '🚫 Perintah ini hanya bisa digunakan oleh *admin grup*!',
+  //   }, { quoted: msg });
+  // }
 
   const isOpen = commandName === 'open';
   const isClose = commandName === 'close';
