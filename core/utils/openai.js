@@ -3,8 +3,8 @@ const memoryMap = new Map();
 const axios = require('axios')
 
 const models = [
-  "llama3-70b-8192",
- "llama3-8b-8192"
+  "llama-3.1-70b-versatile",
+  "llama-3.1-8b-instant"
 ]
 
 function delay(ms) {
