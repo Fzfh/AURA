@@ -58,11 +58,11 @@ module.exports = async function speak(sock, msg) {
     const senderId = msg.participant || msg.key.participant || msg.key.remoteJid;
     const isAdmin = participants.some(p => p.id === senderId && (p.admin === 'admin' || p.admin === 'superadmin'));
 
-    if (!isAdmin) {
-      return sock.sendMessage(sender, {
-        text: '❌ Maaf, fitur ini cuma bisa dipakai oleh admin grup ya~',
-      }, { quoted: msg });
-    }
+    // if (!isAdmin) {
+    //   return sock.sendMessage(sender, {
+    //     text: '❌ Maaf, fitur ini cuma bisa dipakai oleh admin grup ya~',
+    //   }, { quoted: msg });
+    // }
   }
 
   const content = msg.message?.conversation ||
