@@ -1,24 +1,21 @@
 const { adminList } = require('../../setting/setting');
 
-// 🛠️ Normalizer biar jid aneh jadi nomor asli
+// 🧠 Fungsi normalisasi nomor
 function getDisplayNumber(jid = '') {
   if (!jid) return 'unknown';
   let num = jid.split('@')[0];
-
-  // kalau udah 62xxxxx → biarin
   if (num.startsWith('62')) return num;
-  // kalau +62 ada tapi tanpa plus
   if (num.startsWith('8')) return '62' + num;
-  // kalau jid random (kayak 137xxx), tampilkan apa adanya
   return num;
 }
 
 async function handleStaticCommand(sock, msg, lowerText, body, ctx = {}) {
-  const { actualUserId, displayNumber } = ctx
-  const from = msg.key.remoteJid
+  const { actualUserId } = ctx;
+  const from = msg.key.remoteJid;
 
-  // // ✅ Ubah jadi nomor normal
-  // const displayNumber = getDisplayNumber(userId);
+  // 💡 Normalisasi nomor untuk tampilan
+  const displayNumber = getDisplayNumber(actualUserId);
+
   switch (lowerText) {
     case '/menu':
     case 'menu':
@@ -62,7 +59,7 @@ async function handleStaticCommand(sock, msg, lowerText, body, ctx = {}) {
 ┃ 🤖 *Info Bot*: \`beli bot\` / \`admin\`
 ┃ ❓ *Bantuan*: \`tutorial\` / \`tutor\`
 ╰──────────────────────╯`,
-          mentions: [actualUserId], // tetap JID asli buat mention
+          mentions: [actualUserId],
         },
         { quoted: msg }
       );
@@ -84,10 +81,7 @@ async function handleStaticCommand(sock, msg, lowerText, body, ctx = {}) {
 
 Halo  @${displayNumber}! 👋  
 Terima kasih telah menggunakan *AuraBot*.  
-Berikut ini panduan lengkap dan penjelasan fitur-fitur utama yang bisa kamu gunakan. Yuk kita mulai~
-
-(isi tutor panjang seperti sebelumnya)
-`,
+Berikut ini panduan lengkap dan penjelasan fitur-fitur utama yang bisa kamu gunakan. Yuk kita mulai~`,
           mentions: [actualUserId],
         },
         { quoted: msg }
